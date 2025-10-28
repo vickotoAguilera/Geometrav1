@@ -36,6 +36,7 @@ const AuthButton = () => {
     const auth = useAuth();
 
     const handleSignIn = async () => {
+        if (!auth) return;
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(auth, provider);
@@ -45,6 +46,7 @@ const AuthButton = () => {
     };
 
     const handleSignOut = async () => {
+        if (!auth) return;
         try {
             await signOut(auth);
         } catch (error) {
@@ -53,13 +55,14 @@ const AuthButton = () => {
     };
 
     if (isUserLoading) {
-        return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />;
+        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
     }
 
     if (!user) {
         return (
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full" onClick={handleSignIn}>
-                <GoogleIcon className="h-6 w-6" />
+            <Button variant="outline" size="icon" onClick={handleSignIn}>
+                <GoogleIcon className="h-5 w-5" />
+                 <span className="sr-only">Iniciar sesión con Google</span>
             </Button>
         );
     }
@@ -67,8 +70,8 @@ const AuthButton = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-8 w-8">
+          <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+            <Avatar className="h-9 w-9">
               <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'Usuario'} />
               <AvatarFallback>
                 <UserIcon className="h-5 w-5" />
@@ -101,9 +104,9 @@ const AIChatButton = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost">
+        <Button>
             <Bot className="mr-2 h-5 w-5" />
-            Asistente Geometra
+            Asistente
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
@@ -126,9 +129,9 @@ export default function Header() {
             </span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <AuthButton />
+        <div className="flex flex-1 items-center justify-end space-x-2">
           <AIChatButton />
+          <AuthButton />
         </div>
       </div>
     </header>
