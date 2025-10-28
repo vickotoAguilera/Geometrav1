@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {googleAI} from '@genkit-ai/google-genai';
+import {Part} from 'genkit';
 import {z} from 'genkit';
 
 const MessageSchema = z.object({
@@ -41,23 +42,27 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
-    
-    const history = input.history || [];
     const model = googleAI.model('gemini-2.5-flash');
+    
+    // Start with the existing history
+    const history = input.history || [];
 
-    const promptParts = [
-        `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.`,
-        `User Query: ${input.query}`
-    ];
-
+    // Construct the new user message content
+    const newUserContent: Part[] = [{ text: input.query }];
     if (input.photoDataUri) {
-        promptParts.splice(1, 0, `Photo Analysis: {{media url=${input.photoDataUri}}}`);
+      newUserContent.push({ media: { url: input.photoDataUri } });
     }
+
+    // Add the new user message to the history
+    history.push({
+      role: 'user',
+      content: newUserContent
+    });
     
     const {output} = await ai.generate({
         model: model,
-        history: history,
-        prompt: promptParts.join('\n\n'),
+        history: history, // Pass the full history including the new message
+        prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.`,
         output: {
             schema: MathAssistantOutputSchema
         }
