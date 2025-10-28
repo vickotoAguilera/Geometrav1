@@ -15,7 +15,7 @@ import {
 import { LogOut, User as UserIcon, Bot } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import AIChat from "./ai-chat";
+import { ChatAssistant } from "./chat-assistant";
 
 // SVG para el icono de Google
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -72,8 +72,8 @@ const AIChatButton = () => {
             Asistente Geometra
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col">
-        <AIChat />
+      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+        <ChatAssistant />
       </SheetContent>
     </Sheet>
   );

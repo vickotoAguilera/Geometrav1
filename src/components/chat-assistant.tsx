@@ -3,16 +3,15 @@
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { getAiResponse, getInitialPrompts } from '@/app/actions';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetDescription,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bot, User, Send, CornerDownLeft } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Bot, User, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -28,36 +27,47 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const fetchInitialPrompts = async () => {
-    const { examplePrompts } = await getInitialPrompts();
-    setMessages([
-      {
-        id: Date.now(),
-        role: 'system',
-        content: (
-          <div className="space-y-2">
-            <p className="font-medium">
-              ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy?
-              Aquí tienes algunas ideas:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {examplePrompts.slice(0, 4).map((prompt, i) => (
-                <Button
-                  key={i}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handlePromptClick(prompt)}
-                  className="text-xs h-auto py-1 px-2"
-                >
-                  {prompt}
-                </Button>
-              ))}
+    try {
+      const { examplePrompts } = await getInitialPrompts();
+      setMessages([
+        {
+          id: Date.now(),
+          role: 'system',
+          content: (
+            <div className="space-y-2">
+              <p className="font-medium">
+                ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy?
+                Aquí tienes algunas ideas:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {examplePrompts.slice(0, 4).map((prompt, i) => (
+                  <Button
+                    key={i}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePromptClick(prompt)}
+                    className="text-xs h-auto py-1 px-2"
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
-        ),
-      },
-    ]);
+          ),
+        },
+      ]);
+    } catch (error) {
+       setMessages([
+        {
+          id: Date.now(),
+          role: 'system',
+          content: 'Error al cargar las sugerencias. Por favor, escribe tu consulta.',
+        },
+      ]);
+    }
   };
 
   useEffect(() => {
@@ -65,8 +75,8 @@ export function ChatAssistant() {
   }, []);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    if (viewportRef.current) {
+      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -109,15 +119,18 @@ export function ChatAssistant() {
   };
 
   return (
-    <Card className="w-full h-[60vh] flex flex-col shadow-2xl">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-headline">
-          <Bot /> Asistente Matemático
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
+    <>
+      <SheetHeader className="p-4 border-b">
+        <SheetTitle className="font-headline flex items-center gap-2">
+            <Bot /> Asistente Geometra
+        </SheetTitle>
+        <SheetDescription>
+            Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.
+        </SheetDescription>
+      </SheetHeader>
+
+      <ScrollArea className="flex-1" ref={scrollAreaRef}>
+        <div className="p-4 space-y-6" ref={viewportRef}>
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -126,14 +139,14 @@ export function ChatAssistant() {
                   message.role === 'user' && 'justify-end'
                 )}
               >
-                {message.role === 'assistant' && (
-                  <Avatar className="w-8 h-8">
+                {message.role !== 'user' && (
+                  <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
                       <Bot className="w-5 h-5" />
                     </AvatarFallback>
                   </Avatar>
                 )}
-                {message.role === 'system' ? (
+                 {message.role === 'system' ? (
                   <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
                     {message.content}
                   </div>
@@ -150,7 +163,7 @@ export function ChatAssistant() {
                   </div>
                 )}
                 {message.role === 'user' && (
-                  <Avatar className="w-8 h-8">
+                  <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
                       <User className="w-5 h-5" />
                     </AvatarFallback>
@@ -159,34 +172,38 @@ export function ChatAssistant() {
               </div>
             ))}
             {isPending && (
-              <div className="flex items-start gap-3">
-                <Avatar className="w-8 h-8">
+               <div className="flex items-start gap-3">
+                <Avatar className="w-8 h-8 border">
                   <AvatarFallback>
                     <Bot className="w-5 h-5" />
                   </AvatarFallback>
                 </Avatar>
-                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full">
-                  <Skeleton className="h-4 w-1/4" />
+                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
                 </div>
               </div>
             )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-      <CardFooter>
-        <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe tu pregunta de matemáticas..."
-            disabled={isPending}
-          />
-          <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Enviar</span>
-          </Button>
-        </form>
-      </CardFooter>
-    </Card>
+        </div>
+      </ScrollArea>
+
+      <SheetFooter className="p-4 border-t">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full items-center space-x-2"
+          >
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Escribe tu pregunta..."
+              disabled={isPending}
+            />
+            <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
+              <Send className="w-4 h-4" />
+              <span className="sr-only">Enviar</span>
+            </Button>
+          </form>
+      </SheetFooter>
+    </>
   );
 }
