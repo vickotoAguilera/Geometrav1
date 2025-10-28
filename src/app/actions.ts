@@ -27,10 +27,8 @@ async function getSdks(firebaseApp: FirebaseApp) {
 
 // This is a simplified server-side init.
 async function getFirebaseForServer() {
-  if (!getApps().length) {
-    initializeApp(firebaseConfig);
-  }
-  return getSdks(getApps()[0]);
+  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  return getSdks(app);
 }
 
 export async function getAiResponse(
@@ -55,9 +53,10 @@ export async function uploadAndProcessDocument(
   // 1. Extract text using Genkit flow
   const { textContent } = await processDocument({ fileDataUri });
 
-  // 2. Upload original file to Firebase Storage
+  // 2. Upload original file to Firebase Storage from the server
   const storagePath = `userDocuments/${userId}/${Date.now()}_${fileName}`;
   const storageRef = ref(storage, storagePath);
+  // This upload now happens on the server, bypassing client-side CORS issues.
   await uploadString(storageRef, fileDataUri, 'data_url');
   
   // 3. Save metadata and extracted text to Firestore
