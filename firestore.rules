@@ -1,78 +1,90 @@
 /**
- * @fileoverview Firestore Security Rules for the Geometra application.
+ * @file Firestore Security Rules for Geometra Application
  *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for user profiles and their associated assistance requests.
- * GeoGebra applets are publicly readable.
- *
- * Data Structure:
- * - /users/{userId}: Stores user profiles, accessible only to the user themselves.
- * - /users/{userId}/messages/{messageId}: Stores assistance requests (messages) for each user, accessible only to that user.
- * - /geoGebraApplets/{appletId}: Stores GeoGebra applets, publicly readable.
- *
- * Key Security Decisions:
- * - Users can only access their own profile and messages.
- * - GeoGebra applets are publicly readable, but write access is not defined in the IR, therefore it is denied.
- * - Listing of users is not allowed.
- *
- * Denormalization for Authorization:
- *  - The `userId` is taken from the path and doesn't need to be stored inside the message document, as the path-based rules secure each `messageId` document.
+ * @core_philosophy This ruleset enforces a strict user-ownership model for user profiles and their associated assistance requests. GeoGebra applets are publicly readable.
+ * @data_structure User profiles are stored under `/users/{userId}`, and their assistance requests are stored in a subcollection `/users/{userId}/messages/{messageId}`. GeoGebra applets are stored under `/geoGebraApplets/{appletId}`.
+ * @key_security_decisions
+ *   - Users can only access their own profiles and messages.
+ *   - GeoGebra applets are publicly readable.
+ *   - User listing is not allowed.
+ * @denormalization Not applicable. The current structure relies on path-based authorization.
+ * @structural_segregation User data and public applet data are stored in separate top-level collections to enforce different access controls.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures the user profile collection, ensuring only the authenticated user can read/write their own profile.
+     * @description Enforces access control for user profiles. Users can only read and write their own profile data.
      * @path /users/{userId}
-     * @allow (read, write) if the authenticated user's ID matches the userId in the path.
-     * @deny (read, write) if the authenticated user's ID does not match the userId in the path.
+     * @allow (create) User with ID 'user123' creates their profile. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' reads their profile. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' updates their profile. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' deletes their profile. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' attempts to create a profile for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' attempts to read the profile of 'user123'. request.auth.uid != 'user123'
+     * @deny (update) User with ID 'user456' attempts to update the profile of 'user123'. request.auth.uid != 'user123'
+     * @deny (delete) User with ID 'user456' attempts to delete the profile of 'user123'. request.auth.uid != 'user123'
      * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      allow read, write: if isSignedIn() && isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if false; // User listing is not permitted.
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Secures the messages subcollection, ensuring only the authenticated user can read/write their own messages.
+     * @description Enforces access control for assistance requests (messages) within a user's subcollection. Users can only manage their own messages.
      * @path /users/{userId}/messages/{messageId}
-     * @allow (read, write) if the authenticated user's ID matches the userId in the path.
-     * @deny (read, write) if the authenticated user's ID does not match the userId in the path.
-     * @principle Enforces document ownership for all operations within the messages subcollection.
+     * @allow (create) User with ID 'user123' creates a message. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' reads their own message. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' updates their own message. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' deletes their own message. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' attempts to create a message for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' attempts to read a message from 'user123'. request.auth.uid != 'user123'
+     * @deny (update) User with ID 'user456' attempts to update a message from 'user123'. request.auth.uid != 'user123'
+     * @deny (delete) User with ID 'user456' attempts to delete a message from 'user123'. request.auth.uid != 'user123'
+     * @principle Restricts access to a user's own messages.
      */
     match /users/{userId}/messages/{messageId} {
-      allow read, write: if isSignedIn() && isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows anyone to read the GeoGebra applets, but restricts creation, updates, and deletion.
+     * @description Allows public read access to GeoGebra applets. Only authenticated users can create, update, and delete applets.
      * @path /geoGebraApplets/{appletId}
-     * @allow (get, list) to anyone.
-     * @deny (create, update, delete) to everyone.
-     * @principle Allows public read access while restricting write access.
+     * @allow (get) Any user (authenticated or not) reads a GeoGebra applet.
+     * @allow (list) Any user (authenticated or not) lists GeoGebra applets.
+     * @deny (create) An unauthenticated user attempts to create a GeoGebra applet. request.auth == null
+     * @deny (update) An unauthenticated user attempts to update a GeoGebra applet. request.auth == null
+     * @deny (delete) An unauthenticated user attempts to delete a GeoGebra applet. request.auth == null
+     * @principle Grants public read access while restricting write access to authenticated users.
      */
     match /geoGebraApplets/{appletId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
     }
+  }
 
-    // --- Helper Functions ---
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
 
-    /**
-     * @description Checks if the user is signed in.
-     * @return {bool} True if the user is signed in, false otherwise.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
 
-    /**
-     * @description Checks if the authenticated user is the owner of the resource, based on the userId.
-     * @param {string} userId The user ID to compare against the authenticated user's ID.
-     * @return {bool} True if the authenticated user is the owner, false otherwise.
-     */
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
+  function isExistingOwner(userId) {
+    return isOwner(userId) && resource != null;
   }
 }
