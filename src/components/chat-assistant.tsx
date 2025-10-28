@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { 
   getAiResponse, 
   getInitialPrompts, 
-  processDocument,
-  getSignedUploadUrl,
-  saveDocumentMetadata
+  uploadAndProcessDocument
 } from '@/app/actions';
 import {
   SheetHeader,
@@ -36,9 +34,8 @@ interface Message {
 
 interface DocumentPreview {
   name: string;
-  dataUri: string;
   type: string;
-  file: File;
+  dataUri: string;
 }
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
@@ -147,7 +144,7 @@ export function ChatAssistant() {
           setImagePreview(dataUri);
           setDocumentPreview(null);
         } else {
-          setDocumentPreview({ name: file.name, dataUri, type: file.type, file });
+          setDocumentPreview({ name: file.name, dataUri, type: file.type });
           setImagePreview(null);
         }
       };
@@ -183,34 +180,14 @@ export function ChatAssistant() {
         let aiResponseContent = '';
         if (currentDocument && user) {
           try {
-             // 1. Process document to get text content
-            const { textContent } = await processDocument({ fileDataUri: currentDocument.dataUri });
-
-            // 2. Get a signed URL for upload
-            const { uploadUrl, storagePath } = await getSignedUploadUrl(currentDocument.name, user.uid, currentDocument.type);
-
-            // 3. Upload the file from the client using the signed URL
-            const uploadResponse = await fetch(uploadUrl, {
-                method: 'PUT',
-                body: currentDocument.file,
-                headers: {
-                    'Content-Type': currentDocument.type,
-                },
-            });
-
-            if (!uploadResponse.ok) {
-                throw new Error('File upload failed.');
-            }
-            
-            // 4. Save metadata to Firestore
-            await saveDocumentMetadata(user.uid, currentDocument.name, storagePath, textContent);
+            const fileContentBase64 = currentDocument.dataUri.split(',')[1];
+            const { textContent } = await uploadAndProcessDocument(fileContentBase64, currentDocument.name, currentDocument.type, user.uid);
             
             toast({
               title: "Archivo procesado",
               description: `Se ha analizado "${currentDocument.name}" y se ha guardado en tu biblioteca de ejercicios.`,
             });
             
-            // 5. Ask AI about the document
             const documentContextQuery = `Analiza el siguiente texto extraído del documento "${currentDocument.name}" y luego responde a mi pregunta.\n\nContenido del documento:\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
             const { response } = await getAiResponse(documentContextQuery);
             aiResponseContent = response;
@@ -388,4 +365,3 @@ export function ChatAssistant() {
     </>
   );
 }
-    

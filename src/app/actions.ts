@@ -9,7 +9,7 @@ import {
   processDocument,
   ProcessDocumentOutput,
 } from '@/ai/flows/process-document';
-import { getStorage, ref, getSignedUrl } from 'firebase/storage';
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
@@ -17,7 +17,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
 // Helper function to initialize Firebase on the server if not already done.
-// This ensures we have a single instance.
+// This ensures we have a single instance and uses the correct config.
 function getFirebaseForServer() {
   if (getApps().length > 0) {
     const app = getApp();
@@ -50,40 +50,34 @@ export async function getInitialPrompts(): Promise<GetStartedPromptOutput> {
   return await getStartedPrompt();
 }
 
-export async function getSignedUploadUrl(
+export async function uploadAndProcessDocument(
+  fileDataUri: string,
   fileName: string,
-  userId: string,
-  contentType: string
-): Promise<{ uploadUrl: string; storagePath: string }> {
-  const { storage } = getFirebaseForServer();
+  userId: string
+): Promise<{ documentId: string }> {
+  const { storage, firestore } = getFirebaseForServer();
+
+  // 1. Convert Data URI to buffer for upload and processing
+  const [, mimeType, , fileContent] = /^data:(.+);(charset=.+;)?base64,(.*)$/.exec(fileDataUri) ?? [];
+  if (!mimeType || !fileContent) {
+    throw new Error('Invalid Data URI format.');
+  }
+  const buffer = Buffer.from(fileContent, 'base64');
+
+  // 2. Upload file to Firebase Storage
   const storagePath = `userDocuments/${userId}/${Date.now()}_${fileName}`;
   const storageRef = ref(storage, storagePath);
+  await uploadBytes(storageRef, buffer, { contentType: mimeType });
 
-  const uploadUrl = await getSignedUrl(storageRef, {
-    action: 'write',
-    expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-    contentType: contentType,
-  });
-
-  return { uploadUrl, storagePath };
-}
-
-export async function saveDocumentMetadata(
-  userId: string,
-  fileName: string,
-  storagePath: string,
-  textContent: string
-): Promise<{ documentId: string }> {
-  const { firestore } = getFirebaseForServer();
-
-  // 1. Extract text using Genkit flow
-  const processedDoc = await processDocument({ fileDataUri: `data:${fileName};base64,` });
-
+  // 3. Extract text content using Genkit flow
+  const { textContent } = await processDocument({ fileDataUri });
+  
+  // 4. Save metadata to Firestore
   const docData = {
     userId,
     fileName,
     storagePath,
-    textContent: processedDoc.textContent,
+    textContent: textContent,
     createdAt: serverTimestamp(),
   };
 
