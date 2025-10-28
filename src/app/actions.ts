@@ -26,9 +26,31 @@ async function getSdks(firebaseApp: FirebaseApp) {
 }
 
 // This is a simplified server-side init.
+// It uses the automatic initialization provided by Firebase App Hosting.
 async function getFirebaseForServer() {
-  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  return getSdks(app);
+  if (getApps().length > 0) {
+    return getSdks(getApp());
+  }
+
+  // When running on the server, we can leverage App Hosting's automatic
+  // configuration. It's crucial to try this first.
+  try {
+    const app = initializeApp();
+    return getSdks(app);
+  } catch (e) {
+    // If automatic init fails (e.g., local dev without env vars),
+    // fall back to the config file.
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Automatic server-side Firebase initialization failed, falling back to firebaseConfig. This is normal for local development.');
+      const app = initializeApp(firebaseConfig);
+      return getSdks(app);
+    } else {
+      console.error('CRITICAL: Automatic server-side Firebase initialization failed in production.', e);
+      // In a real production scenario, you might want to throw an error
+      // or have more robust error handling.
+      throw e;
+    }
+  }
 }
 
 export async function getAiResponse(
