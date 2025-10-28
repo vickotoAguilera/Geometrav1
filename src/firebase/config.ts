@@ -1,9 +1,9 @@
 export const firebaseConfig = {
-  "projectId": "studio-1195079921-d488c",
-  "appId": "1:1055885226453:web:c6f39dc1222057e85dcd5c",
-  "apiKey": "AIzaSyCGgzq-uZ5qtZuQjdC0Zq4cX3bBGVXkZhM",
-  "authDomain": "studio-1195079921-d488c.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "1055885226453",
-  "storageBucket": "studio-1195079921-d488c.appspot.com"
+  "apiKey": "AIzaSyCAmqE1-QKZqJJ59zyHgwhg7szwFffZbcg",
+  "authDomain": "geogebra-476523.firebaseapp.com",
+  "projectId": "geogebra-476523",
+  "storageBucket": "geogebra-476523.appspot.com",
+  "messagingSenderId": "929725972973",
+  "appId": "1:929725972973:web:43969e5859f54ef8b2a7e4",
+  "measurementId": "G-4517Z1F1CS"
 };
