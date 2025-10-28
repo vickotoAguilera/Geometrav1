@@ -14,7 +14,7 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase, getSdks } from '@/firebase';
+import { getSdks, initializeFirebase } from '@/firebase';
 
 interface Message {
   role: 'user' | 'model';
