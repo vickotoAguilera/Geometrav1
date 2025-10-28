@@ -3,8 +3,7 @@
 import { useState, useRef } from 'react';
 import Header from '@/components/header';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, serverTimestamp, addDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes } from 'firebase/storage';
+import { collection, query, where } from 'firebase/firestore';
 import { Upload, FileText, Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,7 +44,7 @@ const DocumentList = ({ documents }: { documents: UserDocument[] }) => (
                 </CardHeader>
                 <CardContent>
                     <p className="text-xs text-muted-foreground">
-                        Subido: {doc.createdAt.toDate().toLocaleDateString()}
+                        Subido: {doc.createdAt ? doc.createdAt.toDate().toLocaleDateString() : 'Fecha no disponible'}
                     </p>
                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100">
                         <Trash2 className="h-4 w-4 text-destructive" />

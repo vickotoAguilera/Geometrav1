@@ -9,18 +9,20 @@ import {
   processDocument,
   ProcessDocumentOutput,
 } from '@/ai/flows/process-document';
-import {
-  getStorage,
-  ref,
-  uploadString,
-  getDownloadURL,
-} from 'firebase/storage';
+import { getStorage, ref, uploadString } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getSdks } from '@/firebase'; // Assuming getSdks is available for server-side use
+import { initializeApp, getApps } from 'firebase/app';
+import { firebaseConfig } from '@/firebase/config';
 
 // This is a simplified server-side init. In a real app, you'd share this.
 function getFirebaseForServer() {
-  return getSdks(globalThis.firebaseApp);
+  if (!getApps().length) {
+    initializeApp(firebaseConfig);
+  }
+  // This is a simplified way to get the SDKs on the server.
+  // In a real app, you'd likely have a shared admin initialization.
+  return getSdks(getApps()[0]);
 }
 
 export async function getAiResponse(
