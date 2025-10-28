@@ -128,7 +128,7 @@ export function ChatAssistant() {
     setInput(prompt);
   };
 
-  const saveMessage = (role: 'user' | 'assistant', content: string) => {
+  const saveMessage = (role: 'user' | 'assistant', content: string | React.ReactNode) => {
     if (!messagesRef) return;
     const messageData = {
       userId: user?.uid,
@@ -171,11 +171,39 @@ export function ChatAssistant() {
     const currentImage = imagePreview;
     const currentDocument = documentPreview;
 
-    let userMessage = currentInput;
-    if(currentImage) userMessage += "\n[Imagen adjunta]";
-    if(currentDocument) userMessage += `\n[Archivo adjunto: ${currentDocument.name}]`;
+    let userMessageContent: React.ReactNode = currentInput;
     
-    saveMessage('user', userMessage);
+    // Create a combined display message for the UI
+    if (currentImage && currentDocument) {
+        userMessageContent = (
+            <div>
+                {currentInput}
+                <div className="mt-2 text-xs text-right italic">
+                    [Imagen y archivo adjuntos]
+                </div>
+            </div>
+        );
+    } else if (currentImage) {
+        userMessageContent = (
+            <div>
+                {currentInput}
+                <div className="mt-2 text-xs text-right italic">
+                    [Imagen adjunta]
+                </div>
+            </div>
+        );
+    } else if (currentDocument) {
+        userMessageContent = (
+            <div>
+                {currentInput}
+                <div className="mt-2 text-xs text-right italic">
+                    [Archivo adjunto: {currentDocument.name}]
+                </div>
+            </div>
+        );
+    }
+
+    saveMessage('user', userMessageContent);
     
     setInput('');
     resetAttachments();
@@ -185,7 +213,7 @@ export function ChatAssistant() {
         let aiQuery = currentInput;
         
         const history: GenkitMessage[] = messages
-          .filter(m => typeof m.content === 'string')
+          .filter(m => typeof m.content === 'string') // Only include text messages in history
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content as string }],
@@ -198,7 +226,15 @@ export function ChatAssistant() {
               title: "Archivo analizado",
               description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre su contenido.`,
             });
+            // Prepend context to the query for the AI
             aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
+            
+            // Also add the document content as a "user" message in the history for conversation memory
+            history.push({
+              role: 'user',
+              content: [{ text: `He adjuntado un documento. Su contenido es:\n${textContent}` }]
+            });
+
           } catch (docError) {
             console.error("Error processing document:", docError);
             saveMessage('assistant', `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`);
@@ -288,10 +324,12 @@ export function ChatAssistant() {
                 )}
                   <div
                     className={cn(
-                      'p-3 rounded-lg max-w-[80%] text-sm whitespace-pre-wrap',
+                      'p-3 rounded-lg max-w-[80%] text-sm',
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
+                        : 'bg-muted text-muted-foreground',
+                      // whitespace-pre-wrap is good for text but can mess up layout for ReactNodes
+                      typeof message.content === 'string' ? 'whitespace-pre-wrap' : ''
                     )}
                   >
                     {message.content}
