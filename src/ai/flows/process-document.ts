@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileoverview A Genkit flow for processing uploaded documents (PDF, TXT)
+ * @fileoverview A Genkit flow for processing uploaded documents (PDF, TXT, DOCX)
  * and extracting their text content.
  *
  * - processDocument - A flow that takes a file's data URI and extracts text.
@@ -12,6 +12,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import pdf from 'pdf-parse';
+import mammoth from 'mammoth';
 
 const ProcessDocumentInputSchema = z.object({
   fileDataUri: z.string().describe(
@@ -54,9 +55,10 @@ const processDocumentFlow = ai.defineFlow(
         textContent = data.text;
       } else if (MimeType.startsWith('text/')) {
         textContent = buffer.toString('utf-8');
+      } else if (MimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const { value } = await mammoth.extractRawText({ buffer });
+        textContent = value;
       } else {
-        // Placeholder for other file types like .doc, .docx
-        // You might need libraries like 'mammoth' for docx
         textContent = `[Contenido de tipo ${MimeType} no se puede procesar todavía.]`;
       }
     } catch (error) {
