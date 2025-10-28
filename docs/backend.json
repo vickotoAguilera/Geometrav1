@@ -125,21 +125,21 @@
         }
       },
       {
-        "path": "/users/{userId}/assistanceRequests/{requestId}",
+        "path": "/users/{userId}/messages/{messageId}",
         "definition": {
           "entityName": "AssistanceRequest",
           "schema": {
             "$ref": "#/backend/entities/AssistanceRequest"
           },
-          "description": "Stores assistance requests associated with each user. Path-based ownership enforced by requiring `request.auth.uid == userId`.",
+          "description": "Stores assistance requests (messages) associated with each user. Path-based ownership enforced by requiring `request.auth.uid == userId`.",
           "params": [
             {
               "name": "userId",
               "description": "The unique identifier for the user."
             },
             {
-              "name": "requestId",
-              "description": "The unique identifier for the assistance request."
+              "name": "messageId",
+              "description": "The unique identifier for the message."
             }
           ]
         }
@@ -161,6 +161,7 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to provide a secure and scalable solution for the Geometra application, focusing on user data and assistance requests. The structure prioritizes authorization independence by avoiding hierarchical dependencies in security rules.  It also supports QAPs using path-based ownership, ensuring secure list operations.\n\n1.  **Users Collection:** The `/users/{userId}` collection stores user profiles. This adheres to the path-based ownership principle, ensuring that only the user can access their own data. This is the root level of private user data.\n2.  **Assistance Requests Subcollection:** The `/users/{userId}/assistanceRequests/{requestId}` subcollection stores assistance requests associated with each user. This continues the path-based ownership pattern, making security rules straightforward and efficient. The userId is implicitly associated and enforced by the path. The userId is not duplicated inside the document.\n\nThis design achieves Authorization Independence by using path-based ownership. Security rules can directly check `request.auth.uid` against the `{userId}` path parameter without needing to read any parent documents.  This structure supports required QAPs since list operations on `/users/{userId}/assistanceRequests` are secured via the path, allowing listing only by the authenticated user."
+    "reasoning": "The Firestore structure is designed to provide a secure and scalable solution for the Geometra application, focusing on user data and assistance requests. The structure prioritizes authorization independence by avoiding hierarchical dependencies in security rules.  It also supports QAPs using path-based ownership, ensuring secure list operations.\n\n1.  **Users Collection:** The `/users/{userId}` collection stores user profiles. This adheres to the path-based ownership principle, ensuring that only the user can access their own data. This is the root level of private user data.\n2.  **Messages Subcollection:** The `/users/{userId}/messages/{messageId}` subcollection stores chat messages associated with each user. This continues the path-based ownership pattern, making security rules straightforward and efficient. The userId is implicitly associated and enforced by the path. The userId is not duplicated inside the document.\n\nThis design achieves Authorization Independence by using path-based ownership. Security rules can directly check `request.auth.uid` against the `{userId}` path parameter without needing to read any parent documents.  This structure supports required QAPs since list operations on `/users/{userId}/messages` are secured via the path, allowing listing only by the authenticated user."
   }
 }
+    
