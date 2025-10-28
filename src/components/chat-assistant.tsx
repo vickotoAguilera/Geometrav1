@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { 
-  getAiResponse, 
-  getInitialPrompts, 
-  uploadAndProcessDocument
+import {
+  getAiResponse,
+  getInitialPrompts,
+  processDocument,
 } from '@/app/actions';
 import {
   SheetHeader,
@@ -23,7 +23,6 @@ import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebas
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-
 
 interface Message {
   id: string;
@@ -180,15 +179,11 @@ export function ChatAssistant() {
         let aiResponseContent = '';
         if (currentDocument && user) {
           try {
-             const { documentId, textContent } = await uploadAndProcessDocument(
-              currentDocument.dataUri,
-              currentDocument.name,
-              user.uid
-            );
+             const { textContent } = await processDocument(currentDocument.dataUri);
             
             toast({
-              title: "Archivo procesado",
-              description: `Se ha analizado "${currentDocument.name}" y se ha guardado en tu biblioteca de ejercicios.`,
+              title: "Archivo analizado",
+              description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre su contenido.`,
             });
             
             const documentContextQuery = `Analiza el siguiente texto extraído del documento "${currentDocument.name}" y luego responde a mi pregunta.\n\nContenido del documento:\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
@@ -198,6 +193,11 @@ export function ChatAssistant() {
           } catch (docError) {
              console.error("Error processing document:", docError);
              aiResponseContent = `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`;
+             toast({
+                variant: "destructive",
+                title: "Error al procesar",
+                description: "Hubo un problema al analizar tu archivo.",
+            });
           }
         } else {
           const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
@@ -236,7 +236,7 @@ export function ChatAssistant() {
             <Bot /> Asistente Geometra
         </SheetTitle>
         <SheetDescription>
-            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra. Puedes adjuntar imágenes o documentos.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
