@@ -12,6 +12,9 @@ import {z} from 'genkit';
 
 const MathAssistantInputSchema = z.object({
   query: z.string().describe('The user query related to math or Geogebra.'),
+  photoDataUri: z.string().optional().describe(
+    "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+  ),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
 
@@ -28,7 +31,16 @@ const prompt = ai.definePrompt({
   name: 'mathAssistantPrompt',
   input: {schema: MathAssistantInputSchema},
   output: {schema: MathAssistantOutputSchema},
-  prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Respond to the user query with accurate and helpful information.\n\nUser Query: {{{query}}}`,
+  prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. 
+  
+  If a photo is provided, analyze it first. Describe the mathematical content you see in the image (equations, geometric figures, text problems, etc.). Then, using that analysis and the user's query, provide an accurate and helpful response.
+
+  {{#if photoDataUri}}
+  Photo Analysis:
+  {{media url=photoDataUri}}
+  {{/if}}
+
+  User Query: {{{query}}}`,
 });
 
 const mathAssistantFlow = ai.defineFlow(

@@ -7,9 +7,10 @@ import {
 } from '@/ai/flows/get-started-prompt';
 
 export async function getAiResponse(
-  query: string
+  query: string,
+  photoDataUri?: string
 ): Promise<MathAssistantOutput> {
-  return await mathAssistant({ query });
+  return await mathAssistant({ query, photoDataUri });
 }
 
 export async function getInitialPrompts(): Promise<GetStartedPromptOutput> {

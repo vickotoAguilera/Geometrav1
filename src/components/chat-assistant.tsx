@@ -11,12 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send } from 'lucide-react';
+import { Bot, User, Send, Paperclip, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
+import Image from 'next/image';
+
 
 interface Message {
   id: string;
@@ -78,6 +80,8 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
@@ -114,23 +118,41 @@ export function ChatAssistant() {
       content,
       createdAt: serverTimestamp(),
     };
-    addDocumentNonBlocking(messagesRef, messageData);
+    // No-blocking write
+    addDoc(messagesRef, messageData).catch(err => console.error("Failed to save message", err));
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) return;
+    if ((!input.trim() && !imagePreview) || isPending || !user) return;
 
     const currentInput = input;
+    const currentImage = imagePreview;
+
+    saveMessage('user', currentInput + (currentImage ? "\n[Imagen adjunta]" : ""));
+    
     setInput('');
-    saveMessage('user', currentInput);
+    setImagePreview(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+
 
     startTransition(async () => {
       try {
-        const { response } = await getAiResponse(currentInput);
+        const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
         saveMessage('assistant', response);
       } catch (error) {
-        saveMessage('assistant', 'Lo siento, ocurrió un error. Por favor, intenta de nuevo.');
+        saveMessage('assistant', 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');
       }
     });
   };
@@ -202,7 +224,7 @@ export function ChatAssistant() {
                 )}
                   <div
                     className={cn(
-                      'p-3 rounded-lg max-w-[80%] text-sm',
+                      'p-3 rounded-lg max-w-[80%] text-sm whitespace-pre-wrap',
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-muted-foreground'
@@ -236,22 +258,57 @@ export function ChatAssistant() {
         </div>
       </ScrollArea>
 
-      <SheetFooter className="p-4 border-t">
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full items-center space-x-2"
-          >
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
-              disabled={isPending || !user}
-            />
-            <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
-              <Send className="w-4 h-4" />
-              <span className="sr-only">Enviar</span>
-            </Button>
-          </form>
+      <SheetFooter className="p-4 border-t bg-background">
+          <div className="w-full">
+            {imagePreview && (
+              <div className="mb-2 relative w-24 h-24 rounded-md overflow-hidden border">
+                <Image src={imagePreview} alt="Vista previa" layout="fill" objectFit="cover" />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6"
+                  onClick={() => {
+                    setImagePreview(null);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full items-center space-x-2"
+            >
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                onChange={handleFileChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
+              <Button 
+                type="button" 
+                size="icon" 
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending || !user}
+              >
+                <Paperclip className="w-4 h-4" />
+                <span className="sr-only">Adjuntar imagen</span>
+              </Button>
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
+                disabled={isPending || !user}
+              />
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !imagePreview) || !user}>
+                <Send className="w-4 h-4" />
+                <span className="sr-only">Enviar</span>
+              </Button>
+            </form>
+          </div>
       </SheetFooter>
     </>
   );
