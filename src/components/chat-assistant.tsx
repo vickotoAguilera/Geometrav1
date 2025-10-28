@@ -137,22 +137,25 @@ export function ChatAssistant() {
     setInput(prompt);
   };
 
-  const saveMessage = (role: 'user' | 'assistant', content: string) => {
-    if (!messagesRef) return;
+  const saveMessage = async (role: 'user' | 'assistant', content: string, fileInfo?: FileInfo) => {
+    if (!messagesRef || !user) return;
     const messageData = {
-      userId: user?.uid,
+      userId: user.uid,
       role,
       content,
       createdAt: serverTimestamp(),
+      ...(fileInfo && { fileInfo }),
     };
-    addDoc(messagesRef, messageData).catch(err => {
+    try {
+      await addDoc(messagesRef, messageData);
+    } catch(err) {
       console.error("Failed to save message", err);
       toast({
         variant: "destructive",
         title: "Error de guardado",
         description: "No se pudo guardar el mensaje en la base de datos."
       });
-    });
+    }
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,10 +197,11 @@ export function ChatAssistant() {
       try {
         let aiQuery = currentInput;
         let finalImageUri = currentImage;
+        let userMessageContent = currentInput;
 
-        // Start with the existing message history
+        // Start with the existing message history, correctly formatted
         const history: GenkitMessage[] = messages
-          .filter(m => typeof m.content === 'string') // Use only text messages for history
+          .filter(m => typeof m.content === 'string') // Ensure content is a string
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content }],
@@ -206,7 +210,7 @@ export function ChatAssistant() {
         // Handle file upload and processing
         if (currentDocument) {
           toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
-          const { textContent, downloadUrl } = await uploadAndProcessDocument(
+          const { textContent, downloadUrl, storagePath } = await uploadAndProcessDocument(
             currentDocument.dataUri,
             currentDocument.name,
             currentDocument.type,
@@ -218,28 +222,30 @@ export function ChatAssistant() {
             description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre él.`,
           });
           
+          userMessageContent = `Adjunto el documento "${currentDocument.name}".\n\n${currentInput || 'Por favor, resume el contenido del documento.'}`;
           aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
           
-          history.push({
-            role: 'user',
-            content: [{ text: `He adjuntado el documento "${currentDocument.name}". Su contenido es:\n${textContent}` }]
+          await saveMessage('user', userMessageContent, {
+            name: currentDocument.name,
+            type: currentDocument.type,
+            downloadUrl,
+            path: storagePath,
           });
 
         } else if (currentImage) {
-           // For images, we just save the user message text. The image URI is passed separately.
-           saveMessage('user', currentInput || '[Imagen adjunta]');
+           userMessageContent = currentInput || '[Imagen adjunta]';
+           await saveMessage('user', userMessageContent);
         } else {
-          // Regular text message
-          saveMessage('user', currentInput);
+          await saveMessage('user', currentInput);
         }
         
         const { response } = await getAiResponse(aiQuery, history, finalImageUri ?? undefined);
-        saveMessage('assistant', response);
+        await saveMessage('assistant', response);
         
       } catch (error) {
         console.error("Error in transition:", error);
         const errorMessage = error instanceof Error ? error.message : 'Por favor, intenta de nuevo.';
-        saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
+        await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
         toast({
           variant: "destructive",
           title: "Error en la solicitud",
