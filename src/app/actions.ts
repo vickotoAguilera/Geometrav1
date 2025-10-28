@@ -17,7 +17,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
 
 // This function is now defined on the server-side to avoid client/server context issues.
-export async function getSdks(firebaseApp: FirebaseApp) {
+async function getSdks(firebaseApp: FirebaseApp) {
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),
@@ -26,7 +26,7 @@ export async function getSdks(firebaseApp: FirebaseApp) {
 }
 
 // This is a simplified server-side init.
-function getFirebaseForServer() {
+async function getFirebaseForServer() {
   if (!getApps().length) {
     initializeApp(firebaseConfig);
   }
@@ -49,8 +49,8 @@ export async function uploadAndProcessDocument(
   fileName: string,
   userId: string
 ): Promise<{ documentId: string; textContent: string }> {
-  const { firestore } = await getFirebaseForServer();
-  const storage = getStorage();
+  const { firestore, firebaseApp } = await getFirebaseForServer();
+  const storage = getStorage(firebaseApp);
 
   // 1. Extract text using Genkit flow
   const { textContent } = await processDocument({ fileDataUri });
