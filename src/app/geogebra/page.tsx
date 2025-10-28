@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function GeogebraPage() {
-  return (
-    <div className="flex-1 w-full h-full">
-      <GeogebraApplet />
-    </div>
-  );
+  return <GeogebraApplet />;
 }
