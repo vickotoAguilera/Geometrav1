@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getAiResponse, getInitialPrompts, uploadAndProcessDocument } from '@/app/actions';
+import { 
+  getAiResponse, 
+  getInitialPrompts, 
+  processDocument,
+  getSignedUploadUrl,
+  saveDocumentMetadata
+} from '@/app/actions';
 import {
   SheetHeader,
   SheetTitle,
@@ -32,6 +38,7 @@ interface DocumentPreview {
   name: string;
   dataUri: string;
   type: string;
+  file: File;
 }
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
@@ -140,7 +147,7 @@ export function ChatAssistant() {
           setImagePreview(dataUri);
           setDocumentPreview(null);
         } else {
-          setDocumentPreview({ name: file.name, dataUri, type: file.type });
+          setDocumentPreview({ name: file.name, dataUri, type: file.type, file });
           setImagePreview(null);
         }
       };
@@ -174,28 +181,51 @@ export function ChatAssistant() {
     startTransition(async () => {
       try {
         let aiResponseContent = '';
-        // Si hay un documento, lo procesamos primero
         if (currentDocument && user) {
           try {
-            const { textContent } = await uploadAndProcessDocument(currentDocument.dataUri, currentDocument.name, user.uid);
+             // 1. Process document to get text content
+            const { textContent } = await processDocument({ fileDataUri: currentDocument.dataUri });
+
+            // 2. Get a signed URL for upload
+            const { uploadUrl, storagePath } = await getSignedUploadUrl(currentDocument.name, user.uid, currentDocument.type);
+
+            // 3. Upload the file from the client using the signed URL
+            const uploadResponse = await fetch(uploadUrl, {
+                method: 'PUT',
+                body: currentDocument.file,
+                headers: {
+                    'Content-Type': currentDocument.type,
+                },
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('File upload failed.');
+            }
+            
+            // 4. Save metadata to Firestore
+            await saveDocumentMetadata(user.uid, currentDocument.name, storagePath, textContent);
+            
             toast({
               title: "Archivo procesado",
               description: `Se ha analizado "${currentDocument.name}" y se ha guardado en tu biblioteca de ejercicios.`,
             });
+            
+            // 5. Ask AI about the document
             const documentContextQuery = `Analiza el siguiente texto extraído del documento "${currentDocument.name}" y luego responde a mi pregunta.\n\nContenido del documento:\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
             const { response } = await getAiResponse(documentContextQuery);
             aiResponseContent = response;
+
           } catch (docError) {
              console.error("Error processing document:", docError);
              aiResponseContent = `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`;
           }
         } else {
-          // Si no hay documento, es una pregunta normal (con o sin imagen)
           const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
           aiResponseContent = response;
         }
         saveMessage('assistant', aiResponseContent);
       } catch (error) {
+        console.error("Error in transition:", error);
         saveMessage('assistant', 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');
       }
     });
