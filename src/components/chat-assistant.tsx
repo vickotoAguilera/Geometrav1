@@ -184,7 +184,7 @@ export function ChatAssistant() {
         let aiQuery = currentInput;
         
         const history: GenkitMessage[] = messages
-          .filter(m => typeof m.content === 'string') // Only process messages with simple string content
+          .filter(m => typeof m.content === 'string')
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content as string }],
