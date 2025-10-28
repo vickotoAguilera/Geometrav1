@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getAiResponse, getInitialPrompts } from '@/app/actions';
+import { getAiResponse, getInitialPrompts, uploadAndProcessDocument } from '@/app/actions';
 import {
   SheetHeader,
   SheetTitle,
@@ -11,13 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Paperclip, X } from 'lucide-react';
+import { Bot, User, Send, Paperclip, X, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
 
 
 interface Message {
@@ -25,6 +26,11 @@ interface Message {
   role: 'user' | 'assistant' | 'system';
   content: React.ReactNode;
   createdAt?: Timestamp;
+}
+
+interface DocumentPreview {
+  name: string;
+  dataUri: string;
 }
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
@@ -82,6 +88,8 @@ export function ChatAssistant() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [documentPreview, setDocumentPreview] = useState<DocumentPreview | null>(null);
+  const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
@@ -118,45 +126,74 @@ export function ChatAssistant() {
       content,
       createdAt: serverTimestamp(),
     };
-    // No-blocking write
     addDoc(messagesRef, messageData).catch(err => console.error("Failed to save message", err));
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Lógica para manejar PDF, TXT, Word
-        console.log('Archivo no-imagen seleccionado:', file.name);
-        // Aquí se implementará la lógica de extracción de texto y guardado en Firestore.
-      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        if (file.type.startsWith('image/')) {
+          setImagePreview(dataUri);
+          setDocumentPreview(null);
+        } else {
+          setDocumentPreview({ name: file.name, dataUri });
+          setImagePreview(null);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
+  const resetAttachments = () => {
+    setImagePreview(null);
+    setDocumentPreview(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!input.trim() && !imagePreview) || isPending || !user) return;
+    if ((!input.trim() && !imagePreview && !documentPreview) || isPending || !user) return;
 
     const currentInput = input;
     const currentImage = imagePreview;
+    const currentDocument = documentPreview;
 
-    saveMessage('user', currentInput + (currentImage ? "\n[Imagen adjunta]" : ""));
+    let userMessage = currentInput;
+    if(currentImage) userMessage += "\n[Imagen adjunta]";
+    if(currentDocument) userMessage += `\n[Archivo adjunto: ${currentDocument.name}]`;
+    
+    saveMessage('user', userMessage);
     
     setInput('');
-    setImagePreview(null);
-    if(fileInputRef.current) fileInputRef.current.value = "";
-
+    resetAttachments();
 
     startTransition(async () => {
       try {
-        const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
-        saveMessage('assistant', response);
+        let aiResponseContent = '';
+        // Si hay un documento, lo procesamos primero
+        if (currentDocument && user) {
+          try {
+            const { textContent } = await uploadAndProcessDocument(currentDocument.dataUri, currentDocument.name, user.uid);
+            toast({
+              title: "Archivo procesado",
+              description: `Se ha analizado "${currentDocument.name}" y se ha guardado en tu biblioteca de ejercicios.`,
+            });
+            const documentContextQuery = `Analiza el siguiente texto extraído del documento "${currentDocument.name}" y luego responde a mi pregunta.\n\nContenido del documento:\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
+            const { response } = await getAiResponse(documentContextQuery);
+            aiResponseContent = response;
+          } catch (docError) {
+             console.error("Error processing document:", docError);
+             aiResponseContent = `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`;
+          }
+        } else {
+          // Si no hay documento, es una pregunta normal (con o sin imagen)
+          const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
+          aiResponseContent = response;
+        }
+        saveMessage('assistant', aiResponseContent);
       } catch (error) {
         saveMessage('assistant', 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');
       }
@@ -269,18 +306,19 @@ export function ChatAssistant() {
             {imagePreview && (
               <div className="mb-2 relative w-24 h-24 rounded-md overflow-hidden border">
                 <Image src={imagePreview} alt="Vista previa" layout="fill" objectFit="cover" />
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-1 right-1 h-6 w-6"
-                  onClick={() => {
-                    setImagePreview(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                >
+                <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={resetAttachments}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
+            )}
+            {documentPreview && (
+                <div className="mb-2 relative w-full p-2 pr-10 rounded-md border bg-muted/50 text-sm flex items-center">
+                    <FileText className="h-5 w-5 mr-2 shrink-0 text-muted-foreground" />
+                    <span className="truncate font-medium text-foreground">{documentPreview.name}</span>
+                    <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-7 w-7" onClick={resetAttachments}>
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
             )}
             <form
               onSubmit={handleSubmit}
@@ -309,7 +347,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !imagePreview) || !user}>
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !imagePreview && !documentPreview) || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
