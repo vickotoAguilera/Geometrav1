@@ -31,6 +31,11 @@ interface Message {
   createdAt?: Timestamp;
 }
 
+interface GenkitMessage {
+  role: 'user' | 'model';
+  content: { text: string }[];
+}
+
 interface DocumentPreview {
   name: string;
   type: string;
@@ -176,34 +181,38 @@ export function ChatAssistant() {
 
     startTransition(async () => {
       try {
-        let aiResponseContent = '';
-        if (currentDocument && user) {
+        let aiQuery = currentInput;
+        
+        const history: GenkitMessage[] = messages
+          .filter(m => typeof m.content === 'string') // Only process messages with simple string content
+          .map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            content: [{ text: m.content as string }],
+          }));
+
+        if (currentDocument) {
           try {
-             const { textContent } = await processDocument(currentDocument.dataUri);
-            
+            const { textContent } = await processDocument(currentDocument.dataUri);
             toast({
               title: "Archivo analizado",
               description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre su contenido.`,
             });
-            
-            const documentContextQuery = `Analiza el siguiente texto extraído del documento "${currentDocument.name}" y luego responde a mi pregunta.\n\nContenido del documento:\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
-            const { response } = await getAiResponse(documentContextQuery);
-            aiResponseContent = response;
-
+            aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
           } catch (docError) {
-             console.error("Error processing document:", docError);
-             aiResponseContent = `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`;
-             toast({
-                variant: "destructive",
-                title: "Error al procesar",
-                description: "Hubo un problema al analizar tu archivo.",
+            console.error("Error processing document:", docError);
+            saveMessage('assistant', `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`);
+            toast({
+              variant: "destructive",
+              title: "Error al procesar",
+              description: "Hubo un problema al analizar tu archivo.",
             });
+            return;
           }
-        } else {
-          const { response } = await getAiResponse(currentInput, currentImage ?? undefined);
-          aiResponseContent = response;
         }
-        saveMessage('assistant', aiResponseContent);
+        
+        const { response } = await getAiResponse(aiQuery, history, currentImage ?? undefined);
+        saveMessage('assistant', response);
+        
       } catch (error) {
         console.error("Error in transition:", error);
         saveMessage('assistant', 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');

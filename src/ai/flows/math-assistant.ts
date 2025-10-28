@@ -10,7 +10,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const MessageSchema = z.object({
+  role: z.enum(['user', 'model']),
+  content: z.array(z.any()),
+});
+
 const MathAssistantInputSchema = z.object({
+  history: z.array(MessageSchema).optional().describe('The conversation history.'),
   query: z.string().describe('The user query related to math or Geogebra.'),
   photoDataUri: z.string().optional().describe(
     "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
@@ -31,9 +37,7 @@ const prompt = ai.definePrompt({
   name: 'mathAssistantPrompt',
   input: {schema: MathAssistantInputSchema},
   output: {schema: MathAssistantOutputSchema},
-  prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. 
-  
-  If a photo is provided, analyze it first. Describe the mathematical content you see in the image (equations, geometric figures, text problems, etc.). Then, using that analysis and the user's query, provide an accurate and helpful response.
+  prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.
 
   {{#if photoDataUri}}
   Photo Analysis:
@@ -50,7 +54,27 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    
+    const llm = ai.model('googleai/gemini-2.5-flash');
+
+    const history = input.history?.map(msg => ({
+        role: msg.role,
+        content: msg.content.map(c => ({text: c.text}))
+    })) || [];
+    
+    const {output} = await ai.generate({
+        model: llm,
+        history: history,
+        prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.
+
+        ${input.photoDataUri ? `Photo Analysis: {{media url=${input.photoDataUri}}}`: ''}
+
+        User Query: ${input.query}`,
+        output: {
+            schema: MathAssistantOutputSchema
+        }
+    })
+
     return output!;
   }
 );
