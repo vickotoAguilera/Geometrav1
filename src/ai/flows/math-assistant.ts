@@ -41,20 +41,7 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
-    // Start with the existing history
     const history = input.history || [];
-
-    // Construct the new user message content
-    const newUserContent: Part[] = [{text: input.query}];
-    if (input.photoDataUri) {
-      newUserContent.push({media: {url: input.photoDataUri}});
-    }
-
-    // Add the new user message to the history
-    history.push({
-      role: 'user',
-      content: newUserContent,
-    });
 
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
