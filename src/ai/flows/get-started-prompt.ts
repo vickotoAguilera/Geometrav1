@@ -38,14 +38,14 @@ const getStartedPromptFlow = ai.defineFlow(
   },
   async () => {
     const examplePrompts = [
-      'Solve the equation 2x + 3 = 7.',
-      'Explain the concept of derivatives in calculus.',
-      'How to construct a perpendicular bisector in Geogebra?',
-      'What are the applications of integrals in real life?',
-      'Graph the function y = x^2 - 4x + 3 using Geogebra.',
-      'Show me how to calculate the area of a circle in Geogebra.',
-      'Explain the Pythagorean theorem.',
-      'Give me some example questions that can be addressed with the tool.',
+      'Resuelve la ecuación 2x + 3 = 7.',
+      'Explica el concepto de derivadas en cálculo.',
+      '¿Cómo construir una bisectriz perpendicular en Geogebra?',
+      '¿Cuáles son las aplicaciones de las integrales en la vida real?',
+      'Grafica la función y = x^2 - 4x + 3 usando Geogebra.',
+      'Muéstrame cómo calcular el área de un círculo en Geogebra.',
+      'Explica el teorema de Pitágoras.',
+      'Dame algunas preguntas de ejemplo que se puedan resolver con la herramienta.',
     ];
 
     const {output} = await prompt({

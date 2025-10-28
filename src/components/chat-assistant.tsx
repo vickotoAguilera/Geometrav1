@@ -39,8 +39,7 @@ export function ChatAssistant() {
           content: (
             <div className="space-y-2">
               <p className="font-medium">
-                ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy?
-                Aquí tienes algunas ideas:
+                ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy? Aquí tienes algunas ideas:
               </p>
               <div className="flex flex-wrap gap-2">
                 {examplePrompts.slice(0, 4).map((prompt, i) => (
