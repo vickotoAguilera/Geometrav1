@@ -63,40 +63,38 @@
         "userId"
       ]
     },
-    "AssistantInteraction": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "AssistantInteraction",
+    "ChatMessage": {
+      "title": "Chat Message",
       "type": "object",
-      "description": "Represents an interaction with the AI assistant.",
+      "description": "Represents a single message in a chat conversation between a user and the assistant.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the assistant interaction."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp of the interaction.",
-          "format": "date-time"
-        },
-        "question": {
-          "type": "string",
-          "description": "User's question to the assistant."
-        },
-        "answer": {
-          "type": "string",
-          "description": "Assistant's response to the user."
-        },
         "userId": {
           "type": "string",
-          "description": "Reference to the User who initiated the interaction. (Relationship: User 1:N AssistantInteraction)"
+          "description": "The ID of the user who sent or received the message."
+        },
+        "role": {
+          "type": "string",
+          "description": "The author of the message.",
+          "enum": [
+            "user",
+            "assistant"
+          ]
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of the message."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the message was created.",
+          "format": "date-time"
         }
       },
       "required": [
-        "id",
-        "timestamp",
-        "question",
-        "answer",
-        "userId"
+        "userId",
+        "role",
+        "content",
+        "createdAt"
       ]
     }
   },
@@ -126,6 +124,26 @@
         }
       },
       {
+        "path": "/users/{userId}/messages/{messageId}",
+        "definition": {
+          "entityName": "ChatMessage",
+          "schema": {
+            "$ref": "#/backend/entities/ChatMessage"
+          },
+          "description": "Stores chat messages for a specific user. Accessible only to that user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique identifier of the chat message."
+            }
+          ]
+        }
+      },
+      {
         "path": "/geogebraApplets/{geogebraAppletId}",
         "definition": {
           "entityName": "GeogebraApplet",
@@ -140,24 +158,8 @@
             }
           ]
         }
-      },
-      {
-        "path": "/assistantInteractions/{assistantInteractionId}",
-        "definition": {
-          "entityName": "AssistantInteraction",
-          "schema": {
-            "$ref": "#/backend/entities/AssistantInteraction"
-          },
-          "description": "Stores AI assistant interactions. Includes denormalized 'userId' for authorization independence, allowing direct validation of ownership.",
-          "params": [
-            {
-              "name": "assistantInteractionId",
-              "description": "The unique identifier of the assistant interaction."
-            }
-          ]
-        }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support the Geometra application, focusing on math assistance and Geogebra applets. It prioritizes authorization independence and follows best practices for security and scalability. User data, Geogebra applets, and assistant interactions are stored in separate collections to maintain a clear and manageable data model.\n\n**Authorization Independence:** The `GeogebraApplet` and `AssistantInteraction` collections both include the `userId` field, denormalizing the user-applet and user-interaction relationships. This denormalization is crucial for authorization independence. Security rules can directly validate the `userId` against `request.auth.uid` without needing to perform expensive `get()` operations to check user ownership in a parent document. This design allows atomic creation and modification of applets and interactions.\n\n**Structural Segregation:** Data with different access needs is segregated. User profiles are stored under `/users/{userId}`, while applets and interactions are stored in their respective collections, ensuring that security rules can be applied consistently across each collection.\n\n**Access Modeling:** Path-based ownership is used for user data (`/users/{userId}`). `GeogebraApplet` and `AssistantInteraction` leverage denormalized `userId` fields for ownership checks. This approach simplifies security rules and improves performance.\n\n**QAPs Support:** The design supports secure list operations. The segregation of applets and interactions into separate collections, combined with the denormalized `userId` field, allows listing operations to be secured based on the requesting user's ID. Security rules can ensure that users can only list applets and interactions that they own, without needing to filter based on data content."
+    "reasoning": "The Firestore structure is designed to support the Geometra application, focusing on math assistance and Geogebra applets. It prioritizes authorization independence and follows best practices for security and scalability. User data, Geogebra applets, and assistant interactions are stored in separate collections to maintain a clear and manageable data model.\n\n**Authorization Independence:** The `GeogebraApplet` and `ChatMessage` collections both include the `userId` field, denormalizing the user-applet and user-interaction relationships. This denormalization is crucial for authorization independence. Security rules can directly validate the `userId` against `request.auth.uid` without needing to perform expensive `get()` operations to check user ownership in a parent document. This design allows atomic creation and modification of applets and interactions.\n\n**Structural Segregation:** Data with different access needs is segregated. User profiles are stored under `/users/{userId}`, while applets and interactions are stored in their respective collections, ensuring that security rules can be applied consistently across each collection.\n\n**Access Modeling:** Path-based ownership is used for user data (`/users/{userId}`). `GeogebraApplet` and `ChatMessage` leverage denormalized `userId` fields for ownership checks. This approach simplifies security rules and improves performance.\n\n**QAPs Support:** The design supports secure list operations. The segregation of applets and interactions into separate collections, combined with the denormalized `userId` field, allows listing operations to be secured based on the requesting user's ID. Security rules can ensure that users can only list applets and interactions that they own, without needing to filter based on data content."
   }
 }

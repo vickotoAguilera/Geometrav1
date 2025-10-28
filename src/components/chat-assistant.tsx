@@ -15,107 +15,143 @@ import { Bot, User, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from '@/firebase';
+import { collection, query, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 interface Message {
-  id: number;
+  id: string;
   role: 'user' | 'assistant' | 'system';
   content: React.ReactNode;
+  createdAt?: Timestamp;
 }
 
-export function ChatAssistant() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isPending, startTransition] = useTransition();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
-
-  const fetchInitialPrompts = async () => {
-    try {
-      const { examplePrompts } = await getInitialPrompts();
-      setMessages([
-        {
-          id: Date.now(),
-          role: 'system',
-          content: (
-            <div className="space-y-2">
-              <p className="font-medium">
-                ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy? Aquí tienes algunas ideas:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {examplePrompts.slice(0, 4).map((prompt, i) => (
-                  <Button
-                    key={i}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handlePromptClick(prompt)}
-                    className="text-xs h-auto py-1 px-2"
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          ),
-        },
-      ]);
-    } catch (error) {
-       setMessages([
-        {
-          id: Date.now(),
-          role: 'system',
-          content: 'Error al cargar las sugerencias. Por favor, escribe tu consulta.',
-        },
-      ]);
-    }
-  };
+const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
+  const [prompts, setPrompts] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchInitialPrompts();
+    const fetchPrompts = async () => {
+      setIsLoading(true);
+      try {
+        const { examplePrompts } = await getInitialPrompts();
+        setPrompts(examplePrompts);
+      } catch (error) {
+        // En caso de error, no mostramos nada.
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPrompts();
   }, []);
+
+  return (
+    <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full space-y-2">
+      <p className="font-medium">
+        ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy?
+      </p>
+      {isLoading ? (
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-6 w-1/2" />
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {prompts.slice(0, 4).map((prompt, i) => (
+            <Button
+              key={i}
+              size="sm"
+              variant="outline"
+              onClick={() => onPromptClick(prompt)}
+              className="text-xs h-auto py-1 px-2"
+            >
+              {prompt}
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+export function ChatAssistant() {
+  const [input, setInput] = useState('');
+  const [isPending, startTransition] = useTransition();
+  const viewportRef = useRef<HTMLDivElement>(null);
+  
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const messagesRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return collection(firestore, 'users', user.uid, 'messages');
+  }, [user, firestore]);
+
+  const messagesQuery = useMemoFirebase(() => {
+    if (!messagesRef) return null;
+    return query(messagesRef, orderBy('createdAt', 'asc'));
+  }, [messagesRef]);
+
+  const { data: messagesData, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
+
+  const messages: Message[] = messagesData || [];
 
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isPending]);
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
   };
 
+  const saveMessage = (role: 'user' | 'assistant', content: string) => {
+    if (!messagesRef) return;
+    const messageData = {
+      userId: user?.uid,
+      role,
+      content,
+      createdAt: serverTimestamp(),
+    };
+    addDocumentNonBlocking(messagesRef, messageData);
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending) return;
+    if (!input.trim() || isPending || !user) return;
 
-    const userMessage: Message = {
-      id: Date.now(),
-      role: 'user',
-      content: input,
-    };
-    setMessages((prev) => [...prev, userMessage]);
     const currentInput = input;
     setInput('');
+    saveMessage('user', currentInput);
 
     startTransition(async () => {
       try {
         const { response } = await getAiResponse(currentInput);
-        const assistantMessage: Message = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: response,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
+        saveMessage('assistant', response);
       } catch (error) {
-        const errorMessage: Message = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content:
-            'Lo siento, ocurrió un error. Por favor, intenta de nuevo.',
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        saveMessage('assistant', 'Lo siento, ocurrió un error. Por favor, intenta de nuevo.');
       }
     });
   };
+
+  if (isUserLoading) {
+     return (
+        <div className="flex-1 p-4 space-y-6 flex items-end">
+            <div className="flex items-start gap-3 w-full">
+              <Avatar className="w-8 h-8 border">
+                <AvatarFallback>
+                  <Bot className="w-5 h-5" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </div>
+        </div>
+     )
+  }
 
   return (
     <>
@@ -124,13 +160,32 @@ export function ChatAssistant() {
             <Bot /> Asistente Geometra
         </SheetTitle>
         <SheetDescription>
-            Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.
+            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
-      <ScrollArea className="flex-1" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1">
         <div className="p-4 space-y-6" ref={viewportRef}>
-            {messages.map((message) => (
+          {!user ? (
+             <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
+               Inicia sesión con Google para comenzar a chatear.
+             </div>
+          ) : isLoadingMessages ? (
+             <div className="flex items-start gap-3">
+                <Avatar className="w-8 h-8 border">
+                  <AvatarFallback>
+                    <Bot className="w-5 h-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+              </div>
+          ) : messages.length === 0 ? (
+            <WelcomeMessage onPromptClick={handlePromptClick} />
+          ) : (
+            messages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -145,11 +200,6 @@ export function ChatAssistant() {
                     </AvatarFallback>
                   </Avatar>
                 )}
-                 {message.role === 'system' ? (
-                  <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
-                    {message.content}
-                  </div>
-                ) : (
                   <div
                     className={cn(
                       'p-3 rounded-lg max-w-[80%] text-sm',
@@ -160,7 +210,6 @@ export function ChatAssistant() {
                   >
                     {message.content}
                   </div>
-                )}
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
@@ -169,20 +218,21 @@ export function ChatAssistant() {
                   </Avatar>
                 )}
               </div>
-            ))}
-            {isPending && (
-               <div className="flex items-start gap-3">
-                <Avatar className="w-8 h-8 border">
-                  <AvatarFallback>
-                    <Bot className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
+            ))
+          )}
+          {isPending && (
+             <div className="flex items-start gap-3">
+              <Avatar className="w-8 h-8 border">
+                <AvatarFallback>
+                  <Bot className="w-5 h-5" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
               </div>
-            )}
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -194,10 +244,10 @@ export function ChatAssistant() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Escribe tu pregunta..."
-              disabled={isPending}
+              placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
+              disabled={isPending || !user}
             />
-            <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
+            <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
               <Send className="w-4 h-4" />
               <span className="sr-only">Enviar</span>
             </Button>
