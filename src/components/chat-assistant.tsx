@@ -125,11 +125,17 @@ export function ChatAssistant() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Lógica para manejar PDF, TXT, Word
+        console.log('Archivo no-imagen seleccionado:', file.name);
+        // Aquí se implementará la lógica de extracción de texto y guardado en Firestore.
+      }
     }
   };
 
@@ -284,7 +290,7 @@ export function ChatAssistant() {
                 type="file" 
                 ref={fileInputRef}
                 onChange={handleFileChange} 
-                accept="image/*" 
+                accept="image/*,application/pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt" 
                 className="hidden" 
               />
               <Button 
@@ -295,7 +301,7 @@ export function ChatAssistant() {
                 disabled={isPending || !user}
               >
                 <Paperclip className="w-4 h-4" />
-                <span className="sr-only">Adjuntar imagen</span>
+                <span className="sr-only">Adjuntar archivo</span>
               </Button>
               <Input
                 value={input}

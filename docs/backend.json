@@ -96,6 +96,41 @@
         "content",
         "createdAt"
       ]
+    },
+    "UserDocument": {
+      "title": "User Document",
+      "type": "object",
+      "description": "Represents a file uploaded by a user, along with its extracted text content.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who uploaded the document."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "The original name of the uploaded file."
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "The path to the file in Firebase Storage."
+        },
+        "textContent": {
+          "type": "string",
+          "description": "The extracted text content from the document."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the document was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "fileName",
+        "storagePath",
+        "textContent",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -155,6 +190,22 @@
             {
               "name": "geogebraAppletId",
               "description": "The unique identifier of the Geogebra applet."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userDocuments/{documentId}",
+        "definition": {
+          "entityName": "UserDocument",
+          "schema": {
+            "$ref": "#/backend/entities/UserDocument"
+          },
+          "description": "Stores metadata and extracted text for user-uploaded files. Accessible only to the owning user.",
+          "params": [
+            {
+              "name": "documentId",
+              "description": "The unique identifier of the document record."
             }
           ]
         }
