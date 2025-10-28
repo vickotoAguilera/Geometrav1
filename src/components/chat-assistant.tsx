@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import {
   getAiResponse,
   getInitialPrompts,
-  processDocument,
+  uploadAndProcessDocument,
 } from '@/app/actions';
 import {
   SheetHeader,
@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Paperclip, X, FileText } from 'lucide-react';
+import { Bot, User, Send, Paperclip, X, FileText, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -24,11 +24,20 @@ import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from '
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
+import Link from 'next/link';
+
+interface FileInfo {
+  name: string;
+  type: string;
+  path: string;
+  downloadUrl: string;
+}
 
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
-  content: React.ReactNode;
+  content: string; // Keep content simple string for Firestore
+  fileInfo?: FileInfo;
   createdAt?: Timestamp;
 }
 
@@ -136,7 +145,14 @@ export function ChatAssistant() {
       content,
       createdAt: serverTimestamp(),
     };
-    addDoc(messagesRef, messageData).catch(err => console.error("Failed to save message", err));
+    addDoc(messagesRef, messageData).catch(err => {
+      console.error("Failed to save message", err);
+      toast({
+        variant: "destructive",
+        title: "Error de guardado",
+        description: "No se pudo guardar el mensaje en la base de datos."
+      });
+    });
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,57 +187,64 @@ export function ChatAssistant() {
     const currentImage = imagePreview;
     const currentDocument = documentPreview;
 
-    // Save only the pure text content to Firestore
-    saveMessage('user', currentInput);
-    
     setInput('');
     resetAttachments();
 
     startTransition(async () => {
       try {
         let aiQuery = currentInput;
-        
+        let finalImageUri = currentImage;
+
+        // Start with the existing message history
         const history: GenkitMessage[] = messages
-          .filter(m => typeof m.content === 'string') // Only include text messages in history
+          .filter(m => typeof m.content === 'string') // Use only text messages for history
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
-            content: [{ text: m.content as string }],
+            content: [{ text: m.content }],
           }));
-
+        
+        // Handle file upload and processing
         if (currentDocument) {
-          try {
-            const { textContent } = await processDocument(currentDocument.dataUri);
-            toast({
-              title: "Archivo analizado",
-              description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre su contenido.`,
-            });
-            // Prepend context to the query for the AI
-            aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput}`;
-            
-            // Also add the document content as a "user" message in the history for conversation memory
-            history.push({
-              role: 'user',
-              content: [{ text: `He adjuntado un documento. Su contenido es:\n${textContent}` }]
-            });
+          toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
+          const { textContent, downloadUrl } = await uploadAndProcessDocument(
+            currentDocument.dataUri,
+            currentDocument.name,
+            currentDocument.type,
+            user.uid
+          );
+          
+          toast({
+            title: "Archivo procesado",
+            description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre él.`,
+          });
+          
+          aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
+          
+          history.push({
+            role: 'user',
+            content: [{ text: `He adjuntado el documento "${currentDocument.name}". Su contenido es:\n${textContent}` }]
+          });
 
-          } catch (docError) {
-            console.error("Error processing document:", docError);
-            saveMessage('assistant', `Lo siento, hubo un error al procesar el documento "${currentDocument.name}". Por favor, intenta de nuevo.`);
-            toast({
-              variant: "destructive",
-              title: "Error al procesar",
-              description: "Hubo un problema al analizar tu archivo.",
-            });
-            return;
-          }
+        } else if (currentImage) {
+           // For images, we just save the user message text. The image URI is passed separately.
+           saveMessage('user', currentInput || '[Imagen adjunta]');
+        } else {
+          // Regular text message
+          saveMessage('user', currentInput);
         }
         
-        const { response } = await getAiResponse(aiQuery, history, currentImage ?? undefined);
+        const { response } = await getAiResponse(aiQuery, history, finalImageUri ?? undefined);
         saveMessage('assistant', response);
         
       } catch (error) {
         console.error("Error in transition:", error);
-        saveMessage('assistant', 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');
+        const errorMessage = error instanceof Error ? error.message : 'Por favor, intenta de nuevo.';
+        saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
+        toast({
+          variant: "destructive",
+          title: "Error en la solicitud",
+          description: errorMessage,
+        });
       }
     });
   };
@@ -293,15 +316,24 @@ export function ChatAssistant() {
                 )}
                   <div
                     className={cn(
-                      'p-3 rounded-lg max-w-[80%] text-sm',
+                      'p-3 rounded-lg max-w-[80%] text-sm whitespace-pre-wrap',
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground',
-                      // whitespace-pre-wrap is good for text but can mess up layout for ReactNodes
-                      typeof message.content === 'string' ? 'whitespace-pre-wrap' : ''
+                        : 'bg-muted text-muted-foreground'
                     )}
                   >
                     {message.content}
+                    {message.fileInfo && (
+                       <div className="mt-2 p-2 bg-black/10 rounded-md flex items-center justify-between gap-2">
+                          <div className='flex items-center gap-2 truncate'>
+                            <FileText className="h-4 w-4 shrink-0" />
+                            <span className="truncate text-xs font-medium">{message.fileInfo.name}</span>
+                          </div>
+                          <Link href={message.fileInfo.downloadUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-full hover:bg-black/20">
+                            <Download className="h-4 w-4" />
+                          </Link>
+                       </div>
+                    )}
                   </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
