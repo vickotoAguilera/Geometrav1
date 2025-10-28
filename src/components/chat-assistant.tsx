@@ -31,6 +31,7 @@ interface Message {
 interface DocumentPreview {
   name: string;
   dataUri: string;
+  type: string;
 }
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
@@ -139,7 +140,7 @@ export function ChatAssistant() {
           setImagePreview(dataUri);
           setDocumentPreview(null);
         } else {
-          setDocumentPreview({ name: file.name, dataUri });
+          setDocumentPreview({ name: file.name, dataUri, type: file.type });
           setImagePreview(null);
         }
       };

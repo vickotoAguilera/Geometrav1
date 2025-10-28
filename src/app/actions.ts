@@ -9,7 +9,7 @@ import {
   processDocument,
   ProcessDocumentOutput,
 } from '@/ai/flows/process-document';
-import { getStorage, ref, uploadString } from 'firebase/storage';
+import { getStorage, ref, getDownloadURL, uploadString } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
@@ -35,7 +35,7 @@ async function getFirebaseForServer() {
   // When running on the server, we can leverage App Hosting's automatic
   // configuration. It's crucial to try this first.
   try {
-    const app = initializeApp();
+    const app = initializeApp({}); // Pass empty config for auto-init
     return getSdks(app);
   } catch (e) {
     // If automatic init fails (e.g., local dev without env vars),
@@ -52,6 +52,7 @@ async function getFirebaseForServer() {
     }
   }
 }
+
 
 export async function getAiResponse(
   query: string,
