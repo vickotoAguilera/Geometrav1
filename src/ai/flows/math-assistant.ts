@@ -8,6 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const MessageSchema = z.object({
@@ -33,20 +34,6 @@ export async function mathAssistant(input: MathAssistantInput): Promise<MathAssi
   return mathAssistantFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'mathAssistantPrompt',
-  input: {schema: MathAssistantInputSchema},
-  output: {schema: MathAssistantOutputSchema},
-  prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.
-
-  {{#if photoDataUri}}
-  Photo Analysis:
-  {{media url=photoDataUri}}
-  {{/if}}
-
-  User Query: {{{query}}}`,
-});
-
 const mathAssistantFlow = ai.defineFlow(
   {
     name: 'mathAssistantFlow',
@@ -55,15 +42,13 @@ const mathAssistantFlow = ai.defineFlow(
   },
   async input => {
     
-    const llm = ai.model('googleai/gemini-2.5-flash');
-
     const history = input.history?.map(msg => ({
         role: msg.role,
         content: msg.content.map(c => ({text: c.text}))
     })) || [];
     
     const {output} = await ai.generate({
-        model: llm,
+        model: googleAI.model('gemini-2.5-flash'),
         history: history,
         prompt: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.
 
