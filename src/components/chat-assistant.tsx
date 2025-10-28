@@ -23,6 +23,7 @@ import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebas
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { Part } from 'genkit';
 
 interface Message {
   id: string;
@@ -33,7 +34,7 @@ interface Message {
 
 interface GenkitMessage {
   role: 'user' | 'model';
-  content: { text: string }[];
+  content: Part[];
 }
 
 interface DocumentPreview {
