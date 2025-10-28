@@ -16,6 +16,9 @@ import { LogOut, User as UserIcon, Bot } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
+import { useAuth, useUser } from "@/firebase";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+
 
 // SVG para el icono de Google
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -29,13 +32,44 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const AuthButton = () => {
-    // This is a static version, so we show a generic user.
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+
+    const handleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error("Error signing in with Google", error);
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Error signing out", error);
+        }
+    };
+
+    if (isUserLoading) {
+        return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />;
+    }
+
+    if (!user) {
+        return (
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full" onClick={handleSignIn}>
+                <GoogleIcon className="h-6 w-6" />
+            </Button>
+        );
+    }
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="Usuario" />
+              <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'Usuario'} />
               <AvatarFallback>
                 <UserIcon className="h-5 w-5" />
               </AvatarFallback>
@@ -45,14 +79,14 @@ const AuthButton = () => {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">Usuario de Prueba</p>
+              <p className="text-sm font-medium leading-none">{user.displayName}</p>
               <p className="text-xs leading-none text-muted-foreground">
-                usuario@example.com
+                {user.email}
               </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Cerrar sesión</span>
           </DropdownMenuItem>
