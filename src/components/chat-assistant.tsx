@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send } from 'lucide-react';
+import { Bot, User, Send, Paperclip } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -22,6 +22,7 @@ import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebas
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Message {
   id: string;
@@ -88,6 +89,7 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
@@ -106,7 +108,7 @@ export function ChatAssistant() {
   const { data: messagesData, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
 
   const messages: Message[] = messagesData || [];
-
+  
   const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
 
   useEffect(() => {
@@ -120,6 +122,7 @@ export function ChatAssistant() {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   }, [allMessages, isPending]);
+
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -144,6 +147,85 @@ export function ChatAssistant() {
       });
     }
   };
+  
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Reset file input to allow re-uploading the same file
+    if(fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
+    startTransition(() => {
+      const processAndRespond = async () => {
+        const userMessageContent = `Analiza el archivo: ${file.name}`;
+        
+        const optimisticUserMessage: Message = {
+          id: `optimistic-user-${Date.now()}`,
+          role: 'user',
+          content: userMessageContent,
+          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+        };
+        const optimisticAssistantMessage: Message = {
+          id: `optimistic-assistant-${Date.now()}`,
+          role: 'assistant',
+          content: '...',
+          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+        };
+        setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+
+        try {
+          await saveMessage('user', userMessageContent);
+
+          const storage = getStorage();
+          const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}-${file.name}`);
+          
+          toast({
+            title: "Subiendo archivo...",
+            description: `Tu archivo "${file.name}" se está subiendo.`,
+          });
+
+          await uploadBytes(storageRef, file);
+          const downloadURL = await getDownloadURL(storageRef);
+
+          toast({
+            title: "Archivo subido",
+            description: "Analizando con la IA...",
+          });
+
+          const history: GenkitMessage[] = (messagesData || [])
+            .map(m => ({
+              role: m.role === 'assistant' ? 'model' : 'user',
+              content: [{ text: m.content as string }],
+            }));
+            
+          const photoDataUri = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target?.result as string);
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+          });
+          
+          const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
+          await saveMessage('assistant', aiResponse);
+
+        } catch (error) {
+          console.error("Error processing file:", error);
+          const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
+          await saveMessage('assistant', `Lo siento, ocurrió un error al procesar el archivo: ${errorMessage}`);
+          toast({
+            variant: "destructive",
+            title: "Error al procesar archivo",
+            description: errorMessage,
+          });
+        } finally {
+            setOptimisticMessages([]);
+        }
+      };
+      processAndRespond();
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,65 +234,50 @@ export function ChatAssistant() {
     const currentInput = input;
     setInput('');
   
-    // --- Optimistic UI Update ---
     const optimisticUserMessage: Message = {
       id: `optimistic-user-${Date.now()}`,
       role: 'user',
       content: currentInput,
       createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
-    
     const optimisticAssistantMessage: Message = {
         id: `optimistic-assistant-${Date.now()}`,
         role: 'assistant',
-        content: '...', // Placeholder for loading
+        content: '...',
         createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
-
     setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
-    // --- End Optimistic UI ---
 
     startTransition(() => {
       const processAndRespond = async () => {
         try {
-          // 1. Save user message to Firestore
           await saveMessage('user', currentInput);
   
-          // 2. Prepare data for AI
           const history: GenkitMessage[] = (messagesData || [])
-            .filter(m => m.role !== 'system' && typeof m.content === 'string')
             .map(m => ({
               role: m.role === 'assistant' ? 'model' : 'user',
-              content: [{ text: m.content }],
+              content: [{ text: m.content as string }],
             }));
   
-          // 3. Get AI response
           const { response: aiResponse } = await getAiResponse(currentInput, history);
-          
-          // 4. Save AI response to Firestore
           await saveMessage('assistant', aiResponse);
   
         } catch (error) {
-          console.error("Error in chat submission process:", error);
+          console.error("Error in chat submission:", error);
           const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
-          
           await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
-          
           toast({
             variant: "destructive",
             title: "Error en el chat",
             description: errorMessage,
           });
         } finally {
-            // The real messages from Firestore will replace the optimistic ones
             setOptimisticMessages([]);
         }
       };
-  
       processAndRespond();
     });
   };
-
 
   if (isUserLoading) {
      return (
@@ -286,8 +353,10 @@ export function ChatAssistant() {
                     )}
                   >
                     {message.content === '...' ? (
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-12" />
+                        <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
                         </div>
                     ) : (
                         message.content
@@ -316,6 +385,18 @@ export function ChatAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
+                disabled={isPending || !user}
+              />
+              <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isPending || !user}>
+                <Paperclip className="w-4 h-4" />
+                <span className="sr-only">Adjuntar archivo</span>
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx"
                 disabled={isPending || !user}
               />
               <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>

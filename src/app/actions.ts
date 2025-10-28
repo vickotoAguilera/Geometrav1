@@ -17,18 +17,10 @@ export async function getAiResponse(
   history: GenkitMessage[],
   photoDataUri?: string
 ): Promise<MathAssistantOutput> {
-  const finalHistory = [...history];
-  const userMessage: Part[] = [{ text: query }];
-  if (photoDataUri) {
-    userMessage.push({ media: { url: photoDataUri } });
-  }
-  
-  // This logic is now handled in the flow
-  // finalHistory.push({ role: 'user', content: userMessage });
 
   return await mathAssistant({
     query: query,
-    history: finalHistory,
+    history: history,
     photoDataUri: photoDataUri,
   });
 }
