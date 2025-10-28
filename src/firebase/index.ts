@@ -25,24 +25,19 @@ export function initializeFirebase() {
       firebaseApp = initializeApp(firebaseConfig);
     }
 
-    // getSdks is now defined within the client-side scope where it is used.
-    const getClientSdks = (app: FirebaseApp) => ({
-        firebaseApp: app,
-        auth: getAuth(app),
-        firestore: getFirestore(app)
-    });
-
-    return getClientSdks(firebaseApp);
+    return getSdks(firebaseApp);
   }
 
   // If already initialized, return the SDKs with the already initialized App
-  const getClientSdks = (app: FirebaseApp) => ({
-    firebaseApp: app,
-    auth: getAuth(app),
-    firestore: getFirestore(app)
-  });
+  return getSdks(getApp());
+}
 
-  return getClientSdks(getApp());
+export function getSdks(firebaseApp: FirebaseApp) {
+  return {
+    firebaseApp,
+    auth: getAuth(firebaseApp),
+    firestore: getFirestore(firebaseApp)
+  };
 }
 
 export * from './provider';

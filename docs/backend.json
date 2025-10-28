@@ -8,136 +8,102 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user.",
-          "format": "uuid"
+          "description": "Unique identifier for the user."
         },
         "email": {
           "type": "string",
-          "description": "Email address of the user.",
+          "description": "User's email address.",
           "format": "email"
         },
         "name": {
           "type": "string",
-          "description": "Display name of the user."
+          "description": "User's full name."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "Date and time the user registered.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
         "email",
-        "name"
+        "name",
+        "registrationDate"
       ]
     },
-    "GeogebraApplet": {
+    "GeoGebraApplet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "GeogebraApplet",
+      "title": "GeoGebraApplet",
       "type": "object",
-      "description": "Represents a Geogebra applet used in the application.",
+      "description": "Represents a specific Geogebra applet used within the application.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Geogebra applet."
+          "description": "Unique identifier for the GeoGebra applet."
         },
         "title": {
           "type": "string",
-          "description": "Title of the Geogebra applet."
+          "description": "Title of the GeoGebra applet."
         },
         "description": {
           "type": "string",
-          "description": "Description of the Geogebra applet."
+          "description": "Description of the GeoGebra applet."
         },
-        "geogebraId": {
+        "geogebraUrl": {
           "type": "string",
-          "description": "The unique id assigned by Geogebra for the applet.",
-          "format": "string"
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who created the applet. (Relationship: User 1:N GeogebraApplet)"
+          "description": "URL of the Geogebra applet.",
+          "format": "uri"
         }
       },
       "required": [
         "id",
         "title",
         "description",
-        "geogebraId",
-        "userId"
+        "geogebraUrl"
       ]
     },
-    "ChatMessage": {
-      "title": "Chat Message",
+    "AssistanceRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AssistanceRequest",
       "type": "object",
-      "description": "Represents a single message in a chat conversation between a user and the assistant.",
+      "description": "Represents a user's request for assistance from the AI assistant.",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the assistance request."
+        },
         "userId": {
           "type": "string",
-          "description": "The ID of the user who sent or received the message."
+          "description": "Reference to User. (Relationship: User 1:N AssistanceRequest)"
         },
-        "role": {
+        "requestText": {
           "type": "string",
-          "description": "The author of the message.",
-          "enum": [
-            "user",
-            "assistant"
-          ]
+          "description": "The text of the user's request."
         },
-        "content": {
+        "responseText": {
           "type": "string",
-          "description": "The text content of the message."
+          "description": "The AI assistant's response to the request."
         },
-        "createdAt": {
+        "requestTimestamp": {
           "type": "string",
-          "description": "The timestamp when the message was created.",
+          "description": "Timestamp of when the request was made.",
           "format": "date-time"
         }
       },
       "required": [
+        "id",
         "userId",
-        "role",
-        "content",
-        "createdAt"
-      ]
-    },
-    "UserDocument": {
-      "title": "User Document",
-      "type": "object",
-      "description": "Represents a file uploaded by a user, along with its extracted text content.",
-      "properties": {
-        "userId": {
-          "type": "string",
-          "description": "The ID of the user who uploaded the document."
-        },
-        "fileName": {
-          "type": "string",
-          "description": "The original name of the uploaded file."
-        },
-        "storagePath": {
-          "type": "string",
-          "description": "The path to the file in Firebase Storage."
-        },
-        "textContent": {
-          "type": "string",
-          "description": "The extracted text content from the document."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The timestamp when the document was uploaded.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "userId",
-        "fileName",
-        "storagePath",
-        "textContent",
-        "createdAt"
+        "requestText",
+        "responseText",
+        "requestTimestamp"
       ]
     }
   },
   "auth": {
     "providers": [
       "password",
-      "anonymous",
-      "google.com"
+      "anonymous"
     ]
   },
   "firestore": {
@@ -149,68 +115,52 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information. Accessible only to the user themselves (path-based ownership).",
+          "description": "Stores user profiles.  Path-based ownership is enforced by requiring `request.auth.uid == userId`.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user."
+              "description": "The unique identifier for the user."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/messages/{messageId}",
+        "path": "/users/{userId}/assistanceRequests/{requestId}",
         "definition": {
-          "entityName": "ChatMessage",
+          "entityName": "AssistanceRequest",
           "schema": {
-            "$ref": "#/backend/entities/ChatMessage"
+            "$ref": "#/backend/entities/AssistanceRequest"
           },
-          "description": "Stores chat messages for a specific user. Accessible only to that user.",
+          "description": "Stores assistance requests associated with each user. Path-based ownership enforced by requiring `request.auth.uid == userId`.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user."
+              "description": "The unique identifier for the user."
             },
             {
-              "name": "messageId",
-              "description": "The unique identifier of the chat message."
+              "name": "requestId",
+              "description": "The unique identifier for the assistance request."
             }
           ]
         }
       },
       {
-        "path": "/geogebraApplets/{geogebraAppletId}",
+        "path": "/geoGebraApplets/{appletId}",
         "definition": {
-          "entityName": "GeogebraApplet",
+          "entityName": "GeoGebraApplet",
           "schema": {
-            "$ref": "#/backend/entities/GeogebraApplet"
+            "$ref": "#/backend/entities/GeoGebraApplet"
           },
-          "description": "Stores Geogebra applets. Includes denormalized 'userId' for authorization independence, allowing direct validation of ownership.",
+          "description": "Stores the GeoGebra applets used in the application.  This collection is globally readable.",
           "params": [
             {
-              "name": "geogebraAppletId",
-              "description": "The unique identifier of the Geogebra applet."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/userDocuments/{documentId}",
-        "definition": {
-          "entityName": "UserDocument",
-          "schema": {
-            "$ref": "#/backend/entities/UserDocument"
-          },
-          "description": "Stores metadata and extracted text for user-uploaded files. Accessible only to the owning user.",
-          "params": [
-            {
-              "name": "documentId",
-              "description": "The unique identifier of the document record."
+              "name": "appletId",
+              "description": "The unique identifier for the Geogebra Applet."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support the Geometra application, focusing on math assistance and Geogebra applets. It prioritizes authorization independence and follows best practices for security and scalability. User data, Geogebra applets, and assistant interactions are stored in separate collections to maintain a clear and manageable data model.\n\n**Authorization Independence:** The `GeogebraApplet` and `ChatMessage` collections both include the `userId` field, denormalizing the user-applet and user-interaction relationships. This denormalization is crucial for authorization independence. Security rules can directly validate the `userId` against `request.auth.uid` without needing to perform expensive `get()` operations to check user ownership in a parent document. This design allows atomic creation and modification of applets and interactions.\n\n**Structural Segregation:** Data with different access needs is segregated. User profiles are stored under `/users/{userId}`, while applets and interactions are stored in their respective collections, ensuring that security rules can be applied consistently across each collection.\n\n**Access Modeling:** Path-based ownership is used for user data (`/users/{userId}`). `GeogebraApplet` and `ChatMessage` leverage denormalized `userId` fields for ownership checks. This approach simplifies security rules and improves performance.\n\n**QAPs Support:** The design supports secure list operations. The segregation of applets and interactions into separate collections, combined with the denormalized `userId` field, allows listing operations to be secured based on the requesting user's ID. Security rules can ensure that users can only list applets and interactions that they own, without needing to filter based on data content."
+    "reasoning": "The Firestore structure is designed to provide a secure and scalable solution for the Geometra application, focusing on user data and assistance requests. The structure prioritizes authorization independence by avoiding hierarchical dependencies in security rules.  It also supports QAPs using path-based ownership, ensuring secure list operations.\n\n1.  **Users Collection:** The `/users/{userId}` collection stores user profiles. This adheres to the path-based ownership principle, ensuring that only the user can access their own data. This is the root level of private user data.\n2.  **Assistance Requests Subcollection:** The `/users/{userId}/assistanceRequests/{requestId}` subcollection stores assistance requests associated with each user. This continues the path-based ownership pattern, making security rules straightforward and efficient. The userId is implicitly associated and enforced by the path. The userId is not duplicated inside the document.\n\nThis design achieves Authorization Independence by using path-based ownership. Security rules can directly check `request.auth.uid` against the `{userId}` path parameter without needing to read any parent documents.  This structure supports required QAPs since list operations on `/users/{userId}/assistanceRequests` are secured via the path, allowing listing only by the authenticated user."
   }
 }
