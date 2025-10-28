@@ -1,0 +1,162 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Geometra application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the user."
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name"
+      ]
+    },
+    "GeogebraApplet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GeogebraApplet",
+      "type": "object",
+      "description": "Represents a Geogebra applet used in the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Geogebra applet."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the Geogebra applet."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the Geogebra applet."
+        },
+        "geogebraId": {
+          "type": "string",
+          "description": "The unique id assigned by Geogebra for the applet.",
+          "format": "string"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who created the applet. (Relationship: User 1:N GeogebraApplet)"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "geogebraId",
+        "userId"
+      ]
+    },
+    "AssistantInteraction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AssistantInteraction",
+      "type": "object",
+      "description": "Represents an interaction with the AI assistant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the assistant interaction."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the interaction.",
+          "format": "date-time"
+        },
+        "question": {
+          "type": "string",
+          "description": "User's question to the assistant."
+        },
+        "answer": {
+          "type": "string",
+          "description": "Assistant's response to the user."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who initiated the interaction. (Relationship: User 1:N AssistantInteraction)"
+        }
+      },
+      "required": [
+        "id",
+        "timestamp",
+        "question",
+        "answer",
+        "userId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Accessible only to the user themselves (path-based ownership).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/geogebraApplets/{geogebraAppletId}",
+        "definition": {
+          "entityName": "GeogebraApplet",
+          "schema": {
+            "$ref": "#/backend/entities/GeogebraApplet"
+          },
+          "description": "Stores Geogebra applets. Includes denormalized 'userId' for authorization independence, allowing direct validation of ownership.",
+          "params": [
+            {
+              "name": "geogebraAppletId",
+              "description": "The unique identifier of the Geogebra applet."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/assistantInteractions/{assistantInteractionId}",
+        "definition": {
+          "entityName": "AssistantInteraction",
+          "schema": {
+            "$ref": "#/backend/entities/AssistantInteraction"
+          },
+          "description": "Stores AI assistant interactions. Includes denormalized 'userId' for authorization independence, allowing direct validation of ownership.",
+          "params": [
+            {
+              "name": "assistantInteractionId",
+              "description": "The unique identifier of the assistant interaction."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the Geometra application, focusing on math assistance and Geogebra applets. It prioritizes authorization independence and follows best practices for security and scalability. User data, Geogebra applets, and assistant interactions are stored in separate collections to maintain a clear and manageable data model.\n\n**Authorization Independence:** The `GeogebraApplet` and `AssistantInteraction` collections both include the `userId` field, denormalizing the user-applet and user-interaction relationships. This denormalization is crucial for authorization independence. Security rules can directly validate the `userId` against `request.auth.uid` without needing to perform expensive `get()` operations to check user ownership in a parent document. This design allows atomic creation and modification of applets and interactions.\n\n**Structural Segregation:** Data with different access needs is segregated. User profiles are stored under `/users/{userId}`, while applets and interactions are stored in their respective collections, ensuring that security rules can be applied consistently across each collection.\n\n**Access Modeling:** Path-based ownership is used for user data (`/users/{userId}`). `GeogebraApplet` and `AssistantInteraction` leverage denormalized `userId` fields for ownership checks. This approach simplifies security rules and improves performance.\n\n**QAPs Support:** The design supports secure list operations. The segregation of applets and interactions into separate collections, combined with the denormalized `userId` field, allows listing operations to be secured based on the requesting user's ID. Security rules can ensure that users can only list applets and interactions that they own, without needing to filter based on data content."
+  }
+}

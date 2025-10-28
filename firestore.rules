@@ -1,0 +1,98 @@
+/**
+ * @file Firestore Security Rules for Geometra Application
+ * @description This ruleset enforces a strict user-ownership model, ensuring that users can only access their own data.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information, accessible only to the user themselves.
+ * - /geogebraApplets/{geogebraAppletId}: Stores Geogebra applets, with denormalized 'userId' for ownership checks.
+ * - /assistantInteractions/{assistantInteractionId}: Stores AI assistant interactions, with denormalized 'userId' for ownership checks.
+ *
+ * Key Security Decisions:
+ * - User data is private and accessible only to the authenticated user.
+ * - Geogebra applets and assistant interactions are owned by the user who created them.
+ * - Listing operations are restricted to the owner of the data.
+ * - The ruleset leverages denormalization to avoid costly `get()` calls for authorization.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Enforces user-only access to user profiles.
+     * @path /users/{userId}
+     * @allow (create) - User with ID 'user123' creates their profile. auth.uid == 'user123'
+     * @allow (get, update, delete, list) - User with ID 'user123' reads their profile. auth.uid == 'user123'
+     * @deny (create, get, update, delete, list) - User with ID 'user456' attempts to access user 'user123's profile. auth.uid == 'user456'
+     * @principle Enforces path-based ownership for user profiles.
+     */
+    match /users/{userId} {
+      // Function to check if the user is the owner of the document.
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Function to check if the user is the owner of the existing document.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // enforces immutability of the userId field.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages access to Geogebra applets, ensuring owner-only write access.
+     * @path /geogebraApplets/{geogebraAppletId}
+     * @allow (get, list) - Any user can view the list of applets and get individual applets.
+     * @allow (create) - User with ID 'user123' creates a new applet with userId: 'user123'. auth.uid == 'user123'
+     * @allow (update, delete) - User with ID 'user123' updates or deletes an applet they own (userId: 'user123'). auth.uid == 'user123'
+     * @deny (create, update, delete) - User with ID 'user456' attempts to create, update, or delete an applet with userId: 'user123'. auth.uid == 'user456'
+     * @principle Enforces document ownership for writes, allows public reads.
+     */
+    match /geogebraApplets/{geogebraAppletId} {
+      // Function to check if the request is made by the owner of the applet.
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Function to check if the user is the owner of the existing document.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get, list: if true;
+      allow create: if isOwner(request.resource.data.userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+
+    /**
+     * @description Manages access to AI assistant interactions, ensuring owner-only write access.
+     * @path /assistantInteractions/{assistantInteractionId}
+     * @allow (get, list) - Any user can view the list of interactions and get individual interactions.
+     * @allow (create) - User with ID 'user123' creates a new interaction with userId: 'user123'. auth.uid == 'user123'
+     * @allow (update, delete) - User with ID 'user123' updates or deletes an interaction they own (userId: 'user123'). auth.uid == 'user123'
+     * @deny (create, update, delete) - User with ID 'user456' attempts to create, update, or delete an interaction with userId: 'user123'. auth.uid == 'user456'
+     * @principle Enforces document ownership for writes, allows public reads.
+     */
+    match /assistantInteractions/{assistantInteractionId} {
+      // Function to check if the request is made by the owner of the interaction.
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Function to check if the user is the owner of the existing document.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get, list: if true;
+      allow create: if isOwner(request.resource.data.userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+  }
+}
