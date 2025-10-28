@@ -180,8 +180,11 @@ export function ChatAssistant() {
         let aiResponseContent = '';
         if (currentDocument && user) {
           try {
-            const fileContentBase64 = currentDocument.dataUri.split(',')[1];
-            const { textContent } = await uploadAndProcessDocument(fileContentBase64, currentDocument.name, currentDocument.type, user.uid);
+             const { documentId, textContent } = await uploadAndProcessDocument(
+              currentDocument.dataUri,
+              currentDocument.name,
+              user.uid
+            );
             
             toast({
               title: "Archivo procesado",
