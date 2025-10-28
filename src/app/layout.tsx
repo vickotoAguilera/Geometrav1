@@ -1,22 +1,30 @@
+'use client';
 import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Toaster } from '@/components/ui/toaster';
+import { usePathname } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Geometra',
-  description:
-    'Tu asistente de IA para dominar las matemáticas y GeoGebra.',
-};
+// This is a workaround since metadata is not supported in client components
+// export const metadata: Metadata = {
+//   title: 'Geometra',
+//   description:
+//     'Tu asistente de IA para dominar las matemáticas y GeoGebra.',
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isGeogebraPage = pathname === '/geogebra';
+
   return (
     <html lang="es" className="dark">
       <head>
+        <title>Geometra</title>
+        <meta name="description" content="Tu asistente de IA para dominar las matemáticas y GeoGebra." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -29,7 +37,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body bg-background text-foreground antialiased flex flex-col min-h-screen">
-        <Header />
+        {!isGeogebraPage && <Header />}
         <main className="flex-1 flex flex-col">{children}</main>
         <Toaster />
       </body>
