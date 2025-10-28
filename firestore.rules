@@ -1,54 +1,78 @@
+/**
+ * @fileoverview Firestore Security Rules for the Geometra application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles and their associated assistance requests.
+ * GeoGebra applets are publicly readable.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles, accessible only to the user themselves.
+ * - /users/{userId}/messages/{messageId}: Stores assistance requests (messages) for each user, accessible only to that user.
+ * - /geoGebraApplets/{appletId}: Stores GeoGebra applets, publicly readable.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own profile and messages.
+ * - GeoGebra applets are publicly readable, but write access is not defined in the IR, therefore it is denied.
+ * - Listing of users is not allowed.
+ *
+ * Denormalization for Authorization:
+ *  - The `userId` is taken from the path and doesn't need to be stored inside the message document, as the path-based rules secure each `messageId` document.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile documents.
+     * @description Secures the user profile collection, ensuring only the authenticated user can read/write their own profile.
+     * @path /users/{userId}
+     * @allow (read, write) if the authenticated user's ID matches the userId in the path.
+     * @deny (read, write) if the authenticated user's ID does not match the userId in the path.
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if false;
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Controls access to assistance request documents for a user.
+     * @description Secures the messages subcollection, ensuring only the authenticated user can read/write their own messages.
+     * @path /users/{userId}/messages/{messageId}
+     * @allow (read, write) if the authenticated user's ID matches the userId in the path.
+     * @deny (read, write) if the authenticated user's ID does not match the userId in the path.
+     * @principle Enforces document ownership for all operations within the messages subcollection.
      */
-    match /users/{userId}/assistanceRequests/{requestId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if false; // Listing assistance requests is disallowed
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
+    match /users/{userId}/messages/{messageId} {
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Controls access to GeoGebra applet documents.
+     * @description Allows anyone to read the GeoGebra applets, but restricts creation, updates, and deletion.
+     * @path /geoGebraApplets/{appletId}
+     * @allow (get, list) to anyone.
+     * @deny (create, update, delete) to everyone.
+     * @principle Allows public read access while restricting write access.
      */
     match /geoGebraApplets/{appletId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    // --- Helper Functions ---
+
+    /**
+     * @description Checks if the user is signed in.
+     * @return {bool} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource, based on the userId.
+     * @param {string} userId The user ID to compare against the authenticated user's ID.
+     * @return {bool} True if the authenticated user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
     }
   }
 }
