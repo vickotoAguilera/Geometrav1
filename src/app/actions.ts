@@ -11,17 +11,25 @@ import {
 } from '@/ai/flows/process-document';
 import { getStorage, ref, uploadString } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { getSdks } from '@/firebase'; // Assuming getSdks is available for server-side use
-import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore'
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
 
-// This is a simplified server-side init. In a real app, you'd share this.
+// This function is now defined on the server-side to avoid client/server context issues.
+export async function getSdks(firebaseApp: FirebaseApp) {
+  return {
+    firebaseApp,
+    auth: getAuth(firebaseApp),
+    firestore: getFirestore(firebaseApp)
+  };
+}
+
+// This is a simplified server-side init.
 function getFirebaseForServer() {
   if (!getApps().length) {
     initializeApp(firebaseConfig);
   }
-  // This is a simplified way to get the SDKs on the server.
-  // In a real app, you'd likely have a shared admin initialization.
   return getSdks(getApps()[0]);
 }
 
@@ -41,7 +49,7 @@ export async function uploadAndProcessDocument(
   fileName: string,
   userId: string
 ): Promise<{ documentId: string; textContent: string }> {
-  const { firestore } = getFirebaseForServer();
+  const { firestore } = await getFirebaseForServer();
   const storage = getStorage();
 
   // 1. Extract text using Genkit flow
