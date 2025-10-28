@@ -139,10 +139,13 @@ export function ChatAssistant() {
 
   const saveMessage = async (role: 'user' | 'assistant', content: string, fileInfo?: FileInfo) => {
     if (!messagesRef || !user) return;
+    // Ensure we are saving a simple string.
+    const messageContent = typeof content === 'string' ? content : 'Contenido complejo no guardado.';
+    
     const messageData = {
       userId: user.uid,
       role,
-      content,
+      content: messageContent,
       createdAt: serverTimestamp(),
       ...(fileInfo && { fileInfo }),
     };
@@ -197,20 +200,19 @@ export function ChatAssistant() {
       try {
         let aiQuery = currentInput;
         let finalImageUri = currentImage;
-        let userMessageContent = currentInput;
 
-        // Start with the existing message history, correctly formatted
+        // Correctly prepare history for Genkit
         const history: GenkitMessage[] = messages
-          .filter(m => typeof m.content === 'string') // Ensure content is a string
+          .filter(m => typeof m.content === 'string' && m.content.trim() !== '') // Ensure content is a non-empty string
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
-            content: [{ text: m.content }],
+            content: [{ text: m.content }], // Wrap content in the expected structure
           }));
         
         // Handle file upload and processing
         if (currentDocument) {
           toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
-          const { textContent, downloadUrl, storagePath } = await uploadAndProcessDocument(
+          const { textContent, downloadUrl, path } = await uploadAndProcessDocument(
             currentDocument.dataUri,
             currentDocument.name,
             currentDocument.type,
@@ -222,20 +224,21 @@ export function ChatAssistant() {
             description: `Se ha extraído el texto de "${currentDocument.name}". Ahora puedes hacer preguntas sobre él.`,
           });
           
-          userMessageContent = `Adjunto el documento "${currentDocument.name}".\n\n${currentInput || 'Por favor, resume el contenido del documento.'}`;
+          const userMessageContent = `Adjunto el documento "${currentDocument.name}".\n\n${currentInput || 'Por favor, resume el contenido del documento.'}`;
           aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
           
           await saveMessage('user', userMessageContent, {
             name: currentDocument.name,
             type: currentDocument.type,
             downloadUrl,
-            path: storagePath,
+            path: path,
           });
 
         } else if (currentImage) {
-           userMessageContent = currentInput || '[Imagen adjunta]';
+           const userMessageContent = currentInput || 'Imagen adjunta';
            await saveMessage('user', userMessageContent);
         } else {
+          // This is the crucial part that was missing. Always save the simple text message.
           await saveMessage('user', currentInput);
         }
         
