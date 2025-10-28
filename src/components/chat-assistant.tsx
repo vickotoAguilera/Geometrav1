@@ -128,7 +128,7 @@ export function ChatAssistant() {
     setInput(prompt);
   };
 
-  const saveMessage = (role: 'user' | 'assistant', content: string | React.ReactNode) => {
+  const saveMessage = (role: 'user' | 'assistant', content: string) => {
     if (!messagesRef) return;
     const messageData = {
       userId: user?.uid,
@@ -171,39 +171,8 @@ export function ChatAssistant() {
     const currentImage = imagePreview;
     const currentDocument = documentPreview;
 
-    let userMessageContent: React.ReactNode = currentInput;
-    
-    // Create a combined display message for the UI
-    if (currentImage && currentDocument) {
-        userMessageContent = (
-            <div>
-                {currentInput}
-                <div className="mt-2 text-xs text-right italic">
-                    [Imagen y archivo adjuntos]
-                </div>
-            </div>
-        );
-    } else if (currentImage) {
-        userMessageContent = (
-            <div>
-                {currentInput}
-                <div className="mt-2 text-xs text-right italic">
-                    [Imagen adjunta]
-                </div>
-            </div>
-        );
-    } else if (currentDocument) {
-        userMessageContent = (
-            <div>
-                {currentInput}
-                <div className="mt-2 text-xs text-right italic">
-                    [Archivo adjunto: {currentDocument.name}]
-                </div>
-            </div>
-        );
-    }
-
-    saveMessage('user', userMessageContent);
+    // Save only the pure text content to Firestore
+    saveMessage('user', currentInput);
     
     setInput('');
     resetAttachments();
