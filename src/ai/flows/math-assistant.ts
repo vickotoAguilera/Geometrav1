@@ -42,11 +42,19 @@ const mathAssistantFlow = ai.defineFlow(
   },
   async input => {
     const history = input.history || [];
+    const prompt: Part[] = [{ text: input.query }];
+
+    if (input.photoDataUri) {
+      prompt.push({ media: { url: input.photoDataUri } });
+    }
+    
+    history.push({ role: 'user', content: prompt });
 
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.`,
-      history: history, // Pass the full history including the new message
+      history: history.slice(0, -1),
+      prompt: history.slice(-1)[0].content,
       output: {
         schema: MathAssistantOutputSchema,
       },

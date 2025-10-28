@@ -127,17 +127,25 @@ export function ChatAssistant() {
 
   const messages: Message[] = messagesData || [];
 
+  const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    setOptimisticMessages([]);
+  }, [messagesData]);
+  
+  const allMessages = [...messages, ...optimisticMessages];
+
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
-  }, [messages, isPending]);
+  }, [allMessages, isPending]);
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
   };
 
-  const saveMessage = (role: 'user' | 'assistant', content: string, fileInfo?: FileInfo) => {
+  const saveMessage = async (role: 'user' | 'assistant', content: string, fileInfo?: FileInfo) => {
     if (!messagesRef || !user) return;
     const messageData = {
       userId: user.uid,
@@ -146,8 +154,16 @@ export function ChatAssistant() {
       createdAt: serverTimestamp(),
       ...(fileInfo && { fileInfo }),
     };
-    // No usamos await aquí para no bloquear la interfaz
-    addDoc(messagesRef, messageData).catch(err => console.error("Failed to save message", err));
+    try {
+      await addDoc(messagesRef, messageData);
+    } catch (err) {
+      console.error("Failed to save message", err);
+      toast({
+        variant: "destructive",
+        title: "Error al guardar mensaje",
+        description: "No se pudo guardar tu mensaje. Por favor, inténtalo de nuevo.",
+      });
+    }
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,83 +193,85 @@ export function ChatAssistant() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if ((!input.trim() && !imagePreview && !documentPreview) || isPending || !user) return;
-
+  
     const currentInput = input;
     const currentImage = imagePreview;
     const currentDocument = documentPreview;
-
+  
     setInput('');
     resetAttachments();
-
-    startTransition(async () => {
-      let userMessageContent = currentInput;
-      let aiQuery = currentInput;
-      let finalImageUri = currentImage;
-      let fileInfo: FileInfo | undefined = undefined;
-
-      const history: GenkitMessage[] = (messagesData || [])
-        .filter(m => typeof m.content === 'string' && m.content.trim() !== '')
-        .map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          content: [{ text: m.content }],
-        }));
-
-      // Manejar la subida y procesamiento del documento primero
-      if (currentDocument) {
-        toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
+  
+    // Optimistic UI update for user message
+    const optimisticUserMessage: Message = {
+      id: `optimistic-user-${Date.now()}`,
+      role: 'user',
+      content: currentInput, // This will be updated later if there's a file
+      createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+    };
+  
+    setOptimisticMessages(prev => [...prev, optimisticUserMessage]);
+  
+    startTransition(() => {
+      // This part runs in the background
+      const processAndRespond = async () => {
+        let userMessageContent = currentInput;
+        let aiQuery = currentInput;
+        let fileInfo: FileInfo | undefined = undefined;
+  
         try {
-          const { textContent, downloadUrl, path } = await uploadAndProcessDocument(
-            currentDocument.dataUri,
-            currentDocument.name,
-            currentDocument.type,
-            user.uid
-          );
+          // 1. Handle document upload if present
+          if (currentDocument) {
+            toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
+            const { textContent, downloadUrl, path } = await uploadAndProcessDocument(
+              currentDocument.dataUri,
+              currentDocument.name,
+              currentDocument.type,
+              user.uid
+            );
+            toast({
+              title: "Archivo procesado",
+              description: `Ahora puedes hacer preguntas sobre "${currentDocument.name}".`,
+            });
+            
+            userMessageContent = `${currentInput || 'Adjunto el documento'}: "${currentDocument.name}"`;
+            aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
+            fileInfo = { name: currentDocument.name, type: currentDocument.type, downloadUrl, path };
+          }
+  
+          // 2. Save the definitive user message to Firestore
+          await saveMessage('user', userMessageContent, fileInfo);
+  
+          // 3. Prepare data for AI
+          const history: GenkitMessage[] = (messagesData || [])
+            .filter(m => m.role !== 'system' && typeof m.content === 'string')
+            .map(m => ({
+              role: m.role === 'assistant' ? 'model' : 'user',
+              content: [{ text: m.content }],
+            }));
+  
+          // 4. Get AI response
+          const { response: aiResponse } = await getAiResponse(aiQuery, history, currentImage ?? undefined);
+          
+          // 5. Save AI response to Firestore
+          await saveMessage('assistant', aiResponse);
+  
+        } catch (error) {
+          console.error("Error in chat submission process:", error);
+          const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
+          
+          await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
           
           toast({
-            title: "Archivo procesado",
-            description: `Ahora puedes hacer preguntas sobre "${currentDocument.name}".`,
+            variant: "destructive",
+            title: "Error en el chat",
+            description: errorMessage,
           });
-          
-          userMessageContent = `${currentInput || 'Adjunto el documento'}: "${currentDocument.name}"`;
-          aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
-          fileInfo = { name: currentDocument.name, type: currentDocument.type, downloadUrl, path };
-        
-        } catch(error) {
-          console.error("Error processing document:", error);
-          const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar el archivo.';
-          toast({ variant: "destructive", title: "Error de procesamiento", description: errorMessage });
-          saveMessage('assistant', `Error al procesar el archivo: ${errorMessage}`);
-          return; // Detener la ejecución si el archivo falla
+        } finally {
+            setOptimisticMessages([]);
         }
-      }
-
-      // Guardar el mensaje del usuario inmediatamente (Actualización Optimista)
-      saveMessage('user', userMessageContent, fileInfo);
-      
-      // Añadir el mensaje actual al historial para la llamada a la IA
-      const newUserContent: Part[] = [{text: aiQuery}];
-      if (finalImageUri) {
-          newUserContent.push({media: {url: finalImageUri}});
-      }
-       history.push({
-          role: 'user',
-          content: newUserContent,
-      });
-
-      // Llamar a la IA
-      try {
-        const { response } = await getAiResponse(aiQuery, history, finalImageUri ?? undefined);
-        saveMessage('assistant', response);
-      } catch (error) {
-        console.error("Error getting AI response:", error);
-        const errorMessage = error instanceof Error ? error.message : 'Por favor, intenta de nuevo.';
-        saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
-        toast({
-          variant: "destructive",
-          title: "Error en la solicitud a la IA",
-          description: errorMessage,
-        });
-      }
+      };
+  
+      processAndRespond();
     });
   };
 
@@ -305,10 +323,10 @@ export function ChatAssistant() {
                   <Skeleton className="h-4 w-5/6" />
                 </div>
               </div>
-          ) : messages.length === 0 ? (
+          ) : allMessages.length === 0 ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            messages.map((message) => (
+            allMessages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -354,7 +372,7 @@ export function ChatAssistant() {
               </div>
             ))
           )}
-          {isPending && (
+          {isPending && optimisticMessages.length === 0 && (
              <div className="flex items-start gap-3">
               <Avatar className="w-8 h-8 border">
                 <AvatarFallback>
