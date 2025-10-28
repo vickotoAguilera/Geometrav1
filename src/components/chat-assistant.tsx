@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import {
   getAiResponse,
   getInitialPrompts,
-  uploadAndProcessDocument,
 } from '@/app/actions';
 import {
   SheetHeader,
@@ -15,41 +14,25 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Paperclip, X, FileText, Download } from 'lucide-react';
+import { Bot, User, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
-import Link from 'next/link';
-
-interface FileInfo {
-  name: string;
-  type: string;
-  path: string;
-  downloadUrl: string;
-}
 
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string; 
-  fileInfo?: FileInfo;
   createdAt?: Timestamp;
 }
 
 interface GenkitMessage {
   role: 'user' | 'model';
   content: Part[];
-}
-
-interface DocumentPreview {
-  name: string;
-  type: string;
-  dataUri: string;
 }
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
@@ -105,9 +88,6 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [documentPreview, setDocumentPreview] = useState<DocumentPreview | null>(null);
   const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
@@ -145,14 +125,13 @@ export function ChatAssistant() {
     setInput(prompt);
   };
 
-  const saveMessage = async (role: 'user' | 'assistant', content: string, fileInfo?: FileInfo) => {
+  const saveMessage = async (role: 'user' | 'assistant', content: string) => {
     if (!messagesRef || !user) return;
     const messageData = {
       userId: user.uid,
       role,
       content,
       createdAt: serverTimestamp(),
-      ...(fileInfo && { fileInfo }),
     };
     try {
       await addDoc(messagesRef, messageData);
@@ -165,83 +144,39 @@ export function ChatAssistant() {
       });
     }
   };
-  
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUri = reader.result as string;
-        if (file.type.startsWith('image/')) {
-          setImagePreview(dataUri);
-          setDocumentPreview(null);
-        } else {
-          setDocumentPreview({ name: file.name, dataUri, type: file.type });
-          setImagePreview(null);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const resetAttachments = () => {
-    setImagePreview(null);
-    setDocumentPreview(null);
-    if(fileInputRef.current) fileInputRef.current.value = "";
-  }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!input.trim() && !imagePreview && !documentPreview) || isPending || !user) return;
+    if (!input.trim() || isPending || !user) return;
   
     const currentInput = input;
-    const currentImage = imagePreview;
-    const currentDocument = documentPreview;
-  
     setInput('');
-    resetAttachments();
   
-    // Optimistic UI update for user message
+    // --- Optimistic UI Update ---
     const optimisticUserMessage: Message = {
       id: `optimistic-user-${Date.now()}`,
       role: 'user',
-      content: currentInput, // This will be updated later if there's a file
+      content: currentInput,
       createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
-  
-    setOptimisticMessages(prev => [...prev, optimisticUserMessage]);
-  
+    
+    const optimisticAssistantMessage: Message = {
+        id: `optimistic-assistant-${Date.now()}`,
+        role: 'assistant',
+        content: '...', // Placeholder for loading
+        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+    };
+
+    setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+    // --- End Optimistic UI ---
+
     startTransition(() => {
-      // This part runs in the background
       const processAndRespond = async () => {
-        let userMessageContent = currentInput;
-        let aiQuery = currentInput;
-        let fileInfo: FileInfo | undefined = undefined;
-  
         try {
-          // 1. Handle document upload if present
-          if (currentDocument) {
-            toast({ title: "Subiendo y procesando archivo...", description: `Por favor espera.` });
-            const { textContent, downloadUrl, path } = await uploadAndProcessDocument(
-              currentDocument.dataUri,
-              currentDocument.name,
-              currentDocument.type,
-              user.uid
-            );
-            toast({
-              title: "Archivo procesado",
-              description: `Ahora puedes hacer preguntas sobre "${currentDocument.name}".`,
-            });
-            
-            userMessageContent = `${currentInput || 'Adjunto el documento'}: "${currentDocument.name}"`;
-            aiQuery = `Contexto del documento "${currentDocument.name}":\n---\n${textContent}\n---\n\nMi pregunta: ${currentInput || 'Resume el contenido del documento.'}`;
-            fileInfo = { name: currentDocument.name, type: currentDocument.type, downloadUrl, path };
-          }
+          // 1. Save user message to Firestore
+          await saveMessage('user', currentInput);
   
-          // 2. Save the definitive user message to Firestore
-          await saveMessage('user', userMessageContent, fileInfo);
-  
-          // 3. Prepare data for AI
+          // 2. Prepare data for AI
           const history: GenkitMessage[] = (messagesData || [])
             .filter(m => m.role !== 'system' && typeof m.content === 'string')
             .map(m => ({
@@ -249,10 +184,10 @@ export function ChatAssistant() {
               content: [{ text: m.content }],
             }));
   
-          // 4. Get AI response
-          const { response: aiResponse } = await getAiResponse(aiQuery, history, currentImage ?? undefined);
+          // 3. Get AI response
+          const { response: aiResponse } = await getAiResponse(currentInput, history);
           
-          // 5. Save AI response to Firestore
+          // 4. Save AI response to Firestore
           await saveMessage('assistant', aiResponse);
   
         } catch (error) {
@@ -267,6 +202,7 @@ export function ChatAssistant() {
             description: errorMessage,
           });
         } finally {
+            // The real messages from Firestore will replace the optimistic ones
             setOptimisticMessages([]);
         }
       };
@@ -301,7 +237,7 @@ export function ChatAssistant() {
             <Bot /> Asistente Geometra
         </SheetTitle>
         <SheetDescription>
-            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra. Puedes adjuntar imágenes o documentos.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -349,17 +285,12 @@ export function ChatAssistant() {
                         : 'bg-muted text-muted-foreground'
                     )}
                   >
-                    {message.content}
-                    {message.fileInfo && (
-                       <div className="mt-2 p-2 bg-black/10 rounded-md flex items-center justify-between gap-2">
-                          <div className='flex items-center gap-2 truncate'>
-                            <FileText className="h-4 w-4 shrink-0" />
-                            <span className="truncate text-xs font-medium">{message.fileInfo.name}</span>
-                          </div>
-                          <Link href={message.fileInfo.downloadUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-full hover:bg-black/20">
-                            <Download className="h-4 w-4" />
-                          </Link>
-                       </div>
+                    {message.content === '...' ? (
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-12" />
+                        </div>
+                    ) : (
+                        message.content
                     )}
                   </div>
                 {message.role === 'user' && (
@@ -372,69 +303,22 @@ export function ChatAssistant() {
               </div>
             ))
           )}
-          {isPending && optimisticMessages.length === 0 && (
-             <div className="flex items-start gap-3">
-              <Avatar className="w-8 h-8 border">
-                <AvatarFallback>
-                  <Bot className="w-5 h-5" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            </div>
-          )}
         </div>
       </ScrollArea>
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full">
-            {imagePreview && (
-              <div className="mb-2 relative w-24 h-24 rounded-md overflow-hidden border">
-                <Image src={imagePreview} alt="Vista previa" layout="fill" objectFit="cover" />
-                <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={resetAttachments}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-            {documentPreview && (
-                <div className="mb-2 relative w-full p-2 pr-10 rounded-md border bg-muted/50 text-sm flex items-center">
-                    <FileText className="h-5 w-5 mr-2 shrink-0 text-muted-foreground" />
-                    <span className="truncate font-medium text-foreground">{documentPreview.name}</span>
-                    <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-7 w-7" onClick={resetAttachments}>
-                        <X className="h-4 w-4" />
-                    </Button>
-                </div>
-            )}
             <form
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleFileChange} 
-                accept="image/*,application/pdf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt" 
-                className="hidden" 
-              />
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isPending || !user}
-              >
-                <Paperclip className="w-4 h-4" />
-                <span className="sr-only">Adjuntar archivo</span>
-              </Button>
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !imagePreview && !documentPreview) || !user}>
+              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
