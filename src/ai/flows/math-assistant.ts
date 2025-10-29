@@ -19,11 +19,16 @@ const MessageSchema = z.object({
   content: z.array(z.any()),
 });
 
+const ContextFileSchema = z.object({
+  fileName: z.string(),
+  fileDataUri: z.string(),
+});
+
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
   query: z.string().describe('The user query related to math or Geogebra.'),
-  fileDataUri: z.string().optional().describe("A file as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
-  fileName: z.string().optional().describe('The name of the attached file.'),
+  imageQueryDataUri: z.string().optional().describe("An image attached to the current query, as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
+  activeContextFiles: z.array(ContextFileSchema).optional().describe('A list of currently active documents to be used as context.'),
   tutorMode: z.enum(['math', 'geogebra']).optional().default('math').describe('The selected tutor personality.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
@@ -44,38 +49,41 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
-    let fileContent = '';
+    let documentContext = '';
     const prompt: Part[] = [];
     
-    if (input.fileDataUri && input.fileName) {
-        const fileType = input.fileDataUri.substring(input.fileDataUri.indexOf(':') + 1, input.fileDataUri.indexOf(';'));
-        const isImage = fileType.startsWith('image/');
-        
-        if (isImage) {
-            // If it's an image, pass it as a media part
-            prompt.push({ media: { url: input.fileDataUri } });
-        } else {
-            // If it's a document, extract text content
-            const base64Data = input.fileDataUri.split(',')[1];
-            const buffer = Buffer.from(base64Data, 'base64');
-            try {
-                if (input.fileName.endsWith('.pdf')) {
-                    const data = await pdf(buffer);
-                    fileContent = data.text;
-                } else if (input.fileName.endsWith('.docx')) {
-                    const result = await mammoth.extractRawText({ buffer });
-                    fileContent = result.value;
-                }
-            } catch (e) {
-                console.error("Error processing file in flow: ", e);
-                return { response: "Lo siento, tuve un problema al leer el archivo. ¿Podrías intentar subirlo de nuevo?" };
-            }
+    // 1. Handle image attached to the current query
+    if (input.imageQueryDataUri) {
+        prompt.push({ media: { url: input.imageQueryDataUri } });
+    }
+
+    // 2. Handle active context files (PDF, DOCX)
+    if (input.activeContextFiles && input.activeContextFiles.length > 0) {
+      let fileContents: string[] = [];
+      for (const file of input.activeContextFiles) {
+        try {
+          const base64Data = file.fileDataUri.split(',')[1];
+          const buffer = Buffer.from(base64Data, 'base64');
+          if (file.fileName.endsWith('.pdf')) {
+              const data = await pdf(buffer);
+              fileContents.push(`Contenido del archivo '${file.fileName}':\n${data.text}`);
+          } else if (file.fileName.endsWith('.docx')) {
+              const result = await mammoth.extractRawText({ buffer });
+              fileContents.push(`Contenido del archivo '${file.fileName}':\n${result.value}`);
+          }
+        } catch (e) {
+            console.error(`Error processing file ${file.fileName} in flow: `, e);
+            // Optionally notify user about the specific file that failed
         }
+      }
+      if (fileContents.length > 0) {
+        documentContext = `--- INICIO DEL CONTEXTO DE ARCHIVOS ---\n${fileContents.join('\n\n')}\n--- FIN DEL CONTEXTO DE ARCHIVOS ---`;
+      }
     }
 
     let userQuery = input.query;
-    if (fileContent) {
-        userQuery = `Usando el siguiente contexto, responde la pregunta.\n\nCONTEXTO:\n---\n${fileContent}\n---\n\nPREGUNTA: ${input.query}`;
+    if (documentContext) {
+        userQuery = `Usando el siguiente contexto de uno o más documentos, responde la pregunta.\n\nCONTEXTO:\n${documentContext}\n\nPREGUNTA: ${input.query}`;
     }
 
     prompt.push({ text: userQuery });

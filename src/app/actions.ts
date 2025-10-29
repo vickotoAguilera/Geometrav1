@@ -6,28 +6,31 @@ import {
   GetStartedPromptOutput,
 } from '@/ai/flows/get-started-prompt';
 import { Part } from 'genkit';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
 
 interface GenkitMessage {
   role: 'user' | 'model';
   content: Part[];
 }
 
+interface ContextFile {
+    fileName: string;
+    fileDataUri: string;
+}
+
 export async function getAiResponse(
   queryText: string,
   history: GenkitMessage[],
   tutorMode: 'math' | 'geogebra',
-  fileContent?: string,
-  fileName?: string
+  imageQueryDataUri?: string,
+  activeContextFiles?: ContextFile[],
 ): Promise<MathAssistantOutput> {
 
   const input = {
     query: queryText,
     history: history,
     tutorMode: tutorMode,
-    fileDataUri: fileContent,
-    fileName: fileName,
+    imageQueryDataUri: imageQueryDataUri,
+    activeContextFiles: activeContextFiles,
   };
 
   return await mathAssistant(input);

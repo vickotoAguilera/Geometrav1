@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -17,6 +17,8 @@ import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import Image from 'next/image';
+
 
 interface BaseMessage {
   id: string;
@@ -26,15 +28,16 @@ interface BaseMessage {
 interface TextMessage extends BaseMessage {
   type: 'text';
   content: string;
+  imageUrl?: string; // For images sent with a text message
 }
-interface FileMessage extends BaseMessage {
-  type: 'file';
+interface FileContextMessage extends BaseMessage {
+  type: 'fileContext';
   content: string; // This will store the data URI
   fileName: string;
-  isActive: boolean; // To mark if it's the active context
+  isActive: boolean; 
 }
 
-type Message = TextMessage | FileMessage;
+type Message = TextMessage | FileContextMessage;
 
 interface GenkitMessage {
   role: 'user' | 'model';
@@ -142,6 +145,7 @@ const parseResponse = (content: string) => {
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [tutorMode, setTutorMode] = useState<TutorMode>('math');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -167,8 +171,8 @@ export function ChatAssistant() {
 
   const allMessages = [...(messages || []), ...optimisticMessages];
 
-  const textMessages = allMessages.filter(m => m.type === 'text');
-  const fileMessages = allMessages.filter(m => m.type === 'file') as FileMessage[];
+  const textMessages = allMessages.filter(m => m.type === 'text') as TextMessage[];
+  const fileContextMessages = allMessages.filter(m => m.type === 'fileContext') as FileContextMessage[];
 
   useEffect(() => {
     if (viewportRef.current) {
@@ -187,7 +191,7 @@ export function ChatAssistant() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (!selectedFile || !user || !messagesRef || !firestore) return;
+    if (!selectedFile || !user || !messagesRef) return;
   
     if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
@@ -199,39 +203,32 @@ export function ChatAssistant() {
     }
     
     try {
-        const fileDataUri = await fileToDataUri(selectedFile);
+      const fileDataUri = await fileToDataUri(selectedFile);
+      const isImage = selectedFile.type.startsWith('image/');
 
-        const batch = writeBatch(firestore);
-        fileMessages.forEach(fileMsg => {
-            if(fileMsg.isActive) {
-                const docRef = doc(messagesRef, fileMsg.id);
-                batch.update(docRef, { isActive: false });
-            }
-        });
-        await batch.commit();
-
-        const fileMessageData: Omit<FileMessage, 'id'> = {
+      if (isImage) {
+        setAttachedImage(fileDataUri);
+      } else {
+        const fileMessageData: Omit<FileContextMessage, 'id'> = {
             role: 'user',
-            type: 'file',
+            type: 'fileContext',
             content: fileDataUri,
             fileName: selectedFile.name,
-            isActive: true,
+            isActive: true, // New documents are active by default
             createdAt: serverTimestamp() as Timestamp,
         };
-
         await addDoc(messagesRef, fileMessageData);
-
         toast({
-            title: "Archivo añadido",
-            description: `${selectedFile.name} está listo para ser usado como contexto.`,
+            title: "Archivo añadido al contexto",
+            description: `${selectedFile.name} está listo para ser usado.`,
         });
-
+      }
     } catch (err) {
-      console.error("Failed to save file message", err);
+      console.error("Failed to process file", err);
       toast({
         variant: "destructive",
         title: "Error al procesar archivo",
-        description: "No se pudo leer o guardar el archivo. Por favor, inténtalo de nuevo.",
+        description: "No se pudo leer o guardar el archivo.",
       });
     }
 
@@ -265,16 +262,25 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) return;
+    if (!input.trim() || isPending || !user) {
+      if(attachedImage && !isPending && user) {
+        // Allow sending image with empty prompt
+      } else {
+        return;
+      }
+    }
   
     const currentInput = input;
+    const currentAttachedImage = attachedImage;
     setInput('');
+    setAttachedImage(null);
     
     const userMessage: Omit<TextMessage, 'id'> = {
       role: 'user',
       type: 'text',
       content: currentInput,
       createdAt: serverTimestamp() as Timestamp,
+      ...(currentAttachedImage && { imageUrl: currentAttachedImage }),
     };
 
     const optimisticUserMessage: TextMessage = {
@@ -298,17 +304,15 @@ export function ChatAssistant() {
         try {
           await saveMessage(userMessage);
 
-          const activeFile = fileMessages.find(f => f.isActive);
-          let fileDataUri: string | undefined;
-          let fileName: string | undefined;
-          
-          if (activeFile) {
+          const activeFiles = fileContextMessages
+            .filter(f => f.isActive)
+            .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
+
+          if (activeFiles.length > 0) {
              toast({
               title: "Usando contexto",
-              description: `La IA está usando '${activeFile.fileName}' como contexto.`,
+              description: `La IA está usando ${activeFiles.length} archivo(s) como contexto.`,
             });
-            fileDataUri = activeFile.content;
-            fileName = activeFile.fileName;
           }
           
           const history: GenkitMessage[] = (messages || [])
@@ -318,7 +322,7 @@ export function ChatAssistant() {
               content: [{ text: (m as TextMessage).content }],
             }));
             
-          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, fileDataUri, fileName);
+          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, activeFiles);
           
           await saveMessage({
             role: 'assistant',
@@ -369,27 +373,10 @@ export function ChatAssistant() {
     }
   };
   
-  const toggleFileActive = async (fileId: string) => {
-    if (!messagesRef || !firestore) return;
-  
-    const fileToToggle = fileMessages.find(f => f.id === fileId);
-    if (!fileToToggle) return;
-  
-    const batch = writeBatch(firestore);
-    
-    // If the clicked file is already active, just deactivate it.
-    if (fileToToggle.isActive) {
-      const docRef = doc(messagesRef, fileId);
-      batch.update(docRef, { isActive: false });
-    } else {
-      // If the clicked file is not active, deactivate all others and activate this one.
-      fileMessages.forEach(file => {
-        const docRef = doc(messagesRef, file.id);
-        batch.update(docRef, { isActive: file.id === fileId });
-      });
-    }
-  
-    await batch.commit();
+  const toggleFileActive = async (fileId: string, isActive: boolean) => {
+    if (!messagesRef) return;
+    const docRef = doc(messagesRef, fileId);
+    await updateDoc(docRef, { isActive });
   };
 
   const deleteFile = async (fileId: string) => {
@@ -462,28 +449,25 @@ export function ChatAssistant() {
         </SheetDescription>
       </SheetHeader>
 
-      {user && fileMessages.length > 0 && (
+      {user && fileContextMessages.length > 0 && (
         <div className="p-3 border-b bg-background">
           <h3 className="text-sm font-medium mb-2 text-muted-foreground flex items-center gap-2">
             <Info className="w-4 h-4"/>
             Contexto de Archivos
           </h3>
           <div className="space-y-2">
-            {fileMessages.map(file => (
+            {fileContextMessages.map(file => (
               <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <FileText className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate" title={file.fileName}>{file.fileName}</span>
                 </div>
-                <div className='flex items-center gap-1'>
-                  <Button 
-                    variant={file.isActive ? 'secondary' : 'ghost'} 
-                    size="sm" 
-                    className="h-7 px-2"
-                    onClick={() => toggleFileActive(file.id)}
-                  >
-                    {file.isActive ? 'Activo' : 'Activar'}
-                  </Button>
+                <div className='flex items-center gap-2'>
+                  <Switch
+                    checked={file.isActive}
+                    onCheckedChange={(checked) => toggleFileActive(file.id, checked)}
+                    aria-label={`Activar contexto para ${file.fileName}`}
+                  />
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteFile(file.id)} title="Quitar archivo">
                       <X className="w-4 h-4" />
                   </Button>
@@ -532,12 +516,18 @@ export function ChatAssistant() {
                 )}
                   <div
                     className={cn(
-                      'p-3 rounded-lg max-w-[80%] text-sm whitespace-pre-wrap',
+                      'p-3 rounded-lg max-w-[80%] text-sm',
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-muted-foreground'
                     )}
                   >
+                    {message.imageUrl && (
+                        <div className="mb-2">
+                            <Image src={message.imageUrl} alt="Imagen adjunta" width={200} height={200} className="rounded-md object-cover"/>
+                        </div>
+                    )}
+                    <div className="whitespace-pre-wrap">
                      {message.content === '...' ? (
                         <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
@@ -566,6 +556,7 @@ export function ChatAssistant() {
                             })}
                         </div>
                     )}
+                    </div>
                   </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
@@ -599,6 +590,19 @@ export function ChatAssistant() {
                   </div>
               </div>
             )}
+             {attachedImage && (
+                <div className="relative w-24 h-24 mx-auto">
+                    <Image src={attachedImage} alt="Imagen para adjuntar" layout="fill" className="rounded-md object-cover" />
+                    <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => setAttachedImage(null)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
             <form
               id="chat-form"
               onSubmit={handleSubmit}
@@ -610,7 +614,7 @@ export function ChatAssistant() {
                 size="icon" 
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending || !user}
-                title="Adjuntar archivo"
+                title="Adjuntar archivo o imagen"
               >
                 <Paperclip className="w-5 h-5" />
               </Button>
@@ -620,7 +624,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedImage) || !user}>
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span className="sr-only">Enviar</span>
               </Button>
