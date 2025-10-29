@@ -124,7 +124,8 @@ export function StudyChatAssistant() {
             content: [{ text: m.content }],
           }));
           
-          const { response: aiResponse } = await getStudyAiResponse(currentInput, history, studyMaterial);
+          // For now, we'll pass an empty string for studyMaterial. We'll fix this later.
+          const { response: aiResponse } = await getStudyAiResponse(currentInput, history, "");
           
           setMessages(prev => prev.slice(0, -1).concat({
             id: `assistant-${Date.now()}-final`,
@@ -147,37 +148,18 @@ export function StudyChatAssistant() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Contexto de Estudio</CardTitle>
-                    <CardDescription>
-                        Pega aquí el contenido (en formato Markdown) que quieres que la IA use como única fuente de conocimiento.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Textarea
-                        value={studyMaterial}
-                        onChange={(e) => setStudyMaterial(e.target.value)}
-                        placeholder="Pega tu material de estudio aquí..."
-                        className="h-96"
-                    />
-                </CardContent>
-            </Card>
-        </div>
-
-        <Card className="flex flex-col h-[600px]">
+    <div className="w-full max-w-2xl mx-auto">
+        <Card className="flex flex-col h-[70vh]">
             <CardHeader>
                 <CardTitle>Asistente de Estudio</CardTitle>
-                <CardDescription>Esta conversación es temporal y se basa en el contexto que proporciones.</CardDescription>
+                <CardDescription>Esta conversación es temporal y se reinicia al recargar la página.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full" viewportRef={viewportRef}>
                     <div className="p-4 space-y-4">
                     {messages.length === 0 ? (
                          <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground">
-                            ¡Hola! Soy tu asistente de estudio. Pega tu material en la caja de contexto y hazme una pregunta.
+                            ¡Hola! Soy tu asistente de estudio temporal. ¿En qué te puedo ayudar?
                          </div>
                     ) : (
                         messages.map((message) => (
