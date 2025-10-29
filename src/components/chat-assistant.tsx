@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs, where } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
-import { Badge } from './ui/badge';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 
 interface Message {
@@ -214,8 +214,7 @@ export function ChatAssistant() {
     const currentInput = input;
     const currentFile = attachedFile;
     setInput('');
-    setAttachedFile(null);
-    if(fileInputRef.current) fileInputRef.current.value = '';
+    
 
     startTransition(() => {
       const processAndRespond = async () => {
@@ -270,6 +269,10 @@ export function ChatAssistant() {
             title: "Error del asistente",
             description: "No se pudo obtener una respuesta. Por favor, inténtalo de nuevo.",
           });
+        } finally {
+            // Limpiar el archivo solo después de que todo el proceso ha terminado
+            setAttachedFile(null);
+            if(fileInputRef.current) fileInputRef.current.value = '';
         }
       };
       processAndRespond();
@@ -339,7 +342,7 @@ export function ChatAssistant() {
             {attachedFile && (
                 <Button variant="destructive" onClick={() => {
                     removeFile();
-                    const trigger = document.querySelector('[aria-haspopup="dialog"]');
+                    const trigger = document.querySelector('[aria-haspopup="dialog"][data-state="open"]');
                     if (trigger instanceof HTMLElement) trigger.click();
                 }}>
                     <FileWarning className="mr-2 h-4 w-4" />
@@ -376,9 +379,17 @@ export function ChatAssistant() {
     <>
       <SheetHeader className="p-4 border-b">
         <div className="flex justify-between items-center">
-            <SheetTitle className="font-headline flex items-center gap-2">
-                <Bot /> Asistente Geometra
-            </SheetTitle>
+            <div className="flex items-center gap-2">
+              <Bot /> 
+              <SheetTitle>
+                Asistente Geometra
+              </SheetTitle>
+              <VisuallyHidden>
+                  <SheetDescription>
+                      Haz una pregunta sobre matemáticas o GeoGebra.
+                  </SheetDescription>
+              </VisuallyHidden>
+            </div>
             {user && (
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -390,9 +401,6 @@ export function ChatAssistant() {
                 </AlertDialog>
             )}
         </div>
-        <SheetDescription>
-            {user ? 'Haz una pregunta sobre matemáticas o GeoGebra.' : 'Inicia sesión para usar el asistente.'}
-        </SheetDescription>
       </SheetHeader>
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
@@ -468,22 +476,25 @@ export function ChatAssistant() {
               </div>
             ))
           )}
+           {isPending && (
+             <div className="flex items-start gap-3">
+                <Avatar className="w-8 h-8 border">
+                    <AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback>
+                </Avatar>
+                <div className="p-3 rounded-lg max-w-[80%] text-sm bg-muted text-muted-foreground">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                    </div>
+                </div>
+             </div>
+           )}
         </div>
       </ScrollArea>
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
-             {attachedFile && (
-                <div className="flex items-center justify-between p-2 rounded-md border bg-muted/50">
-                    <div className="flex items-center gap-2 text-sm font-medium truncate">
-                        <File className="w-4 h-4" />
-                        <span className="truncate">{attachedFile.name}</span>
-                    </div>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeFile}>
-                        <X className="w-4 h-4" />
-                    </Button>
-                </div>
-            )}
             { user && (
               <>
                 <div className="flex items-center justify-center gap-4 text-sm">
@@ -536,5 +547,3 @@ export function ChatAssistant() {
     </>
   );
 }
-
-    
