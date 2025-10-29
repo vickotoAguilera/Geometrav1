@@ -179,7 +179,7 @@ export function ChatAssistant() {
         try {
           toast({ title: "Subiendo archivo..." });
           const formData = new FormData();
-          formData.append('file', file);
+          formData.append('file', file, file.name);
 
           const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
           
@@ -196,6 +196,7 @@ export function ChatAssistant() {
           
           toast({ title: "Archivo subido", description: "Analizando con la IA..." });
 
+          // Convertir el archivo a data URI para enviarlo a la IA
           const photoDataUri = await new Promise<string>((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = (event) => resolve(event.target?.result as string);
@@ -214,7 +215,7 @@ export function ChatAssistant() {
 
         } catch (error: any) {
           console.error("Error en la subida del archivo:", error);
-          const errorMessage = `Lo siento, ocurrió un error al subir el archivo: ${error.message || 'Error del servidor'}`;
+          const errorMessage = `Lo siento, ocurrió un error al subir el archivo. Código: ${error.code || 'desconocido'}`;
           await saveMessage('assistant', errorMessage);
           toast({
               variant: "destructive",
@@ -266,7 +267,7 @@ export function ChatAssistant() {
   
         } catch (error: any) {
           console.error("Error in chat submission:", error);
-          const errorMessage = `Code: ${error.code}, Message: ${error.message}`;
+          const errorMessage = `Código: ${error.code}, Message: ${error.message}`;
           await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
           toast({
             variant: "destructive",
