@@ -15,9 +15,7 @@ export default function AsistentePage() {
       
       {/* Nuevo contenedor fijo para el asistente */}
       <div className="fixed bottom-0 left-0 right-0 h-96 bg-background border-t">
-        <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground">El asistente de chat se integrará aquí.</p>
-        </div>
+        <ChatAssistant />
       </div>
     </div>
   );
