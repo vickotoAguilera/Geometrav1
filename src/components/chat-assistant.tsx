@@ -11,10 +11,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser } from '@/firebase/provider';
-import { useFirestore } from '@/firebase/provider';
-import { useCollection } from '@/firebase/firestore/use-collection';
-import { useMemoFirebase } from '@/firebase/provider';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from '@/components/ui/label';
@@ -25,7 +21,6 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  createdAt?: Timestamp;
 }
 
 interface GenkitMessage {
@@ -140,21 +135,33 @@ export function ChatAssistant() {
   const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const messagesRef = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-    return collection(firestore, 'users', user.uid, 'messages');
-  }, [user, firestore]);
+  // Cargar mensajes desde localStorage al iniciar
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedMessages = localStorage.getItem('chatHistory');
+        if (storedMessages) {
+          setMessages(JSON.parse(storedMessages));
+        }
+      } catch (error) {
+        console.error("Failed to load messages from localStorage", error);
+      }
+    }
+  }, []);
 
-  const messagesQuery = useMemoFirebase(() => {
-    if (!messagesRef) return null;
-    return query(messagesRef, orderBy('createdAt', 'asc'));
-  }, [messagesRef]);
+  // Guardar mensajes en localStorage cada vez que cambian
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('chatHistory', JSON.stringify(messages));
+      } catch (error) {
+        console.error("Failed to save messages to localStorage", error);
+      }
+    }
+  }, [messages]);
 
-  const { data: messages, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
-  
-  const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -163,7 +170,7 @@ export function ChatAssistant() {
         viewport.scrollTop = viewport.scrollHeight;
       }, 0);
     }
-  }, [messages, optimisticMessages, isPending]);
+  }, [messages, isPending]);
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -174,109 +181,77 @@ export function ChatAssistant() {
         }, 0);
     }
   };
-  
-  const saveMessage = async (message: Omit<Message, 'id'>) => {
-    if (!messagesRef) return;
-    try {
-      await addDoc(messagesRef, message);
-    } catch (err) {
-      console.error("Failed to save message", err);
-      toast({
-        variant: "destructive",
-        title: "Error al guardar mensaje",
-        description: "No se pudo guardar tu mensaje. Por favor, inténtalo de nuevo.",
-      });
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    if (isPending || !user) return;
+    if (!input.trim() || isPending || !user) return;
   
     const currentInput = input;
     setInput('');
     
-    const userMessage: Omit<Message, 'id'> = {
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
       role: 'user',
       content: currentInput,
-      createdAt: serverTimestamp() as Timestamp,
     };
 
-    setOptimisticMessages(prev => [
-      ...prev,
-      {
-        ...userMessage,
-        id: `optimistic-user-${Date.now()}`,
-        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-      },
-      {
-        id: `optimistic-assistant-${Date.now()}`,
+    const assistantPlaceholder: Message = {
+        id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: '...',
-        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-      }
-    ]);
+    }
+
+    const currentMessages = [...messages, userMessage];
+    setMessages([...currentMessages, assistantPlaceholder]);
 
     startTransition(() => {
       const processAndRespond = async () => {
         try {
-          await saveMessage(userMessage);
-          
-          const history: GenkitMessage[] = (messages || []).map(m => ({
+          const history: GenkitMessage[] = currentMessages.map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content }],
           }));
             
           const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode);
           
-          const newAssistantMessage: Omit<Message, 'id'> = {
+          const newAssistantMessage: Message = {
+            id: `assistant-${Date.now()}-final`,
             role: 'assistant',
             content: aiResponse,
-            createdAt: serverTimestamp() as Timestamp,
           };
-          await saveMessage(newAssistantMessage);
+          
+          // Reemplaza el placeholder con la respuesta real
+          setMessages(prev => prev.map(msg => msg.id === assistantPlaceholder.id ? newAssistantMessage : msg));
   
         } catch (error: any) {
           console.error("Error in chat:", error);
-          const errorMessage = `Lo siento, ocurrió un error: ${error.message}`;
-          await saveMessage({role: 'assistant', content: errorMessage, createdAt: serverTimestamp() as Timestamp});
+          const errorMessageContent = `Lo siento, ocurrió un error: ${error.message}`;
+          const errorMessage: Message = {
+            id: `assistant-${Date.now()}-error`,
+            role: 'assistant',
+            content: errorMessageContent,
+          }
+          setMessages(prev => prev.map(msg => msg.id === assistantPlaceholder.id ? errorMessage : msg));
           toast({
             variant: "destructive",
             title: "Error del asistente",
             description: "No se pudo obtener una respuesta. Por favor, inténtalo de nuevo.",
           });
-        } finally {
-            setOptimisticMessages([]);
         }
       };
       processAndRespond();
     });
   };
 
-  const handleDeleteChat = async () => {
-    if (!user || !firestore || !messagesRef) return;
-  
-    try {
-      const messagesSnapshot = await getDocs(messagesRef);
-      const batch = writeBatch(firestore);
-      messagesSnapshot.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
-  
-      toast({
-        title: "Chat borrado",
-        description: "Tu historial de chat ha sido eliminado.",
-      });
-    } catch (error) {
-      console.error("Error deleting chat:", error);
-      toast({
-        variant: "destructive",
-        title: "Error al borrar el chat",
-        description: "No se pudo completar la eliminación. Por favor, inténtalo de nuevo.",
-      });
+  const handleDeleteChat = () => {
+    setMessages([]);
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('chatHistory');
     }
+    toast({
+      title: "Chat borrado",
+      description: "Tu historial de chat local ha sido eliminado.",
+    });
   };
 
   if (isUserLoading) {
@@ -297,8 +272,6 @@ export function ChatAssistant() {
      )
   }
 
-  const allMessages = [...(messages || []), ...optimisticMessages];
-
   return (
     <>
       <SheetHeader className="p-4 border-b">
@@ -317,7 +290,7 @@ export function ChatAssistant() {
                         <AlertDialogHeader>
                         <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se borrará permanentemente todo tu historial de chat de nuestros servidores.
+                            Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de este navegador.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -329,7 +302,7 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Haz una pregunta sobre matemáticas o GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Haz una pregunta sobre matemáticas o GeoGebra.' : 'Inicia sesión para usar el asistente.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -339,22 +312,10 @@ export function ChatAssistant() {
              <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
                Inicia sesión con Google para comenzar a chatear.
              </div>
-          ) : isLoadingMessages ? (
-             <div className="flex items-start gap-3">
-                <Avatar className="w-8 h-8 border">
-                  <AvatarFallback>
-                    <Bot className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
-                </div>
-              </div>
-          ) : allMessages.length === 0 ? (
+          ) : messages.length === 0 && !isPending ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            allMessages.map((message) => (
+            messages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -434,7 +395,10 @@ export function ChatAssistant() {
                     checked={tutorMode === 'geogebra'}
                     onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
                     disabled={isPending}
-                    className="data-[state=unchecked]:bg-destructive"
+                    className={cn(
+                        'data-[state=unchecked]:bg-destructive',
+                        'data-[state=checked]:bg-primary'
+                    )}
                   />
                   <div className='flex items-center gap-2 text-muted-foreground'>
                      <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
@@ -466,3 +430,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
