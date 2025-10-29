@@ -231,9 +231,11 @@ export function ChatAssistant() {
             content: [{ text: m.content }],
           }));
           
-          const queryContent = [{ text: currentInput }];
+          let queryContent: (string | { text: string } | { media: { url: string } })[] = [{ text: currentInput }];
           if (currentFile) {
             queryContent.push({ media: { url: currentFile.dataUri } });
+          } else {
+            queryContent = currentInput;
           }
 
           const { response: aiResponse } = await getAiResponse(queryContent, history, tutorMode);
@@ -422,13 +424,14 @@ export function ChatAssistant() {
             { user && (
               <>
                 {attachedFile && (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted">
                         <Badge variant="secondary" className="truncate">
                             <Paperclip className="mr-2 h-4 w-4" />
                             {attachedFile.name}
                         </Badge>
                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setAttachedFile(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>
                             <X className="h-4 w-4" />
+                            <span className="sr-only">Quitar archivo</span>
                         </Button>
                     </div>
                 )}
@@ -482,3 +485,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
