@@ -426,7 +426,7 @@ export function ChatAssistant() {
             { user && (
               <div className="flex items-center justify-center gap-4 text-sm">
                   <div className='flex items-center gap-2 text-muted-foreground'>
-                    <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-primary')}/>
+                    <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-destructive')}/>
                     <Label htmlFor="tutor-mode">Tutor de Mates</Label>
                   </div>
                   <Switch
@@ -434,6 +434,7 @@ export function ChatAssistant() {
                     checked={tutorMode === 'geogebra'}
                     onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
                     disabled={isPending}
+                    className="data-[state=unchecked]:bg-destructive"
                   />
                   <div className='flex items-center gap-2 text-muted-foreground'>
                      <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
