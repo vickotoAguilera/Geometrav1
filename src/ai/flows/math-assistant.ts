@@ -10,6 +10,9 @@
 import {ai} from '@/ai/genkit';
 import {Part} from 'genkit';
 import {z} from 'genkit';
+import mammoth from 'mammoth';
+import pdf from 'pdf-parse/lib/pdf-parse.js';
+
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'model']),
@@ -18,7 +21,9 @@ const MessageSchema = z.object({
 
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
-  query: z.string().describe('The user query related to math or Geogebra. This query may contain context from a user-provided file.'),
+  query: z.string().describe('The user query related to math or Geogebra.'),
+  fileDataUri: z.string().optional().describe("A file as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
+  fileName: z.string().optional().describe('The name of the attached file.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
 
@@ -38,10 +43,36 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
+    let fileContent = '';
+
+    if (input.fileDataUri && input.fileName) {
+      const base64Data = input.fileDataUri.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      
+      try {
+        if (input.fileName.endsWith('.pdf')) {
+          const data = await pdf(buffer);
+          fileContent = data.text;
+        } else if (input.fileName.endsWith('.docx')) {
+          const result = await mammoth.extractRawText({ buffer });
+          fileContent = result.value;
+        }
+      } catch (e) {
+        console.error("Error processing file in flow: ", e);
+        // Return a user-friendly error if processing fails
+        return { response: "Lo siento, tuve un problema al leer el archivo. ¿Podrías intentar subirlo de nuevo?" };
+      }
+    }
+
+    let userQuery = input.query;
+    if (fileContent) {
+      userQuery = `Usando el siguiente contexto, responde la pregunta.\n\nCONTEXTO:\n---\n${fileContent}\n---\n\nPREGUNTA: ${input.query}`;
+    }
+
     const history = input.history || [];
     
     // The user query is the main content.
-    const prompt: Part[] = [{ text: input.query }];
+    const prompt: Part[] = [{ text: userQuery }];
     history.push({ role: 'user', content: prompt });
 
     const {output} = await ai.generate({
