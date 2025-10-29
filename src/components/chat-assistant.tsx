@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -28,7 +28,7 @@ interface TextMessage extends BaseMessage {
 }
 interface FileMessage extends BaseMessage {
   type: 'file';
-  content: string; // Will store the extracted text
+  content: string; // This will store the data URI
   fileName: string;
   isActive: boolean; // To mark if it's the active context
 }
@@ -135,7 +135,7 @@ export function ChatAssistant() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (!selectedFile || !user || !messagesRef) return;
+    if (!selectedFile || !user || !messagesRef || !firestore) return;
   
     if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
@@ -145,44 +145,48 @@ export function ChatAssistant() {
       });
       return;
     }
-
-    // Set other files to inactive
-    const batch = writeBatch(firestore!);
-    fileMessages.forEach(fileMsg => {
-        if(fileMsg.isActive) {
-            const docRef = doc(messagesRef, fileMsg.id);
-            batch.update(docRef, { isActive: false });
-        }
-    });
-    await batch.commit();
-
-    // Now, add the new file as active
-    const fileMessageData: Omit<FileMessage, 'id'> = {
-      role: 'user',
-      type: 'file',
-      content: '', // Content will be processed by the backend
-      fileName: selectedFile.name,
-      isActive: true, // New files are active by default
-      createdAt: serverTimestamp() as Timestamp,
-    };
     
     try {
-      await addDoc(messagesRef, fileMessageData);
-      toast({
-        title: "Archivo añadido",
-        description: `${selectedFile.name} está listo para ser usado como contexto.`,
-      });
+        const fileDataUri = await fileToDataUri(selectedFile);
+
+        // Set other files to inactive
+        const batch = writeBatch(firestore);
+        fileMessages.forEach(fileMsg => {
+            if(fileMsg.isActive) {
+                const docRef = doc(messagesRef, fileMsg.id);
+                batch.update(docRef, { isActive: false });
+            }
+        });
+        await batch.commit();
+
+        const fileMessageData: Omit<FileMessage, 'id'> = {
+            role: 'user',
+            type: 'file',
+            content: fileDataUri,
+            fileName: selectedFile.name,
+            isActive: true,
+            createdAt: serverTimestamp() as Timestamp,
+        };
+
+        await addDoc(messagesRef, fileMessageData);
+
+        toast({
+            title: "Archivo añadido",
+            description: `${selectedFile.name} está listo para ser usado como contexto.`,
+        });
+
     } catch (err) {
       console.error("Failed to save file message", err);
       toast({
         variant: "destructive",
-        title: "Error al guardar archivo",
-        description: "No se pudo guardar la referencia del archivo. Por favor, inténtalo de nuevo.",
+        title: "Error al procesar archivo",
+        description: "No se pudo leer o guardar el archivo. Por favor, inténtalo de nuevo.",
       });
     }
 
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
+
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -240,18 +244,14 @@ export function ChatAssistant() {
           const activeFile = fileMessages.find(f => f.isActive);
           let fileDataUri: string | undefined;
           let fileName: string | undefined;
-
+          
           if (activeFile) {
-            // Re-fetch the actual file from a hidden input if needed or store blob
-            // For this implementation, we assume we need to re-read it if we don't store it.
-            // A better approach would be to store the file content in Firestore directly.
-            // Let's assume the flow is updated to receive the content.
              toast({
               title: "Usando contexto",
               description: `La IA está usando '${activeFile.fileName}' como contexto.`,
             });
-            // The AI flow will now receive the file content from firestore message
-            // and do the processing.
+            fileDataUri = activeFile.content;
+            fileName = activeFile.fileName;
           }
           
           const history: GenkitMessage[] = (messages || [])
@@ -261,10 +261,7 @@ export function ChatAssistant() {
               content: [{ text: (m as TextMessage).content }],
             }));
             
-          // Get the full content of the active file to pass to the AI
-          const activeFileContent = activeFile?.content ?? '';
-
-          const { response: aiResponse } = await getAiResponse(currentInput, history, activeFileContent, activeFile?.fileName);
+          const { response: aiResponse } = await getAiResponse(currentInput, history, fileDataUri, fileName);
           
           await saveMessage({
             role: 'assistant',
@@ -317,16 +314,26 @@ export function ChatAssistant() {
   
   const toggleFileActive = async (fileId: string) => {
     if (!messagesRef || !firestore) return;
+  
+    const fileToToggle = fileMessages.find(f => f.id === fileId);
+    if (!fileToToggle) return;
+  
+    const newActiveState = !fileToToggle.isActive;
+  
     const batch = writeBatch(firestore);
+  
+    // Update all files
     fileMessages.forEach(file => {
       const docRef = doc(messagesRef, file.id);
       if (file.id === fileId) {
-        batch.update(docRef, { isActive: !file.isActive });
-      } else if (file.isActive) {
-        // Deactivate other active files
+        // This is the file we clicked. Set its state to the new state.
+        batch.update(docRef, { isActive: newActiveState });
+      } else if (newActiveState) {
+        // If we are activating a file, all others must be deactivated.
         batch.update(docRef, { isActive: false });
       }
     });
+  
     await batch.commit();
   };
 
