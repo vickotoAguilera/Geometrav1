@@ -88,6 +88,48 @@ const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => 
   );
 };
 
+const parseResponse = (content: string) => {
+    const buttonRegex = /\[button:(.*?)\]/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+  
+    while ((match = buttonRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({ type: 'text', value: content.substring(lastIndex, match.index) });
+      }
+      parts.push({ type: 'button', value: match[1] });
+      lastIndex = match.index + match[0].length;
+    }
+  
+    if (lastIndex < content.length) {
+      parts.push({ type: 'text', value: content.substring(lastIndex) });
+    }
+  
+    // Regex to find code blocks and wrap them
+    const finalParts = parts.map(part => {
+        if (part.type === 'text') {
+            const codeRegex = /<code>(.*?)<\/code>/gs;
+            const textSubParts = [];
+            let lastTextIndex = 0;
+            let codeMatch;
+            while((codeMatch = codeRegex.exec(part.value)) !== null) {
+                if (codeMatch.index > lastTextIndex) {
+                    textSubParts.push({type: 'text', value: part.value.substring(lastTextIndex, codeMatch.index)});
+                }
+                textSubParts.push({type: 'code', value: codeMatch[1]});
+                lastTextIndex = codeMatch.index + codeMatch[0].length;
+            }
+             if (lastTextIndex < part.value.length) {
+                textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex) });
+            }
+            return textSubParts;
+        }
+        return part;
+    }).flat();
+
+    return finalParts;
+  };
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
@@ -149,7 +191,6 @@ export function ChatAssistant() {
     try {
         const fileDataUri = await fileToDataUri(selectedFile);
 
-        // Set other files to inactive
         const batch = writeBatch(firestore);
         fileMessages.forEach(fileMsg => {
             if(fileMsg.isActive) {
@@ -190,6 +231,14 @@ export function ChatAssistant() {
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
+    // Automatically submit the form
+    const form = document.getElementById('chat-form') as HTMLFormElement;
+    if(form) {
+        // We need to use a timeout to allow the state to update before submitting
+        setTimeout(() => {
+            form.requestSubmit();
+        }, 0);
+    }
   };
   
   const saveMessage = async (message: Omit<TextMessage, 'id'>) => {
@@ -326,7 +375,6 @@ export function ChatAssistant() {
     fileMessages.forEach(file => {
       const docRef = doc(messagesRef, file.id);
       if (file.id === fileId) {
-        // This is the file we clicked. Set its state to the new state.
         batch.update(docRef, { isActive: newActiveState });
       } else if (newActiveState) {
         // If we are activating a file, all others must be deactivated.
@@ -483,14 +531,31 @@ export function ChatAssistant() {
                         : 'bg-muted text-muted-foreground'
                     )}
                   >
-                    {message.content === '...' ? (
+                     {message.content === '...' ? (
                         <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
                         </div>
                     ) : (
-                        message.content
+                        <div className="space-y-2">
+                            {parseResponse(message.content).map((part, index) => {
+                                if (part.type === 'button') {
+                                return (
+                                    <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
+                                    {part.value}
+                                    </Button>
+                                );
+                                } else if (part.type === 'code') {
+                                    return (
+                                        <code key={index} className="bg-foreground/10 text-foreground font-semibold rounded-md px-2 py-1 block whitespace-pre-wrap">
+                                            {part.value}
+                                        </code>
+                                    )
+                                }
+                                return <span key={index}>{part.value}</span>;
+                            })}
+                        </div>
                     )}
                   </div>
                 {message.role === 'user' && (
@@ -509,6 +574,7 @@ export function ChatAssistant() {
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full">
             <form
+              id="chat-form"
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
