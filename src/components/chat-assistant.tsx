@@ -421,7 +421,7 @@ export function ChatAssistant() {
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
-            { user && (
+             { user && (
               <>
                 {attachedFile && (
                     <div className="flex items-center justify-between p-2 rounded-md bg-muted text-sm">
