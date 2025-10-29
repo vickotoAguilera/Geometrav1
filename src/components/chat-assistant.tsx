@@ -424,12 +424,12 @@ export function ChatAssistant() {
             { user && (
               <>
                 {attachedFile && (
-                    <div className="flex items-center justify-between p-2 rounded-md bg-muted">
-                        <Badge variant="secondary" className="truncate">
-                            <Paperclip className="mr-2 h-4 w-4" />
-                            {attachedFile.name}
+                    <div className="flex items-center justify-between p-2 rounded-md bg-muted text-sm">
+                        <Badge variant="secondary" className="truncate flex-1">
+                            <Paperclip className="mr-2 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{attachedFile.name}</span>
                         </Badge>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setAttachedFile(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0" onClick={() => { setAttachedFile(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>
                             <X className="h-4 w-4" />
                             <span className="sr-only">Quitar archivo</span>
                         </Button>
@@ -464,7 +464,7 @@ export function ChatAssistant() {
             >
               <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" id="file-upload" accept="image/*,application/pdf,.docx,.doc" />
               <Button type="button" variant="ghost" size="icon" disabled={!user || isPending} asChild>
-                <Label htmlFor="file-upload" className="cursor-pointer">
+                <Label htmlFor="file-upload" className={cn("cursor-pointer", !user && "cursor-not-allowed")}>
                     <Paperclip className="w-5 h-5" />
                     <span className="sr-only">Adjuntar archivo</span>
                 </Label>
@@ -485,5 +485,3 @@ export function ChatAssistant() {
     </>
   );
 }
-
-    
