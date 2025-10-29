@@ -105,7 +105,7 @@ export default function GlosarioPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
-        <h1 className="text-4xl font-bold text-primary-foreground/90">Glosario de Funciones de GeoGebra</h1>
+        <h1 className="text-4xl font-bold text-foreground">Glosario de Funciones de GeoGebra</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-3xl">
             Un diccionario completo de comandos y herramientas de GeoGebra. Úsalo como referencia para potenciar tus construcciones.
         </p>
