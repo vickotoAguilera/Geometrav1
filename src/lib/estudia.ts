@@ -6,8 +6,9 @@ import html from 'remark-html';
 
 const postsDirectory = path.join(process.cwd(), 'src', 'content', 'estudia');
 
-export async function getPostBySlug(slug: string[]) {
-  const filePath = path.join(postsDirectory, ...slug) + '.md';
+export async function getPostBySlug(slug: string[] | string) {
+  const slugArray = Array.isArray(slug) ? slug : [slug];
+  const filePath = path.join(postsDirectory, ...slugArray) + '.md';
   
   if (!fs.existsSync(filePath)) {
     return null;
@@ -20,7 +21,7 @@ export async function getPostBySlug(slug: string[]) {
   const contentHtml = processedContent.toString();
 
   return {
-    slug: slug.join('/'),
+    slug: slugArray.join('/'),
     contentHtml,
     ...(data as { title: string; description: string }),
   };
