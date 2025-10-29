@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
@@ -7,39 +6,45 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs } from 'firebase/firestore';
-import { useCollection } from '@/firebase/firestore/use-collection';
+import Image from 'next/image';
 
 
-interface Message {
+interface BaseMessage {
   id: string;
   role: 'user' | 'assistant';
+  createdAt?: Timestamp;
+}
+interface TextMessage extends BaseMessage {
+  type: 'text';
   content: string;
+  imageUrl?: string; // For images sent with a text message
+}
+interface FileContextMessage extends BaseMessage {
+  type: 'fileContext';
+  content: string; // This will store the data URI
+  fileName: string;
+  isActive: boolean; 
 }
 
-interface FirestoreMessage {
-  id?: string;
-  role: 'user' | 'assistant';
-  content: string;
-  createdAt: any;
-  uid: string;
-}
-
-type TutorMode = 'math' | 'geogebra';
+type Message = TextMessage | FileContextMessage;
 
 interface GenkitMessage {
   role: 'user' | 'model';
-  content: any[];
+  content: Part[];
 }
+
+type TutorMode = 'math' | 'geogebra';
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
@@ -140,7 +145,9 @@ const parseResponse = (content: string) => {
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [tutorMode, setTutorMode] = useState<TutorMode>('math');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -148,20 +155,24 @@ export function ChatAssistant() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
-  const messagesCollectionRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
+  const messagesRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
     return collection(firestore, 'users', user.uid, 'messages');
-  }, [firestore, user]);
-  
+  }, [user, firestore]);
+
   const messagesQuery = useMemoFirebase(() => {
-    if (!messagesCollectionRef) return null;
-    return query(messagesCollectionRef, orderBy('createdAt', 'asc'));
-  }, [messagesCollectionRef]);
+    if (!messagesRef) return null;
+    return query(messagesRef, orderBy('createdAt', 'asc'));
+  }, [messagesRef]);
 
-  const { data: messages, isLoading: isLoadingMessages } = useCollection<FirestoreMessage>(messagesQuery);
-  const messagesRef = useRef(messages);
-  messagesRef.current = messages;
+  const { data: messages, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
+  
+  const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
 
+  const allMessages = [...(messages || []), ...optimisticMessages];
+
+  const textMessages = allMessages.filter(m => m.type === 'text') as TextMessage[];
+  const fileContextMessages = allMessages.filter(m => m.type === 'fileContext') as FileContextMessage[];
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -170,7 +181,63 @@ export function ChatAssistant() {
         viewport.scrollTop = viewport.scrollHeight;
       }, 0);
     }
-  }, [messages, isPending]);
+  }, [allMessages, isPending]);
+
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile || !user || !messagesRef) return;
+  
+    if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        variant: "destructive",
+        title: "Archivo demasiado grande",
+        description: "Por favor, selecciona un archivo de menos de 5MB.",
+      });
+      return;
+    }
+    
+    try {
+      const fileDataUri = await fileToDataUri(selectedFile);
+      const isImage = selectedFile.type.startsWith('image/');
+
+      if (isImage) {
+        setAttachedImage(fileDataUri);
+      } else {
+        const fileMessageData: Omit<FileContextMessage, 'id'> = {
+            role: 'user',
+            type: 'fileContext',
+            content: fileDataUri,
+            fileName: selectedFile.name,
+            isActive: true, // New documents are active by default
+            createdAt: serverTimestamp() as Timestamp,
+        };
+        await addDoc(messagesRef, fileMessageData);
+        toast({
+            title: "Archivo añadido al contexto",
+            description: `${selectedFile.name} está listo para ser usado.`,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to process file", err);
+      toast({
+        variant: "destructive",
+        title: "Error al procesar archivo",
+        description: "No se pudo leer o guardar el archivo.",
+      });
+    }
+
+    if(fileInputRef.current) fileInputRef.current.value = '';
+  };
+
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -181,87 +248,159 @@ export function ChatAssistant() {
         }, 0);
     }
   };
+  
+  const saveMessage = async (message: Omit<TextMessage, 'id'>) => {
+    if (!messagesRef) return;
+    try {
+      await addDoc(messagesRef, message);
+    } catch (err) {
+      console.error("Failed to save message", err);
+      toast({
+        variant: "destructive",
+        title: "Error al guardar mensaje",
+        description: "No se pudo guardar tu mensaje. Por favor, inténtalo de nuevo.",
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user || !messagesCollectionRef) return;
+    if (!input.trim() || isPending || !user) {
+      if(attachedImage && !isPending && user) {
+        // Allow sending image with empty prompt
+      } else {
+        return;
+      }
+    }
   
     const currentInput = input;
+    const currentAttachedImage = attachedImage;
     setInput('');
-  
+    setAttachedImage(null);
+    
+    const userMessage: Omit<TextMessage, 'id'> = {
+      role: 'user',
+      type: 'text',
+      content: currentInput,
+      createdAt: serverTimestamp() as Timestamp,
+      ...(currentAttachedImage && { imageUrl: currentAttachedImage }),
+    };
+
+    const optimisticUserMessage: TextMessage = {
+      ...userMessage,
+      id: `optimistic-user-${Date.now()}`,
+      createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+    };
+    
+    const optimisticAssistantMessage: TextMessage = {
+        id: `optimistic-assistant-${Date.now()}`,
+        role: 'assistant',
+        type: 'text',
+        content: '...',
+        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+    };
+
+    setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+
     startTransition(() => {
       const processAndRespond = async () => {
-        const userMessage: FirestoreMessage = {
-          role: 'user',
-          content: currentInput,
-          createdAt: serverTimestamp(),
-          uid: user.uid,
-        };
-        addDoc(messagesCollectionRef, userMessage);
-  
         try {
-          const currentMessages = messagesRef.current || [];
-          const history: GenkitMessage[] = currentMessages.map(m => ({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            content: [{ text: m.content }],
-          }));
-  
-          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode);
+          await saveMessage(userMessage);
+
+          const activeFiles = fileContextMessages
+            .filter(f => f.isActive)
+            .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
+
+          if (activeFiles.length > 0) {
+             toast({
+              title: "Usando contexto",
+              description: `La IA está usando ${activeFiles.length} archivo(s) como contexto.`,
+            });
+          }
           
-          const newAssistantMessage: FirestoreMessage = {
+          const history: GenkitMessage[] = (messages || [])
+            .filter(m => m.type === 'text')
+            .map(m => ({
+              role: m.role === 'assistant' ? 'model' : 'user',
+              content: [{ text: (m as TextMessage).content }],
+            }));
+            
+          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, activeFiles);
+          
+          await saveMessage({
             role: 'assistant',
+            type: 'text',
             content: aiResponse,
-            createdAt: serverTimestamp(),
-            uid: 'ai-assistant',
-          };
-          addDoc(messagesCollectionRef, newAssistantMessage);
+            createdAt: serverTimestamp() as Timestamp,
+          });
   
         } catch (error: any) {
           console.error("Error in chat:", error);
-           const errorMessageContent = `Lo siento, ocurrió un error: ${error.message}`;
-           const errorMessage: FirestoreMessage = {
-            role: 'assistant',
-            content: errorMessageContent,
-            createdAt: serverTimestamp(),
-            uid: 'ai-assistant-error',
-          };
-          addDoc(messagesCollectionRef, errorMessage);
+          const errorMessage = `Lo siento, ocurrió un error: ${error.message}`;
+          await saveMessage({role: 'assistant', type: 'text', content: errorMessage, createdAt: serverTimestamp() as Timestamp});
           toast({
             variant: "destructive",
             title: "Error del asistente",
             description: "No se pudo obtener una respuesta. Por favor, inténtalo de nuevo.",
           });
+        } finally {
+            setOptimisticMessages([]);
         }
       };
       processAndRespond();
     });
   };
-  
 
   const handleDeleteChat = async () => {
-    if (!messagesCollectionRef) return;
-
+    if (!user || !firestore || !messagesRef) return;
+  
     try {
-        const q = query(messagesCollectionRef);
-        const querySnapshot = await getDocs(q);
-        const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
-        await Promise.all(deletePromises);
-        toast({
-            title: "Chat borrado",
-            description: "Tu historial de chat ha sido eliminado de la base de datos.",
-        });
+      const messagesSnapshot = await getDocs(messagesRef);
+      const batch = writeBatch(firestore);
+      messagesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+  
+      toast({
+        title: "Chat borrado",
+        description: "Tu historial de chat ha sido eliminado.",
+      });
     } catch (error) {
-        console.error("Error deleting chat history: ", error);
-        toast({
-            variant: "destructive",
-            title: "Error al borrar",
-            description: "No se pudo eliminar el historial de chat.",
-        });
+      console.error("Error deleting chat:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al borrar el chat",
+        description: "No se pudo completar la eliminación. Por favor, inténtalo de nuevo.",
+      });
+    }
+  };
+  
+  const toggleFileActive = async (fileId: string, isActive: boolean) => {
+    if (!messagesRef) return;
+    const docRef = doc(messagesRef, fileId);
+    await updateDoc(docRef, { isActive });
+  };
+
+  const deleteFile = async (fileId: string) => {
+    if (!messagesRef) return;
+    try {
+      await deleteDoc(doc(messagesRef, fileId));
+      toast({
+        title: "Archivo eliminado",
+        description: "El archivo ha sido eliminado del contexto.",
+      });
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error al eliminar",
+        description: "No se pudo eliminar el archivo.",
+      });
     }
   };
 
 
-  if (isUserLoading || (user && isLoadingMessages)) {
+  if (isUserLoading) {
      return (
         <div className="flex-1 p-4 space-y-6 flex items-end">
             <div className="flex items-start gap-3 w-full">
@@ -283,26 +422,21 @@ export function ChatAssistant() {
     <>
       <SheetHeader className="p-4 border-b">
         <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Bot />
-              <SheetTitle>Asistente Geometra</SheetTitle>
-              <SheetDescription className="sr-only">
-                  Haz una pregunta sobre matemáticas o GeoGebra.
-              </SheetDescription>
-            </div>
+            <SheetTitle className="font-headline flex items-center gap-2">
+                <Bot /> Asistente Geometra
+            </SheetTitle>
             {user && (
-                <AlertDialog>
+                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" title="Borrar historial del chat">
+                        <Button variant="ghost" size="icon" title="Borrar chat">
                             <Trash2 className="w-5 h-5" />
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                        <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se borrará permanentemente tu
-                            historial de chat de la base de datos.
+                            Esta acción no se puede deshacer. Se borrará permanentemente todo tu historial de chat de nuestros servidores.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -313,18 +447,62 @@ export function ChatAssistant() {
                 </AlertDialog>
             )}
         </div>
+        <SheetDescription>
+            {user ? 'Adjunta un archivo para añadir contexto o haz una pregunta.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+        </SheetDescription>
       </SheetHeader>
+
+      {user && fileContextMessages.length > 0 && (
+        <div className="p-3 border-b bg-background">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground flex items-center gap-2">
+            <Info className="w-4 h-4"/>
+            Contexto de Archivos
+          </h3>
+          <div className="space-y-2">
+            {fileContextMessages.map(file => (
+              <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate" title={file.fileName}>{file.fileName}</span>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <Switch
+                    checked={file.isActive}
+                    onCheckedChange={(checked) => toggleFileActive(file.id, checked)}
+                    aria-label={`Activar contexto para ${file.fileName}`}
+                  />
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteFile(file.id)} title="Quitar archivo">
+                      <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-6">
           {!user ? (
              <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
-               Inicia sesión para comenzar a chatear.
+               Inicia sesión con Google para comenzar a chatear.
              </div>
-          ) : (!messages || messages.length === 0) && !isPending ? (
+          ) : isLoadingMessages ? (
+             <div className="flex items-start gap-3">
+                <Avatar className="w-8 h-8 border">
+                  <AvatarFallback>
+                    <Bot className="w-5 h-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="p-3 rounded-lg bg-muted max-w-[80%] w-full space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+              </div>
+          ) : textMessages.length === 0 ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            messages?.map((message) => (
+            textMessages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -339,45 +517,50 @@ export function ChatAssistant() {
                     </AvatarFallback>
                   </Avatar>
                 )}
-                <div
-                  className={cn(
-                    'p-3 rounded-lg max-w-[80%] text-sm',
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                >
-                  <div className="whitespace-pre-wrap">
-                   {isPending && messagesRef.current?.at(-1)?.id === message.id ? (
-                      <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                          <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                          <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                      </div>
-                  ) : (
-                      <div className="space-y-2 leading-relaxed">
-                          {parseResponse(message.content).map((part, index) => {
-                              if (part.type === 'button') {
-                              return (
-                                  <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
-                                  {part.value}
-                                  </Button>
-                              );
-                              } else if (part.type === 'code') {
-                                  return (
-                                      <code key={index} className="bg-foreground/10 text-foreground font-semibold rounded-md px-2 py-1 block whitespace-pre-wrap">
-                                          {part.value}
-                                      </code>
-                                  )
-                              } else if (part.type === 'bold') {
-                                  return <strong key={index}>{part.value}</strong>
-                              }
-                              return <span key={index}>{part.value}</span>;
-                          })}
-                      </div>
-                  )}
+                  <div
+                    className={cn(
+                      'p-3 rounded-lg max-w-[80%] text-sm',
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    )}
+                  >
+                    {message.imageUrl && (
+                        <div className="mb-2">
+                            <Image src={message.imageUrl} alt="Imagen adjunta" width={200} height={200} className="rounded-md object-cover"/>
+                        </div>
+                    )}
+                    <div className="whitespace-pre-wrap">
+                     {message.content === '...' ? (
+                        <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                        </div>
+                    ) : (
+                        <div className="space-y-2 leading-relaxed">
+                            {parseResponse(message.content).map((part, index) => {
+                                if (part.type === 'button') {
+                                return (
+                                    <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
+                                    {part.value}
+                                    </Button>
+                                );
+                                } else if (part.type === 'code') {
+                                    return (
+                                        <code key={index} className="bg-foreground/10 text-foreground font-semibold rounded-md px-2 py-1 block whitespace-pre-wrap">
+                                            {part.value}
+                                        </code>
+                                    )
+                                } else if (part.type === 'bold') {
+                                    return <strong key={index}>{part.value}</strong>
+                                }
+                                return <span key={index}>{part.value}</span>;
+                            })}
+                        </div>
+                    )}
+                    </div>
                   </div>
-                </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
@@ -388,57 +571,55 @@ export function ChatAssistant() {
               </div>
             ))
           )}
-           {isPending && (
-             <div className="flex items-start gap-3">
-                <Avatar className="w-8 h-8 border">
-                    <AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback>
-                </Avatar>
-                <div className="p-3 rounded-lg max-w-[80%] text-sm bg-muted text-muted-foreground">
-                    <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                        <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                        <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                    </div>
-                </div>
-             </div>
-           )}
         </div>
       </ScrollArea>
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
             { user && (
-              <>
-                <div className="flex items-center justify-center gap-4 text-sm">
-                    <div className={cn('flex items-center gap-2', tutorMode === 'math' ? 'text-destructive' : 'text-muted-foreground')}>
-                      <Sigma className='w-5 h-5'/>
-                      <Label htmlFor="tutor-mode">Tutor de Mates</Label>
-                    </div>
-                    <Switch
-                      id="tutor-mode"
-                      checked={tutorMode === 'geogebra'}
-                      onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
-                      disabled={isPending}
-                       className={cn(
-                        'data-[state=unchecked]:bg-destructive',
-                        'data-[state=checked]:bg-primary'
-                      )}
-                    />
-                    <div className={cn('flex items-center gap-2', tutorMode === 'geogebra' ? 'text-primary' : 'text-muted-foreground')}>
-                       <GraduationCap className='w-5 h-5'/>
-                       <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
-                    </div>
+              <div className="flex items-center justify-center gap-4 text-sm">
+                  <div className='flex items-center gap-2 text-muted-foreground'>
+                    <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-primary')}/>
+                    <Label htmlFor="tutor-mode">Tutor de Mates</Label>
+                  </div>
+                  <Switch
+                    id="tutor-mode"
+                    checked={tutorMode === 'geogebra'}
+                    onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
+                  />
+                  <div className='flex items-center gap-2 text-muted-foreground'>
+                     <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
+                     <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
+                  </div>
+              </div>
+            )}
+             {attachedImage && (
+                <div className="relative w-24 h-24 mx-auto">
+                    <Image src={attachedImage} alt="Imagen para adjuntar" layout="fill" className="rounded-md object-cover" />
+                    <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => setAttachedImage(null)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
                 </div>
-              </>
             )}
             <form
               id="chat-form"
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
-              <Button type="button" variant="ghost" size="icon" disabled>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending || !user}
+                title="Adjuntar archivo o imagen"
+              >
                 <Paperclip className="w-5 h-5" />
-                <span className="sr-only">Adjuntar archivo</span>
               </Button>
               <Input
                 value={input}
@@ -446,10 +627,17 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
-                <Send className="w-4 h-4" />
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedImage) || !user}>
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span className="sr-only">Enviar</span>
               </Button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange}
+                className="hidden"
+                accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
+              />
             </form>
           </div>
       </SheetFooter>
