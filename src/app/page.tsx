@@ -1,10 +1,6 @@
 import Link from 'next/link';
 import Header from '@/components/header';
 import Logo from '@/components/logo';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Bot } from 'lucide-react';
-import { ChatAssistant } from '@/components/chat-assistant';
 
 export default function HomePage() {
   return (
@@ -16,24 +12,32 @@ export default function HomePage() {
           Bienvenido a Geometra
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-          Tu plataforma todo-en-uno para dominar la geometría y la física con la ayuda de un tutor de IA experto y el poder de GeoGebra.
+          Tu plataforma todo-en-uno para dominar las matemáticas y GeoGebra con la ayuda de un tutor de IA experto.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
           
           <Link href="/applet" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
               <span className="text-2xl mb-2">칠</span>
-              <span className="font-semibold">Ir a la Pizarra</span>
-              <p className="text-sm text-muted-foreground mt-1">Tu lienzo en blanco.</p>
+              <span className="font-semibold">Pizarra Interactiva</span>
+              <p className="text-sm text-muted-foreground mt-1">Tu lienzo en blanco con GeoGebra.</p>
+            </div>
+          </Link>
+
+           <Link href="/asistente" passHref className="group">
+            <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
+              <span className="text-2xl mb-2">🤖</span>
+              <span className="font-semibold">Asistente de Mates</span>
+              <p className="text-sm text-muted-foreground mt-1">Chatea con el tutor de IA.</p>
             </div>
           </Link>
 
           <Link href="/estudia" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
               <span className="text-2xl mb-2">✏️</span>
-              <span className="font-semibold">Estudia con la IA</span>
-              <p className="text-sm text-muted-foreground mt-1">Tu espacio de estudio personalizado.</p>
+              <span className="font-semibold">Temas de Estudio</span>
+              <p className="text-sm text-muted-foreground mt-1">Tu espacio de aprendizaje.</p>
             </div>
           </Link>
 

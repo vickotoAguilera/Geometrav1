@@ -39,12 +39,3 @@ export default async function StudyTopicPage({ params }: { params: { slug: strin
     </div>
   );
 }
-
-// Esta función se puede usar para generar las rutas estáticamente en tiempo de compilación
-// import { getAllPosts } from '@/lib/estudia';
-// export async function generateStaticParams() {
-//   const posts = await getAllPosts();
-//   return posts.map((post) => ({
-//     slug: post.slug,
-//   }));
-// }
