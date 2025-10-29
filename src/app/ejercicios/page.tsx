@@ -1,3 +1,5 @@
+'use client'
+
 import { UploadAnalysis } from '@/components/upload-analysis';
 import Header from '@/components/header';
 

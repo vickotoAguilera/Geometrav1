@@ -2,11 +2,9 @@
 
 import { useState, useRef } from 'react';
 import { useUser } from '@/firebase';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAiResponse } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { UploadCloud, File, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -62,61 +60,69 @@ export function UploadAnalysis() {
       setError('Por favor, selecciona un archivo e inicia sesión para analizar.');
       return;
     }
-
+  
     setIsUploading(true);
     setIsAnalyzing(true);
     setError(null);
     setAnalysisResult(null);
-    setUploadProgress(0); // Reset progress
-
+    setUploadProgress(0);
+  
     try {
-      // Simulate upload progress
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        if (progress > 100) progress = 100;
-        setUploadProgress(progress);
-        if (progress === 100) clearInterval(interval);
-      }, 200);
+        const formData = new FormData();
+        formData.append('file', file);
+  
+        const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
+        
+        // Simular progreso de subida
+        const progressInterval = setInterval(() => {
+            setUploadProgress(prev => Math.min(prev + 10, 90));
+        }, 200);
 
-      const storage = getStorage();
-      const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}-${file.name}`);
-      
-      await uploadBytes(storageRef, file);
-      
-      clearInterval(interval);
-      setUploadProgress(100);
-      setIsUploading(false);
-      
-      toast({
-        title: 'Análisis en curso',
-        description: 'La IA está procesando tu documento. Esto puede tardar unos segundos...',
-      });
-      
-      const photoDataUri = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target?.result as string);
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
-      });
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          body: formData,
+        });
 
-      const prompt = `Analiza el siguiente documento: ${file.name}. Extrae los puntos clave, resume el contenido y, si contiene problemas o ejercicios, sugiere cómo resolverlos.`;
-      const { response } = await getAiResponse(prompt, [], photoDataUri);
-      
-      setAnalysisResult(response);
-
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        setIsUploading(false);
+  
+        if (!response.ok) {
+          const errorBody = await response.text();
+          throw new Error(`Error del servidor (${response.status}): ${errorBody}`);
+        }
+  
+        const result = await response.json();
+  
+        toast({
+          title: 'Análisis en curso',
+          description: 'La IA está procesando tu documento...',
+        });
+  
+        const photoDataUri = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(file);
+        });
+  
+        const prompt = `Analiza el siguiente documento: ${file.name}. Extrae los puntos clave, resume el contenido y, si contiene problemas o ejercicios, sugiere cómo resolverlos.`;
+        const { response: analysis } = await getAiResponse(prompt, [], photoDataUri);
+        
+        setAnalysisResult(analysis);
+  
     } catch (err: any) {
-      console.error(err);
-      const errorMessage = err.message || 'Ocurrió un error desconocido durante el análisis.';
-      setError(errorMessage);
-      toast({
-        variant: 'destructive',
-        title: 'Error en el análisis',
-        description: errorMessage,
-      });
+        console.error(err);
+        const errorMessage = err.message || 'Ocurrió un error desconocido durante el análisis.';
+        setError(errorMessage);
+        toast({
+          variant: 'destructive',
+          title: 'Error en el análisis',
+          description: errorMessage,
+        });
     } finally {
-      setIsAnalyzing(false);
-      setIsUploading(false);
+        setIsAnalyzing(false);
+        setIsUploading(false);
     }
   };
 

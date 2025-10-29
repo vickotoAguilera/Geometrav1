@@ -22,7 +22,6 @@ import { useUser, useFirestore, useCollection, useMemoFirebase, useFirebaseApp }
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
-import { getFunctions, httpsCallable } from 'firebase/functions';
 
 interface Message {
   id: string;
@@ -94,7 +93,6 @@ export function ChatAssistant() {
   
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-  const firebaseApp = useFirebaseApp();
 
 
   const messagesRef = useMemoFirebase(() => {
@@ -152,88 +150,80 @@ export function ChatAssistant() {
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user || !firebaseApp) return;
-
+    if (!file || !user) return;
+  
     if(fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-
+  
     startTransition(() => {
       const processAndRespond = async () => {
-          const userMessageContent = `Analiza el archivo: ${file.name}`;
+        const userMessageContent = `Analiza el archivo: ${file.name}`;
+  
+        const optimisticUserMessage: Message = {
+          id: `optimistic-user-${Date.now()}`,
+          role: 'user',
+          content: userMessageContent,
+          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+        };
+        const optimisticAssistantMessage: Message = {
+          id: `optimistic-assistant-${Date.now()}`,
+          role: 'assistant',
+          content: '...',
+          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+        };
+        setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+  
+        await saveMessage('user', userMessageContent);
+  
+        try {
+          toast({ title: "Subiendo archivo..." });
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
           
-          const optimisticUserMessage: Message = {
-              id: `optimistic-user-${Date.now()}`,
-              role: 'user',
-              content: userMessageContent,
-              createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-          };
-          const optimisticAssistantMessage: Message = {
-              id: `optimistic-assistant-${Date.now()}`,
-              role: 'assistant',
-              content: '...',
-              createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-          };
-          setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+          const response = await fetch(functionUrl, {
+            method: 'POST',
+            body: formData,
+          });
 
-          await saveMessage('user', userMessageContent);
-
-          try {
-            toast({
-              title: "Subiendo archivo...",
-              description: `Progreso: 0%`,
-            });
-            const reader = new FileReader();
-            reader.onload = async () => {
-              const base64Data = (reader.result as string).split(',')[1];
-              
-              const functions = getFunctions(firebaseApp);
-              const uploadFile = httpsCallable(functions, 'uploadFile');
-              
-              toast({
-                  title: "Archivo subido",
-                  description: "Analizando con la IA...",
-              });
-              
-              const result: any = await uploadFile({
-                fileData: base64Data,
-                fileName: file.name,
-                mimeType: file.type
-              });
-              
-              const downloadURL = result.data.downloadURL;
-              console.log('File uploaded:', downloadURL);
-
-              const photoDataUri = await new Promise<string>((resolve, reject) => {
-                  const reader = new FileReader();
-                  reader.onload = (event) => resolve(event.target?.result as string);
-                  reader.onerror = (error) => reject(error);
-                  reader.readAsDataURL(file);
-              });
-              
-              const history: GenkitMessage[] = (messagesData || [])
-                  .map(m => ({
-                      role: m.role === 'assistant' ? 'model' : 'user',
-                      content: [{ text: m.content as string }],
-                  }));
-
-              const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
-              await saveMessage('assistant', aiResponse);
-            };
-            
-            reader.readAsDataURL(file);
-          } catch (error: any) {
-              console.error("Error en la subida del archivo:", error);
-              const errorMessage = `Lo siento, ocurrió un error al subir el archivo. Código: ${error.code || 'desconocido'}. Mensaje: ${error.message || 'Error del servidor'}`;
-              await saveMessage('assistant', errorMessage);
-              toast({
-                  variant: "destructive",
-                  title: "Error al subir archivo",
-                  description: error.message,
-              });
-          } finally {
-            setOptimisticMessages([]);
+          if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Error del servidor (${response.status}): ${errorBody}`);
           }
+          const result = await response.json();
+          
+          toast({ title: "Archivo subido", description: "Analizando con la IA..." });
+
+          const photoDataUri = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (event) => resolve(event.target?.result as string);
+              reader.onerror = (error) => reject(error);
+              reader.readAsDataURL(file);
+          });
+          
+          const history: GenkitMessage[] = (messagesData || [])
+              .map(m => ({
+                  role: m.role === 'assistant' ? 'model' : 'user',
+                  content: [{ text: m.content as string }],
+              }));
+
+          const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
+          await saveMessage('assistant', aiResponse);
+
+        } catch (error: any) {
+          console.error("Error en la subida del archivo:", error);
+          const errorMessage = `Lo siento, ocurrió un error al subir el archivo: ${error.message || 'Error del servidor'}`;
+          await saveMessage('assistant', errorMessage);
+          toast({
+              variant: "destructive",
+              title: "Error al subir archivo",
+              description: error.message,
+          });
+        } finally {
+          setOptimisticMessages([]);
+        }
       };
       processAndRespond();
     });
