@@ -100,7 +100,73 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      typography: (theme: (arg0: string) => any) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.foreground'),
+            a: {
+              color: theme('colors.primary.DEFAULT'),
+              '&:hover': {
+                color: theme('colors.primary.DEFAULT'),
+              },
+            },
+            h1: {
+              color: theme('colors.foreground'),
+            },
+            h2: {
+              color: theme('colors.foreground'),
+            },
+            h3: {
+              color: theme('colors.foreground'),
+            },
+            strong: {
+              color: theme('colors.foreground'),
+            },
+            code: {
+              backgroundColor: theme('colors.muted.DEFAULT'),
+              color: theme('colors.muted.foreground'),
+              padding: '0.2rem 0.4rem',
+              borderRadius: '0.25rem',
+            },
+             blockquote: {
+              borderLeftColor: theme('colors.border'),
+              color: theme('colors.muted.foreground'),
+            },
+          },
+        },
+        invert: {
+           css: {
+            color: theme('colors.foreground'),
+             a: {
+              color: theme('colors.primary.DEFAULT'),
+              '&:hover': {
+                color: theme('colors.primary.DEFAULT'),
+              },
+            },
+            h1: {
+              color: theme('colors.foreground'),
+            },
+            h2: {
+              color: theme('colors.foreground'),
+            },
+            h3: {
+              color: theme('colors.foreground'),
+            },
+            strong: {
+              color: theme('colors.foreground'),
+            },
+            code: {
+              backgroundColor: theme('colors.muted.DEFAULT'),
+              color: theme('colors.muted.foreground'),
+            },
+            blockquote: {
+              borderLeftColor: theme('colors.border'),
+              color: theme('colors.muted.foreground'),
+            },
+          },
+        },
+      }),
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;
