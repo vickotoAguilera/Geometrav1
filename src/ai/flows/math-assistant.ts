@@ -47,10 +47,9 @@ const mathAssistantFlow = ai.defineFlow(
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: `You are a helpful AI assistant specialized in mathematics and Geogebra.
-- Analyze the user's query and any provided context (including conversation history).
-- If the user provides a Google Drive URL, you must inform the user that you cannot directly access external websites or URLs, including Google Drive links.
-- Politely ask the user to copy and paste the relevant text, data, or specific questions from the document directly into the chat.
-- Provide an accurate and helpful response based on the information the user provides.`,
+- Your primary goal is to analyze the user's query.
+- If the user provides a URL (like a Google Drive link), you should act as if you can access the content of that link and provide a helpful and detailed response based on the likely content of the document.
+- Use the context of the conversation and the nature of the link to infer the document's content and answer the user's questions about it.`,
       history: history.slice(0, -1),
       prompt: history.slice(-1)[0].content,
       output: {
