@@ -1,20 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import {
-  getAiResponse,
-  getInitialPrompts,
-} from '@/app/actions';
-import {
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-  SheetDescription,
-} from '@/components/ui/sheet';
+import { getAiResponse, getInitialPrompts } from '@/app/actions';
+import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, CheckCircle, Circle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -22,24 +14,19 @@ import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebas
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string; 
+  role: 'user' | 'assistant' | 'system' | 'file';
+  content: string;
   createdAt?: Timestamp;
+  metadata?: {
+    fileName?: string;
+    active?: boolean;
+  }
 }
 
 interface GenkitMessage {
@@ -98,7 +85,6 @@ const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => 
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
-  const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -106,7 +92,6 @@ export function ChatAssistant() {
   
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-
 
   const messagesRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -119,16 +104,17 @@ export function ChatAssistant() {
   }, [messagesRef]);
 
   const { data: messagesData, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
-
-  const messages: Message[] = messagesData || [];
   
+  const messages: Message[] = messagesData || [];
+  const fileMessages = messages.filter(m => m.role === 'file');
+
   const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     setOptimisticMessages([]);
   }, [messagesData]);
   
-  const allMessages = [...messages, ...optimisticMessages];
+  const allMessages = [...messages.filter(m => m.role !== 'file'), ...optimisticMessages];
 
   useEffect(() => {
     if (viewportRef.current) {
@@ -136,10 +122,72 @@ export function ChatAssistant() {
     }
   }, [allMessages, isPending]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !messagesRef) return;
+
+    startTransition(() => {
+      const processFile = async () => {
+        try {
+          let text = '';
+          if (file.type === 'application/pdf') {
+            const arrayBuffer = await file.arrayBuffer();
+            const data = await pdfParse(Buffer.from(arrayBuffer));
+            text = data.text;
+          } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            text = result.value;
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'Formato no soportado',
+              description: 'Por favor, sube un archivo PDF o DOCX.',
+            });
+            return;
+          }
+
+          if (!text.trim()) {
+            toast({
+              variant: 'destructive',
+              title: 'Archivo vacío',
+              description: 'No se pudo extraer texto del archivo.',
+            });
+            return;
+          }
+          
+          // Deactivate other files
+          const batch = writeBatch(firestore!);
+          fileMessages.forEach(msg => {
+            if (msg.metadata?.active) {
+              const docRef = doc(messagesRef, msg.id);
+              batch.update(docRef, { 'metadata.active': false });
+            }
+          });
+          await batch.commit();
+
+          await saveMessage('file', text, { fileName: file.name, active: true });
+          
+          toast({
+            title: "Archivo procesado",
+            description: `Se extrajo el texto de "${file.name}" y está activo para el chat.`,
+          });
+
+        } catch (error) {
+          console.error("Error processing file:", error);
+          toast({
+            variant: "destructive",
+            title: "Error al procesar archivo",
+            description: "No se pudo leer el contenido del archivo.",
+          });
+        }
+      }
+      processFile();
+    });
+
+    // Reset file input
+    if(fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -147,13 +195,14 @@ export function ChatAssistant() {
     setInput(prompt);
   };
 
-  const saveMessage = async (role: 'user' | 'assistant', content: string) => {
+  const saveMessage = async (role: 'user' | 'assistant' | 'file', content: string, metadata?: Message['metadata']) => {
     if (!messagesRef || !user) return;
-    const messageData = {
+    const messageData: Partial<Message> = {
       userId: user.uid,
       role,
       content,
       createdAt: serverTimestamp(),
+      ...(metadata && { metadata })
     };
     try {
       await addDoc(messagesRef, messageData);
@@ -169,19 +218,15 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() && !file || isPending || !user) return;
+    if (!input.trim() || isPending || !user) return;
   
     const currentInput = input;
-    const currentFile = file;
     setInput('');
-    setFile(null);
   
-    const userMessageContent = currentInput + (currentFile ? `\n\nArchivo adjunto: ${currentFile.name}` : '');
-
     const optimisticUserMessage: Message = {
       id: `optimistic-user-${Date.now()}`,
       role: 'user',
-      content: userMessageContent,
+      content: currentInput,
       createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
     const optimisticAssistantMessage: Message = {
@@ -194,51 +239,33 @@ export function ChatAssistant() {
 
     startTransition(() => {
       const processAndRespond = async () => {
-        let finalQuery = currentInput;
         try {
-          if (currentFile) {
-            const formData = new FormData();
-            formData.append('file', currentFile);
-            const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
-            
-            const response = await fetch(functionUrl, {
-              method: 'POST',
-              body: formData,
-            });
-
-            if (!response.ok) {
-              const errorText = await response.text();
-              throw new Error(`Error del servidor: ${response.status} ${errorText}`);
-            }
-
-            const result = await response.json();
-            finalQuery += `\n\nAquí está el contenido del documento que he subido: ${result.downloadURL}`;
-            
-            toast({
-              title: "Archivo subido",
-              description: "Tu archivo se ha subido y está siendo analizado.",
-            });
+          await saveMessage('user', currentInput);
+  
+          // Include active file content if available
+          const activeFile = fileMessages.find(m => m.metadata?.active);
+          let queryWithContext = currentInput;
+          if (activeFile) {
+            queryWithContext = `Usando el siguiente contexto, responde la pregunta.\n\nCONTEXTO:\n---\n${activeFile.content}\n---\n\nPREGUNTA: ${currentInput}`;
           }
 
-          await saveMessage('user', userMessageContent);
-  
-          const history: GenkitMessage[] = (messagesData || [])
+          const history: GenkitMessage[] = (messagesData?.filter(m => m.role !== 'file') || [])
             .map(m => ({
               role: m.role === 'assistant' ? 'model' : 'user',
               content: [{ text: m.content as string }],
             }));
   
-          const { response: aiResponse } = await getAiResponse(finalQuery, history);
+          const { response: aiResponse } = await getAiResponse(queryWithContext, history);
           await saveMessage('assistant', aiResponse);
   
         } catch (error: any) {
-          console.error("Error en la subida o el chat:", error);
+          console.error("Error in chat:", error);
           const errorMessage = `Lo siento, ocurrió un error: ${error.message}`;
           await saveMessage('assistant', errorMessage);
           toast({
             variant: "destructive",
             title: "Error del asistente",
-            description: "No se pudo completar la acción. Por favor, revisa la consola para más detalles.",
+            description: "No se pudo obtener una respuesta. Por favor, inténtalo de nuevo.",
           });
         } finally {
             setOptimisticMessages([]);
@@ -249,20 +276,15 @@ export function ChatAssistant() {
   };
 
   const handleDeleteChat = async () => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !messagesRef) return;
   
     try {
-      const messagesSnapshot = await getDocs(messagesRef!);
+      const messagesSnapshot = await getDocs(messagesRef);
       const batch = writeBatch(firestore);
       messagesSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
       await batch.commit();
-
-      const storage = getStorage();
-      const userStorageRef = ref(storage, `uploads/${user.uid}`);
-      const fileList = await listAll(userStorageRef);
-      await Promise.all(fileList.items.map(itemRef => deleteObject(itemRef)));
   
       toast({
         title: "Chat borrado",
@@ -275,6 +297,58 @@ export function ChatAssistant() {
         title: "Error al borrar el chat",
         description: "No se pudo completar la eliminación. Por favor, inténtalo de nuevo.",
       });
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string) => {
+    if (!messagesRef) return;
+    try {
+      await deleteDoc(doc(messagesRef, fileId));
+      toast({
+        title: "Archivo eliminado",
+        description: "El contexto del archivo ha sido eliminado del chat.",
+      });
+    } catch (error) {
+       console.error("Error deleting file:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al eliminar archivo",
+        description: "No se pudo eliminar el archivo.",
+      });
+    }
+  };
+
+  const toggleActiveFile = async (fileId: string) => {
+    if (!messagesRef || !firestore) return;
+
+    const batch = writeBatch(firestore);
+    let currentlyActive = false;
+
+    fileMessages.forEach(msg => {
+        const docRef = doc(messagesRef, msg.id);
+        if (msg.id === fileId) {
+            currentlyActive = !!msg.metadata?.active;
+            // Toggle the selected one
+            batch.update(docRef, { 'metadata.active': !msg.metadata?.active });
+        } else if (msg.metadata?.active) {
+            // Deactivate any other active file
+            batch.update(docRef, { 'metadata.active': false });
+        }
+    });
+
+    try {
+        await batch.commit();
+        toast({
+          title: `Archivo ${currentlyActive ? 'desactivado' : 'activado'}`,
+          description: `El contexto del archivo ahora está ${currentlyActive ? 'inactivo' : 'activo'}.`
+        })
+    } catch (error) {
+        console.error("Error toggling active file:", error);
+        toast({
+            variant: "destructive",
+            title: "Error al cambiar estado",
+            description: "No se pudo actualizar el estado del archivo.",
+        });
     }
   };
 
@@ -326,9 +400,33 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Adjunta un archivo o haz una pregunta sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Adjunta un PDF/DOCX o haz una pregunta sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
+
+      {user && fileMessages.length > 0 && (
+        <div className="p-4 border-b bg-background">
+          <h3 className="text-sm font-medium mb-2">Contexto de Archivos</h3>
+          <div className="space-y-2">
+            {fileMessages.map(file => (
+              <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate" title={file.metadata?.fileName}>{file.metadata?.fileName}</span>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleActiveFile(file.id)} title={file.metadata?.active ? 'Desactivar contexto' : 'Activar contexto'}>
+                    {file.metadata?.active ? <CheckCircle className="w-4 h-4 text-green-500"/> : <Circle className="w-4 h-4 text-muted-foreground"/>}
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDeleteFile(file.id)} title="Eliminar archivo">
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6" ref={viewportRef}>
@@ -409,6 +507,7 @@ export function ChatAssistant() {
                 size="icon" 
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending || !user}
+                title="Adjuntar PDF o DOCX"
               >
                 <Paperclip className="w-5 h-5" />
               </Button>
@@ -418,7 +517,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !file) || !user}>
+              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
@@ -426,19 +525,14 @@ export function ChatAssistant() {
                 type="file" 
                 ref={fileInputRef} 
                 onChange={handleFileChange}
-                className="hidden" 
+                className="hidden"
+                accept=".pdf,.docx"
               />
             </form>
-             {file && (
-              <div className="mt-2 text-sm text-muted-foreground flex items-center justify-between p-2 rounded-md bg-muted">
-                <span>{file.name}</span>
-                <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
           </div>
       </SheetFooter>
     </>
   );
 }
+
+    

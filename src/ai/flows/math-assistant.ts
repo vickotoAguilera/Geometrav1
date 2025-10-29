@@ -18,7 +18,7 @@ const MessageSchema = z.object({
 
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
-  query: z.string().describe('The user query related to math or Geogebra. This query might contain a URL to a document on Google Drive.'),
+  query: z.string().describe('The user query related to math or Geogebra. This query may contain context from a user-provided file.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
 
@@ -40,17 +40,17 @@ const mathAssistantFlow = ai.defineFlow(
   async input => {
     const history = input.history || [];
     
-    // The user query is now the main content.
+    // The user query is the main content.
     const prompt: Part[] = [{ text: input.query }];
     history.push({ role: 'user', content: prompt });
 
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
-      system: `You are a helpful AI assistant specialized in mathematics and Geogebra.
-- Your primary goal is to analyze the user's query and any provided document content.
-- If the user provides a URL to a file they have uploaded, you MUST treat that file as the primary source of information. You will be able to access the content of that URL directly.
-- Provide a helpful and detailed response based on the document's content to answer the user's questions about it.
-- You must always respond in Spanish.`,
+      system: `Eres un útil asistente de IA especializado en matemáticas y GeoGebra.
+- Tu objetivo principal es analizar la consulta del usuario y cualquier contenido de archivo proporcionado como contexto.
+- Si la consulta del usuario contiene un CONTEXTO, debes tratar ese texto como la fuente principal de información para responder a la PREGUNTA.
+- Proporciona una respuesta útil y detallada basada en el contenido del contexto para responder las preguntas del usuario sobre él.
+- Debes responder siempre en español.`,
       history: history.slice(0, -1),
       prompt: history.slice(-1)[0].content,
       output: {
@@ -61,3 +61,5 @@ const mathAssistantFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    
