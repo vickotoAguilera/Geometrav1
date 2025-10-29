@@ -425,7 +425,7 @@ export function ChatAssistant() {
               <>
                 {attachedFile && (
                     <div className="flex items-center justify-between p-2 rounded-md bg-muted text-sm">
-                        <Badge variant="secondary" className="truncate flex-1">
+                        <Badge variant="secondary" className="truncate flex-1 mr-2">
                             <Paperclip className="mr-2 h-4 w-4 flex-shrink-0" />
                             <span className="truncate">{attachedFile.name}</span>
                         </Badge>
@@ -464,7 +464,7 @@ export function ChatAssistant() {
             >
               <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" id="file-upload" accept="image/*,application/pdf,.docx,.doc" />
               <Button type="button" variant="ghost" size="icon" disabled={!user || isPending} asChild>
-                <Label htmlFor="file-upload" className={cn("cursor-pointer", !user && "cursor-not-allowed")}>
+                <Label htmlFor="file-upload" className={cn("cursor-pointer", !user || isPending ? "cursor-not-allowed opacity-50" : "")}>
                     <Paperclip className="w-5 h-5" />
                     <span className="sr-only">Adjuntar archivo</span>
                 </Label>
