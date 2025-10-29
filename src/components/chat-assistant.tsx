@@ -205,10 +205,6 @@ export function ChatAssistant() {
     if (fileInputRef.current) {
         fileInputRef.current.value = '';
     }
-    toast({
-        title: "Archivo quitado",
-        description: "El archivo adjunto ha sido eliminado.",
-    });
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -233,7 +229,6 @@ export function ChatAssistant() {
           createdAt: serverTimestamp(),
           uid: user.uid,
         };
-        // Quitamos el await para que no bloquee la UI
         addDoc(messagesCollectionRef, userMessage);
 
         try {
@@ -336,13 +331,17 @@ export function ChatAssistant() {
             Selecciona la acción que quieres realizar.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-2 py-4">
             <Button variant="outline" onClick={() => setShowDeleteConfirmation(true)}>
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Borrar Historial de Chat
             </Button>
             {attachedFile && (
-                <Button variant="destructive" onClick={removeFile}>
+                <Button variant="destructive" onClick={() => {
+                    removeFile();
+                    const trigger = document.querySelector('[aria-haspopup="dialog"]');
+                    if (trigger instanceof HTMLElement) trigger.click();
+                }}>
                     <FileWarning className="mr-2 h-4 w-4" />
                     Quitar &quot;{attachedFile.name}&quot;
                 </Button>
@@ -474,6 +473,17 @@ export function ChatAssistant() {
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
+             {attachedFile && (
+                <div className="flex items-center justify-between p-2 rounded-md border bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm font-medium truncate">
+                        <File className="w-4 h-4" />
+                        <span className="truncate">{attachedFile.name}</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeFile}>
+                        <X className="w-4 h-4" />
+                    </Button>
+                </div>
+            )}
             { user && (
               <>
                 <div className="flex items-center justify-center gap-4 text-sm">
@@ -526,3 +536,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
