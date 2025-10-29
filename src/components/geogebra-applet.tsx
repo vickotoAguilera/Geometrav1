@@ -4,8 +4,9 @@ import { useEffect, useRef, memo, useState } from 'react';
 import { Expand, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Detecta si el dispositivo es móvil (solo en el cliente)
-const isMobileDevice = () => {
+// Se mueve la función de detección dentro del componente o se usa en useEffect.
+// Para este caso, la dejaremos fuera pero su uso se controlará con estado.
+const isMobileDeviceClient = () => {
   if (typeof window === 'undefined') return false;
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
@@ -33,8 +34,14 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   const appletRef = useRef<any>(null);
   const hasInitializedRef = useRef(false);
   const [isSimulatedFullscreen, setIsSimulatedFullscreen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const isMobile = isMobileDevice();
+  useEffect(() => {
+    // Esto se ejecuta solo en el cliente, después de la hidratación.
+    setIsClient(true);
+    setIsMobile(isMobileDeviceClient());
+  }, []);
 
   const toggleFullscreen = () => {
     if (isMobile) {
@@ -60,7 +67,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   };
   
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !isClient) return; // Espera a que el cliente esté listo
 
     const loadGeoGebraScript = (): Promise<void> => {
       return new Promise((resolve, reject) => {
@@ -133,7 +140,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
       const applet = appletRef.current;
       const container = containerRef.current;
       if (!applet || !container) return;
-      if (typeof applet.setSize !== 'function') return;
+      if (typeof applet.setSize !== 'function') return; 
 
       const newWidth = container.clientWidth;
       const newHeight = container.clientHeight;
@@ -177,6 +184,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
 
     return () => {
       if (containerRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         resizeObserver.unobserve(containerRef.current);
       }
       resizeObserver.disconnect();
@@ -187,7 +195,12 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
         document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
       }
     };
-  }, [isMobile]);
+  }, [isClient, isMobile]);
+
+  if (!isClient) {
+    // Renderiza un placeholder o nada durante el SSR y la hidratación inicial.
+    return <div className="w-full h-full min-h-[500px] flex items-center justify-center">Cargando...</div>;
+  }
 
   return (
     <div
@@ -221,3 +234,5 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
     </div>
   );
 });
+
+    
