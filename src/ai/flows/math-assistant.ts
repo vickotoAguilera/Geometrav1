@@ -18,10 +18,7 @@ const MessageSchema = z.object({
 
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
-  query: z.string().describe('The user query related to math or Geogebra.'),
-  photoDataUri: z.string().optional().describe(
-    "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-  ),
+  query: z.string().describe('The user query related to math or Geogebra. This query might contain a URL to a document on Google Drive.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
 
@@ -42,17 +39,18 @@ const mathAssistantFlow = ai.defineFlow(
   },
   async input => {
     const history = input.history || [];
-    const prompt: Part[] = [{ text: input.query }];
-
-    if (input.photoDataUri) {
-      prompt.push({ media: { url: input.photoDataUri } });
-    }
     
+    // The user query is now the main content.
+    const prompt: Part[] = [{ text: input.query }];
     history.push({ role: 'user', content: prompt });
 
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
-      system: `You are a helpful AI assistant specialized in mathematics and Geogebra. Analyze the user's query and any provided context (including images or conversation history) to provide an accurate and helpful response.`,
+      system: `You are a helpful AI assistant specialized in mathematics and Geogebra.
+- Analyze the user's query and any provided context (including conversation history).
+- If the user provides a Google Drive URL, you must inform the user that you cannot directly access external websites or URLs, including Google Drive links.
+- Politely ask the user to copy and paste the relevant text, data, or specific questions from the document directly into the chat.
+- Provide an accurate and helpful response based on the information the user provides.`,
       history: history.slice(0, -1),
       prompt: history.slice(-1)[0].content,
       output: {

@@ -14,11 +14,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Paperclip } from 'lucide-react';
+import { Bot, User, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useCollection, useMemoFirebase, useFirebaseApp } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
@@ -88,7 +88,6 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
@@ -146,88 +145,6 @@ export function ChatAssistant() {
         description: "No se pudo guardar tu mensaje. Por favor, inténtalo de nuevo.",
       });
     }
-  };
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-  
-    if(fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  
-    startTransition(() => {
-      const processAndRespond = async () => {
-        const userMessageContent = `Analiza el archivo: ${file.name}`;
-  
-        const optimisticUserMessage: Message = {
-          id: `optimistic-user-${Date.now()}`,
-          role: 'user',
-          content: userMessageContent,
-          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-        };
-        const optimisticAssistantMessage: Message = {
-          id: `optimistic-assistant-${Date.now()}`,
-          role: 'assistant',
-          content: '...',
-          createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-        };
-        setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
-  
-        await saveMessage('user', userMessageContent);
-  
-        try {
-          toast({ title: "Subiendo archivo..." });
-          const formData = new FormData();
-          formData.append('file', file, file.name);
-
-          const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
-          
-          const response = await fetch(functionUrl, {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`Error del servidor (${response.status}): ${errorBody}`);
-          }
-          const result = await response.json();
-          
-          toast({ title: "Archivo subido", description: "Analizando con la IA..." });
-
-          // Convertir el archivo a data URI para enviarlo a la IA
-          const photoDataUri = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (event) => resolve(event.target?.result as string);
-              reader.onerror = (error) => reject(error);
-              reader.readAsDataURL(file);
-          });
-          
-          const history: GenkitMessage[] = (messagesData || [])
-              .map(m => ({
-                  role: m.role === 'assistant' ? 'model' : 'user',
-                  content: [{ text: m.content as string }],
-              }));
-
-          const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
-          await saveMessage('assistant', aiResponse);
-
-        } catch (error: any) {
-          console.error("Error en la subida del archivo:", error);
-          const errorMessage = `Lo siento, ocurrió un error al subir el archivo. Código: ${error.code || 'desconocido'}`;
-          await saveMessage('assistant', errorMessage);
-          toast({
-              variant: "destructive",
-              title: "Error al subir archivo",
-              description: error.message,
-          });
-        } finally {
-          setOptimisticMessages([]);
-        }
-      };
-      processAndRespond();
-    });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -307,7 +224,7 @@ export function ChatAssistant() {
             <Bot /> Asistente Geometra
         </SheetTitle>
         <SheetDescription>
-            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra. Puedes pegar enlaces a documentos de Google Drive.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -387,19 +304,7 @@ export function ChatAssistant() {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
-                disabled={isPending || !user}
-              />
-              <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isPending || !user}>
-                <Paperclip className="w-4 h-4" />
-                <span className="sr-only">Adjuntar archivo</span>
-              </Button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/*,.pdf,.doc,.docx"
+                placeholder={user ? "Escribe tu pregunta o pega un enlace..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
               <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>

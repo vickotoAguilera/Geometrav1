@@ -14,14 +14,12 @@ interface GenkitMessage {
 
 export async function getAiResponse(
   query: string,
-  history: GenkitMessage[],
-  photoDataUri?: string
+  history: GenkitMessage[]
 ): Promise<MathAssistantOutput> {
 
   return await mathAssistant({
     query: query,
     history: history,
-    photoDataUri: photoDataUri,
   });
 }
 
