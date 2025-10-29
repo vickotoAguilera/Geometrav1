@@ -18,7 +18,7 @@ import { Bot, User, Send, Paperclip } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useCollection, useMemoFirebase, initializeFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase, useFirebaseApp } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
@@ -94,6 +94,8 @@ export function ChatAssistant() {
   
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
+  const firebaseApp = useFirebaseApp();
+
 
   const messagesRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -150,7 +152,7 @@ export function ChatAssistant() {
   
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !user || !firebaseApp) return;
 
     if(fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -177,7 +179,7 @@ export function ChatAssistant() {
         try {
           await saveMessage('user', userMessageContent);
 
-          const { storage } = initializeFirebase();
+          const storage = getStorage(firebaseApp);
           const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}-${file.name}`);
           
           toast({
@@ -211,8 +213,8 @@ export function ChatAssistant() {
 
         } catch (error: any) {
           console.error("Error processing file:", error);
-          const errorMessage = `Code: ${error.code}, Message: ${error.message}`;
-          await saveMessage('assistant', `Lo siento, ocurrió un error al procesar el archivo: ${errorMessage}`);
+          const errorMessage = `Hubo un problema al subir el archivo. Código: ${error.code}, Mensaje: ${error.message}`;
+          await saveMessage('assistant', `Lo siento, ocurrió un error al procesar el archivo. Por favor, revisa la configuración de CORS en tu bucket de Firebase Storage.`);
           toast({
             variant: "destructive",
             title: "Error al procesar archivo",
@@ -408,3 +410,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
