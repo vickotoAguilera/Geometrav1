@@ -433,6 +433,7 @@ export function ChatAssistant() {
                     id="tutor-mode"
                     checked={tutorMode === 'geogebra'}
                     onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
+                    disabled={isPending}
                   />
                   <div className='flex items-center gap-2 text-muted-foreground'>
                      <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
