@@ -247,9 +247,9 @@ export function StudyChatAssistant() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Haz una pregunta sobre el texto..."
-                    disabled={isPending || !studyMaterial}
+                    disabled={isPending}
                     />
-                    <Button type="submit" size="icon" disabled={isPending || !input.trim() || !studyMaterial}>
+                    <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
                     {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </Button>
                 </form>
