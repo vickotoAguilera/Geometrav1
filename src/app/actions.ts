@@ -13,8 +13,8 @@ interface GenkitMessage {
 }
 
 interface ContextFile {
-  fileName: string;
-  fileDataUri: string;
+    fileName: string;
+    fileDataUri: string;
 }
 
 export async function getAiResponse(
@@ -22,34 +22,15 @@ export async function getAiResponse(
   history: GenkitMessage[],
   tutorMode: 'math' | 'geogebra',
   imageQueryDataUri?: string,
-  activeContextFiles?: ContextFile[]
+  activeContextFiles?: ContextFile[],
 ): Promise<MathAssistantOutput> {
-  const queryParts: Part[] = [{ text: queryText }];
-
-  if (imageQueryDataUri) {
-    queryParts.push({
-      media: {
-        url: imageQueryDataUri,
-      },
-    });
-  }
-
-  // Prepend context files to the prompt for the LLM
-  if (activeContextFiles && activeContextFiles.length > 0) {
-    activeContextFiles.forEach(file => {
-      queryParts.unshift({
-        media: {
-          url: file.fileDataUri,
-        },
-      });
-      queryParts.unshift({ text: `**Context File: ${file.fileName}**` });
-    });
-  }
 
   const input = {
-    query: queryParts,
+    query: queryText,
     history: history,
     tutorMode: tutorMode,
+    imageQueryDataUri: imageQueryDataUri,
+    activeContextFiles: activeContextFiles,
   };
 
   return await mathAssistant(input);
