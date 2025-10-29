@@ -113,7 +113,7 @@ export default function GlosarioPage() {
            <Accordion type="single" collapsible className="w-full">
             {glossarioComandos.map((categoria) => (
               <AccordionItem key={categoria.categoria} value={categoria.categoria}>
-                <AccordionTrigger className="text-xl font-semibold text-primary-foreground/80 hover:no-underline">
+                <AccordionTrigger className="text-xl font-semibold text-foreground hover:no-underline">
                   {categoria.categoria}
                 </AccordionTrigger>
                 <AccordionContent>
