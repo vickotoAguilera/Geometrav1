@@ -29,11 +29,13 @@ export default function HomePage() {
             </div>
           </Link>
 
-          <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm">
-            <span className="text-2xl mb-2">✏️</span>
-            <span className="font-semibold">Analiza con la IA</span>
-            <p className="text-sm text-muted-foreground mt-1">Adjunta docs en el chat.</p>
-          </div>
+          <Link href="/ejercicios" passHref className="group">
+            <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
+              <span className="text-2xl mb-2">✏️</span>
+              <span className="font-semibold">Analiza con la IA</span>
+              <p className="text-sm text-muted-foreground mt-1">Pega enlaces de Drive en el chat.</p>
+            </div>
+          </Link>
 
           <Link href="/tutoriales" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">

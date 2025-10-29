@@ -14,14 +14,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send } from 'lucide-react';
+import { Bot, User, Send, Trash2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface Message {
   id: string;
@@ -184,12 +196,12 @@ export function ChatAssistant() {
   
         } catch (error: any) {
           console.error("Error in chat submission:", error);
-          const errorMessage = `Código: ${error.code}, Mensaje: ${error.message}`;
-          await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
+          const errorMessage = `Lo siento, ocurrió un error al contactar a la IA.`;
+          await saveMessage('assistant', errorMessage);
           toast({
             variant: "destructive",
             title: "Error del asistente",
-            description: errorMessage,
+            description: "No se pudo obtener una respuesta de la IA. Por favor, revisa la consola para más detalles.",
           });
         } finally {
             setOptimisticMessages([]);
@@ -197,6 +209,38 @@ export function ChatAssistant() {
       };
       processAndRespond();
     });
+  };
+
+  const handleDeleteChat = async () => {
+    if (!user || !firestore) return;
+  
+    try {
+      // 1. Delete all messages in the subcollection
+      const messagesSnapshot = await getDocs(messagesRef!);
+      const batch = writeBatch(firestore);
+      messagesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+  
+      // 2. Delete all files in the user's storage folder
+      const storage = getStorage();
+      const userStorageRef = ref(storage, `uploads/${user.uid}`);
+      const fileList = await listAll(userStorageRef);
+      await Promise.all(fileList.items.map(itemRef => deleteObject(itemRef)));
+  
+      toast({
+        title: "Chat borrado",
+        description: "Tu historial de chat y los archivos asociados han sido eliminados.",
+      });
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al borrar el chat",
+        description: "No se pudo completar la eliminación. Por favor, inténtalo de nuevo.",
+      });
+    }
   };
 
   if (isUserLoading) {
@@ -220,9 +264,32 @@ export function ChatAssistant() {
   return (
     <>
       <SheetHeader className="p-4 border-b">
-        <SheetTitle className="font-headline flex items-center gap-2">
-            <Bot /> Asistente Geometra
-        </SheetTitle>
+        <div className="flex justify-between items-center">
+            <SheetTitle className="font-headline flex items-center gap-2">
+                <Bot /> Asistente Geometra
+            </SheetTitle>
+            {user && (
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" title="Borrar chat">
+                            <Trash2 className="w-5 h-5" />
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Se borrará permanentemente todo tu historial de chat y los archivos asociados de nuestros servidores.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteChat}>Continuar</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </div>
         <SheetDescription>
             {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra. Puedes pegar enlaces a documentos de Google Drive.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
