@@ -18,7 +18,7 @@ import { Bot, User, Send, Paperclip } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase, initializeFirebase } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
@@ -152,7 +152,6 @@ export function ChatAssistant() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    // Reset file input to allow re-uploading the same file
     if(fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -178,7 +177,7 @@ export function ChatAssistant() {
         try {
           await saveMessage('user', userMessageContent);
 
-          const storage = getStorage();
+          const { storage } = initializeFirebase();
           const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}-${file.name}`);
           
           toast({
@@ -210,9 +209,9 @@ export function ChatAssistant() {
           const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
           await saveMessage('assistant', aiResponse);
 
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error processing file:", error);
-          const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
+          const errorMessage = `Code: ${error.code}, Message: ${error.message}`;
           await saveMessage('assistant', `Lo siento, ocurrió un error al procesar el archivo: ${errorMessage}`);
           toast({
             variant: "destructive",
@@ -262,9 +261,9 @@ export function ChatAssistant() {
           const { response: aiResponse } = await getAiResponse(currentInput, history);
           await saveMessage('assistant', aiResponse);
   
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error in chat submission:", error);
-          const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
+          const errorMessage = `Code: ${error.code}, Message: ${error.message}`;
           await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
           toast({
             variant: "destructive",
