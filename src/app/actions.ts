@@ -1,3 +1,4 @@
+
 'use server';
 
 import { mathAssistant, MathAssistantOutput } from '@/ai/flows/math-assistant';
@@ -8,16 +9,16 @@ import {
 
 interface GenkitMessage {
   role: 'user' | 'model';
-  content: { text: string }[];
+  content: any[];
 }
 
 export async function getAiResponse(
-  queryText: string,
+  query: string | any[],
   history: GenkitMessage[],
   tutorMode: 'math' | 'geogebra'
 ): Promise<MathAssistantOutput> {
   const input = {
-    query: queryText,
+    query: query,
     history: history,
     tutorMode: tutorMode,
   };

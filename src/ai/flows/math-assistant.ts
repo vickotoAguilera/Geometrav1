@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI assistant for mathematics and Geogebra questions.
@@ -17,7 +18,7 @@ const MessageSchema = z.object({
 
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
-  query: z.string().describe('The user query related to math or Geogebra.'),
+  query: z.union([z.string(), z.array(z.any())]).describe('The user query related to math or Geogebra, can include text and media parts.'),
   tutorMode: z.enum(['math', 'geogebra']).optional().default('math').describe('The selected tutor personality.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;

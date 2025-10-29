@@ -7,7 +7,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs, where } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { Badge } from './ui/badge';
 
 
 interface Message {
@@ -34,13 +35,12 @@ interface FirestoreMessage {
   uid: string;
 }
 
+type TutorMode = 'math' | 'geogebra';
 
 interface GenkitMessage {
   role: 'user' | 'model';
-  content: { text: string }[];
+  content: any[];
 }
-
-type TutorMode = 'math' | 'geogebra';
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
@@ -149,6 +149,9 @@ export function ChatAssistant() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
+  const [attachedFile, setAttachedFile] = useState<{ name: string; dataUri: string; } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const messagesCollectionRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, 'users', user.uid, 'messages');
@@ -183,19 +186,39 @@ export function ChatAssistant() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEvent) => {
+        const dataUri = loadEvent.target?.result as string;
+        if (dataUri) {
+          setAttachedFile({ name: file.name, dataUri });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user || !messagesCollectionRef) return;
+    if ((!input.trim() && !attachedFile) || isPending || !user || !messagesCollectionRef) return;
   
     const currentInput = input;
+    const currentFile = attachedFile;
     setInput('');
-    
+    setAttachedFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = '';
+
     startTransition(() => {
       const processAndRespond = async () => {
-        // Optimistically add user message
+        const userMessageContent = currentFile 
+            ? `${currentInput} (Archivo adjunto: ${currentFile.name})`
+            : currentInput;
+
         const userMessage: FirestoreMessage = {
           role: 'user',
-          content: currentInput,
+          content: userMessageContent,
           createdAt: serverTimestamp(),
           uid: user.uid,
         };
@@ -207,8 +230,13 @@ export function ChatAssistant() {
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content }],
           }));
+          
+          const queryContent = [{ text: currentInput }];
+          if (currentFile) {
+            queryContent.push({ media: { url: currentFile.dataUri } });
+          }
 
-          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode);
+          const { response: aiResponse } = await getAiResponse(queryContent, history, tutorMode);
           
           const newAssistantMessage: FirestoreMessage = {
             role: 'assistant',
@@ -317,7 +345,7 @@ export function ChatAssistant() {
         <div className="p-4 space-y-6">
           {!user ? (
              <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
-               Inicia sesión con Google para comenzar a chatear.
+               Inicia sesión para comenzar a chatear.
              </div>
           ) : (!messages || messages.length === 0) && !isPending ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
@@ -392,34 +420,51 @@ export function ChatAssistant() {
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
             { user && (
-              <div className="flex items-center justify-center gap-4 text-sm">
-                  <div className='flex items-center gap-2 text-muted-foreground'>
-                    <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-destructive')}/>
-                    <Label htmlFor="tutor-mode">Tutor de Mates</Label>
-                  </div>
-                  <Switch
-                    id="tutor-mode"
-                    checked={tutorMode === 'geogebra'}
-                    onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
-                    disabled={isPending}
-                    className={cn(
-                        'data-[state=unchecked]:bg-destructive',
-                        'data-[state=checked]:bg-primary'
-                    )}
-                  />
-                  <div className='flex items-center gap-2 text-muted-foreground'>
-                     <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
-                     <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
-                  </div>
-              </div>
+              <>
+                {attachedFile && (
+                    <div className="flex items-center justify-between">
+                        <Badge variant="secondary" className="truncate">
+                            <Paperclip className="mr-2 h-4 w-4" />
+                            {attachedFile.name}
+                        </Badge>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setAttachedFile(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
+                <div className="flex items-center justify-center gap-4 text-sm">
+                    <div className='flex items-center gap-2 text-muted-foreground'>
+                      <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-destructive')}/>
+                      <Label htmlFor="tutor-mode">Tutor de Mates</Label>
+                    </div>
+                    <Switch
+                      id="tutor-mode"
+                      checked={tutorMode === 'geogebra'}
+                      onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
+                      disabled={isPending}
+                      className={cn(
+                          'data-[state=unchecked]:bg-destructive',
+                          'data-[state=checked]:bg-primary'
+                      )}
+                    />
+                    <div className='flex items-center gap-2 text-muted-foreground'>
+                       <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
+                       <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
+                    </div>
+                </div>
+              </>
             )}
             <form
               id="chat-form"
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
-              <Button type="button" variant="ghost" size="icon" disabled>
-                <Paperclip className="w-5 h-5" />
+              <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" id="file-upload" accept="image/*,application/pdf,.docx,.doc" />
+              <Button type="button" variant="ghost" size="icon" disabled={!user || isPending} asChild>
+                <Label htmlFor="file-upload" className="cursor-pointer">
+                    <Paperclip className="w-5 h-5" />
+                    <span className="sr-only">Adjuntar archivo</span>
+                </Label>
               </Button>
               <Input
                 value={input}
@@ -427,7 +472,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedFile) || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
@@ -437,5 +482,3 @@ export function ChatAssistant() {
     </>
   );
 }
-
-    
