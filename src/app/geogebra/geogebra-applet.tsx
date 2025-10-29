@@ -234,3 +234,5 @@ export const GeogebraApplet = memo(function GeoGebraApplet() {
     </div>
   );
 });
+
+    

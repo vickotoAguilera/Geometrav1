@@ -15,8 +15,7 @@ import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import pdfParse from 'pdf-parse';
-import mammoth from 'mammoth';
+// DO NOT import pdf-parse or mammoth statically. They will be imported dynamically.
 
 interface Message {
   id: string;
@@ -131,10 +130,12 @@ export function ChatAssistant() {
         try {
           let text = '';
           if (file.type === 'application/pdf') {
+            const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default;
             const arrayBuffer = await file.arrayBuffer();
             const data = await pdfParse(Buffer.from(arrayBuffer));
             text = data.text;
           } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            const mammoth = (await import('mammoth')).default;
             const arrayBuffer = await file.arrayBuffer();
             const result = await mammoth.extractRawText({ arrayBuffer });
             text = result.value;
@@ -535,3 +536,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    

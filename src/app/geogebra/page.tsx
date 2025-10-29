@@ -7,3 +7,5 @@ export default function GeogebraPage() {
     </div>
   );
 }
+
+    
