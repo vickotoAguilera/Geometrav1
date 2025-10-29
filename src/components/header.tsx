@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { usePathname } from "next/navigation";
 
 
 // SVG para el icono de Google
@@ -32,7 +33,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const AuthButton = () => {
-    const { user, isUserLoading } = useUser();
+    const { user } = useUser();
     const auth = useAuth();
 
     const handleSignIn = async () => {
@@ -54,13 +55,9 @@ const AuthButton = () => {
         }
     };
 
-    if (isUserLoading) {
-        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
-    }
-
     if (!user) {
         return (
-            <Button variant="outline" size="icon" onClick={handleSignIn}>
+            <Button variant="outline" size="icon" onClick={handleSignIn} title="Iniciar sesión con Google">
                 <GoogleIcon className="h-5 w-5" />
                  <span className="sr-only">Iniciar sesión con Google</span>
             </Button>
@@ -100,11 +97,12 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button disabled={!user}>
             <Bot className="mr-2 h-5 w-5" />
             Asistente
         </Button>
@@ -118,6 +116,9 @@ const AIChatButton = () => {
 
 
 export default function Header() {
+  const pathname = usePathname();
+  const isStudyTopicPage = pathname.startsWith('/estudia/') && pathname.length > '/estudia/'.length;
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -130,7 +131,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <AIChatButton />
+          {!isStudyTopicPage && <AIChatButton />}
           <AuthButton />
         </div>
       </div>
