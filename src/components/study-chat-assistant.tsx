@@ -76,7 +76,6 @@ const parseResponse = (content: string) => {
 export function StudyChatAssistant() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [studyMaterial, setStudyMaterial] = useState('');
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -124,7 +123,6 @@ export function StudyChatAssistant() {
             content: [{ text: m.content }],
           }));
           
-          // For now, we'll pass an empty string for studyMaterial. We'll fix this later.
           const { response: aiResponse } = await getStudyAiResponse(currentInput, history, "");
           
           setMessages(prev => prev.slice(0, -1).concat({
@@ -148,8 +146,24 @@ export function StudyChatAssistant() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-        <Card className="flex flex-col h-[70vh]">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Ambiente de Aprendizaje</CardTitle>
+                    <CardDescription>
+                        Este será tu espacio interactivo de aprendizaje.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-96 flex items-center justify-center bg-muted rounded-md">
+                        <p className="text-muted-foreground">Próximamente...</p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <Card className="flex flex-col h-[600px]">
             <CardHeader>
                 <CardTitle>Asistente de Estudio</CardTitle>
                 <CardDescription>Esta conversación es temporal y se reinicia al recargar la página.</CardDescription>
