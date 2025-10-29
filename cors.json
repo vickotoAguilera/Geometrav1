@@ -1,0 +1,22 @@
+[
+  {
+    "origin": [
+      "https://6000-firebase-studio-1761675782529.cluster-thle3dudhffpwss7zs5hxaeu2o.cloudworkstations.dev",
+      "https://9000-firebase-studio-1761675782529.cluster-thle3dudhffpwss7zs5hxaeu2o.cloudworkstations.dev",
+      "https://9002-firebase-studio-1761675782529.cluster-thle3dudhffpwss7zs5hxaeu2o.cloudworkstations.dev",
+      "http://localhost:9002"
+    ],
+    "method": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "HEAD"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Access-Control-Allow-Origin"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
