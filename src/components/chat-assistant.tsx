@@ -184,11 +184,11 @@ export function ChatAssistant() {
   
         } catch (error: any) {
           console.error("Error in chat submission:", error);
-          const errorMessage = `Código: ${error.code}, Message: ${error.message}`;
+          const errorMessage = `Código: ${error.code}, Mensaje: ${error.message}`;
           await saveMessage('assistant', `Lo siento, ocurrió un error: ${errorMessage}`);
           toast({
             variant: "destructive",
-            title: "Error en el chat",
+            title: "Error del asistente",
             description: errorMessage,
           });
         } finally {
