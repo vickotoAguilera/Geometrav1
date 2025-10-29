@@ -7,6 +7,11 @@ admin.initializeApp();
 
 exports.uploadFile = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== 'POST') {
       return res.status(405).send('Method Not Allowed');
     }
