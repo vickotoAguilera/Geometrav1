@@ -12,9 +12,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, Bot, MessageSquare } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { GlobalChatAssistant } from "./global-chat-assistant";
 
 
 // SVG para el icono de Google
@@ -91,6 +99,24 @@ const AuthButton = () => {
     );
 };
 
+const AIChatButton = () => {
+  const { user } = useUser();
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" disabled={!user}>
+          <Bot className="mr-2 h-5 w-5" />
+          Asistente de IA
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-[400px] sm:w-[540px] p-0">
+        <GlobalChatAssistant />
+      </SheetContent>
+    </Sheet>
+  );
+};
+
 
 export default function Header() {
   return (
@@ -105,6 +131,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <AIChatButton />
           <AuthButton />
         </div>
       </div>
