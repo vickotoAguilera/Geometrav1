@@ -30,6 +30,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Fix for 'fs' module not found in pdf-parse and other server-side modules
+    if (!isServer) {
+        config.resolve.fallback = {
+            ...(config.resolve.fallback || {}),
+            fs: false,
+        };
+    }
+
+    return config;
+  }
 };
 
 export default nextConfig;
