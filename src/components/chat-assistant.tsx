@@ -7,7 +7,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma, X } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma, X, FileWarning, MessageSquare, File } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -200,6 +200,17 @@ export function ChatAssistant() {
     }
   };
 
+  const removeFile = () => {
+    setAttachedFile(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+    toast({
+        title: "Archivo quitado",
+        description: "El archivo adjunto ha sido eliminado.",
+    });
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if ((!input.trim() && !attachedFile) || isPending || !user || !messagesCollectionRef) return;
@@ -291,6 +302,58 @@ export function ChatAssistant() {
     }
   };
 
+  const ManageChatDialog = () => {
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  
+    if (showDeleteConfirmation) {
+      return (
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Borrar historial de chat?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de la base de datos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDeleteConfirmation(false)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              handleDeleteChat();
+              setShowDeleteConfirmation(false);
+            }}>
+              Continuar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      );
+    }
+  
+    return (
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Gestionar Chat</AlertDialogTitle>
+          <AlertDialogDescription>
+            Selecciona la acción que quieres realizar.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="flex flex-col space-y-2">
+            <Button variant="outline" onClick={() => setShowDeleteConfirmation(true)}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Borrar Historial de Chat
+            </Button>
+            {attachedFile && (
+                <Button variant="destructive" onClick={removeFile}>
+                    <FileWarning className="mr-2 h-4 w-4" />
+                    Quitar &quot;{attachedFile.name}&quot;
+                </Button>
+            )}
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cerrar</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    );
+  };
+
   if (isUserLoading || (user && isLoadingMessages)) {
      return (
         <div className="flex-1 p-4 space-y-6 flex items-end">
@@ -319,22 +382,11 @@ export function ChatAssistant() {
             {user && (
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" title="Borrar chat">
+                        <Button variant="ghost" size="icon" title="Gestionar chat">
                             <Trash2 className="w-5 h-5" />
                         </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de la base de datos.
-                        </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteChat}>Continuar</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
+                    <ManageChatDialog />
                 </AlertDialog>
             )}
         </div>
@@ -421,20 +473,16 @@ export function ChatAssistant() {
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full space-y-3">
-             { user && (
+             { user && attachedFile && (
+                <div className="flex items-center justify-between p-2 rounded-md bg-muted text-sm">
+                    <Badge variant="secondary" className="truncate flex-1 mr-2">
+                        <File className="mr-2 h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{attachedFile.name}</span>
+                    </Badge>
+                </div>
+            )}
+            { user && (
               <>
-                {attachedFile && (
-                    <div className="flex items-center justify-between p-2 rounded-md bg-muted text-sm">
-                        <Badge variant="secondary" className="truncate flex-1 mr-2">
-                            <Paperclip className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">{attachedFile.name}</span>
-                        </Badge>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0" onClick={() => { setAttachedFile(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Quitar archivo</span>
-                        </Button>
-                    </div>
-                )}
                 <div className="flex items-center justify-center gap-4 text-sm">
                     <div className='flex items-center gap-2 text-muted-foreground'>
                       <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-destructive')}/>
@@ -446,8 +494,8 @@ export function ChatAssistant() {
                       onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
                       disabled={isPending}
                       className={cn(
-                          'data-[state=unchecked]:bg-destructive',
-                          'data-[state=checked]:bg-primary'
+                        'data-[state=unchecked]:bg-destructive',
+                        'data-[state=checked]:bg-primary'
                       )}
                     />
                     <div className='flex items-center gap-2 text-muted-foreground'>
@@ -485,3 +533,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
