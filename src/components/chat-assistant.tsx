@@ -458,7 +458,7 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Adjunta un PDF/DOCX para añadir contexto o haz una pregunta.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Adjunta un archivo para añadir contexto o haz una pregunta.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -610,7 +610,7 @@ export function ChatAssistant() {
                 size="icon" 
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending || !user}
-                title="Adjuntar PDF o DOCX"
+                title="Adjuntar archivo"
               >
                 <Paperclip className="w-5 h-5" />
               </Button>
@@ -629,7 +629,7 @@ export function ChatAssistant() {
                 ref={fileInputRef} 
                 onChange={handleFileChange}
                 className="hidden"
-                accept=".pdf,.docx"
+                accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
               />
             </form>
           </div>

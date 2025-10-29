@@ -45,33 +45,42 @@ const mathAssistantFlow = ai.defineFlow(
   },
   async input => {
     let fileContent = '';
-
+    const prompt: Part[] = [];
+    
     if (input.fileDataUri && input.fileName) {
-      const base64Data = input.fileDataUri.split(',')[1];
-      const buffer = Buffer.from(base64Data, 'base64');
-      
-      try {
-        if (input.fileName.endsWith('.pdf')) {
-          const data = await pdf(buffer);
-          fileContent = data.text;
-        } else if (input.fileName.endsWith('.docx')) {
-          const result = await mammoth.extractRawText({ buffer });
-          fileContent = result.value;
+        const fileType = input.fileDataUri.substring(input.fileDataUri.indexOf(':') + 1, input.fileDataUri.indexOf(';'));
+        const isImage = fileType.startsWith('image/');
+        
+        if (isImage) {
+            // If it's an image, pass it as a media part
+            prompt.push({ media: { url: input.fileDataUri } });
+        } else {
+            // If it's a document, extract text content
+            const base64Data = input.fileDataUri.split(',')[1];
+            const buffer = Buffer.from(base64Data, 'base64');
+            try {
+                if (input.fileName.endsWith('.pdf')) {
+                    const data = await pdf(buffer);
+                    fileContent = data.text;
+                } else if (input.fileName.endsWith('.docx')) {
+                    const result = await mammoth.extractRawText({ buffer });
+                    fileContent = result.value;
+                }
+            } catch (e) {
+                console.error("Error processing file in flow: ", e);
+                return { response: "Lo siento, tuve un problema al leer el archivo. ¿Podrías intentar subirlo de nuevo?" };
+            }
         }
-      } catch (e) {
-        console.error("Error processing file in flow: ", e);
-        return { response: "Lo siento, tuve un problema al leer el archivo. ¿Podrías intentar subirlo de nuevo?" };
-      }
     }
 
     let userQuery = input.query;
     if (fileContent) {
-      userQuery = `Usando el siguiente contexto, responde la pregunta.\n\nCONTEXTO:\n---\n${fileContent}\n---\n\nPREGUNTA: ${input.query}`;
+        userQuery = `Usando el siguiente contexto, responde la pregunta.\n\nCONTEXTO:\n---\n${fileContent}\n---\n\nPREGUNTA: ${input.query}`;
     }
 
-    const history = input.history || [];
+    prompt.push({ text: userQuery });
     
-    const prompt: Part[] = [{ text: userQuery }];
+    const history = input.history || [];
     const newHistory = [...history, { role: 'user', content: prompt }];
     
     const mathTutorSystemPrompt = `Eres un erudito de las matemáticas, el mejor del mundo, y tu nombre es Geometra. Tu propósito es enseñar, no solo resolver. Eres paciente, alentador y extremadamente didáctico.
