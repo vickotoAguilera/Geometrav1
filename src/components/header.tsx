@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { usePathname } from "next/navigation";
 
 
 // SVG para el icono de Google
@@ -106,7 +107,7 @@ const AIChatButton = () => {
       <SheetTrigger asChild>
         <Button>
             <Bot className="mr-2 h-5 w-5" />
-            Asistente
+            Asistente Geometra
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
@@ -118,6 +119,9 @@ const AIChatButton = () => {
 
 
 export default function Header() {
+  const pathname = usePathname();
+  const isStudyPage = pathname.startsWith('/estudia');
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -130,7 +134,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <AIChatButton />
+          {!isStudyPage && <AIChatButton />}
           <AuthButton />
         </div>
       </div>

@@ -25,9 +25,9 @@ export default async function StudyTopicPage({ params }: { params: { slug: strin
        <div className="fixed bottom-8 right-8 z-50">
          <Sheet>
             <SheetTrigger asChild>
-                <Button size="lg" className="rounded-full h-16 w-16">
-                    <Bot className="h-8 w-8" />
-                    <span className="sr-only">Abrir Asistente de Estudio</span>
+                <Button size="lg" variant="destructive" className="rounded-full h-16 w-auto px-6 shadow-lg">
+                    <Bot className="h-6 w-6 mr-2" />
+                    Asistente de Estudio
                 </Button>
             </SheetTrigger>
             <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
