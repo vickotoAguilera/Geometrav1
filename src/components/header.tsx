@@ -97,11 +97,12 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button disabled={!user}>
             <Bot className="mr-2 h-5 w-5" />
             Asistente
         </Button>
@@ -116,7 +117,7 @@ const AIChatButton = () => {
 
 export default function Header() {
   const pathname = usePathname();
-  const isStudyTopicPage = pathname.startsWith('/estudia/') && pathname.split('/').length > 2;
+  const isStudyTopicPage = /^\/estudia\/.+/.test(pathname);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
