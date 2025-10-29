@@ -7,7 +7,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma, X, FileWarning, MessageSquare, File } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -16,9 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs, where } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 
 interface Message {
@@ -149,9 +148,6 @@ export function ChatAssistant() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
-  const [attachedFile, setAttachedFile] = useState<{ name: string; dataUri: string; } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const messagesCollectionRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, 'users', user.uid, 'messages');
@@ -186,65 +182,31 @@ export function ChatAssistant() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (loadEvent) => {
-        const dataUri = loadEvent.target?.result as string;
-        if (dataUri) {
-          setAttachedFile({ name: file.name, dataUri });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeFile = () => {
-    setAttachedFile(null);
-    if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-    }
-  }
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!input.trim() && !attachedFile) || isPending || !user || !messagesCollectionRef) return;
+    if (!input.trim() || isPending || !user || !messagesCollectionRef) return;
   
     const currentInput = input;
-    const currentFile = attachedFile;
     setInput('');
-    
-
+  
     startTransition(() => {
       const processAndRespond = async () => {
-        const userMessageContent = currentFile 
-            ? `${currentInput} (Archivo adjunto: ${currentFile.name})`
-            : currentInput;
-
         const userMessage: FirestoreMessage = {
           role: 'user',
-          content: userMessageContent,
+          content: currentInput,
           createdAt: serverTimestamp(),
           uid: user.uid,
         };
         addDoc(messagesCollectionRef, userMessage);
-
+  
         try {
           const currentMessages = messagesRef.current || [];
           const history: GenkitMessage[] = currentMessages.map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content }],
           }));
-          
-          let queryContent: (string | { text: string } | { media: { url: string } })[] = [{ text: currentInput }];
-          if (currentFile) {
-            queryContent.push({ media: { url: currentFile.dataUri } });
-          } else {
-            queryContent = currentInput;
-          }
-
-          const { response: aiResponse } = await getAiResponse(queryContent, history, tutorMode);
+  
+          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode);
           
           const newAssistantMessage: FirestoreMessage = {
             role: 'assistant',
@@ -252,32 +214,29 @@ export function ChatAssistant() {
             createdAt: serverTimestamp(),
             uid: 'ai-assistant',
           };
-          await addDoc(messagesCollectionRef, newAssistantMessage);
+          addDoc(messagesCollectionRef, newAssistantMessage);
   
         } catch (error: any) {
           console.error("Error in chat:", error);
-          const errorMessageContent = `Lo siento, ocurrió un error: ${error.message}`;
+           const errorMessageContent = `Lo siento, ocurrió un error: ${error.message}`;
            const errorMessage: FirestoreMessage = {
             role: 'assistant',
             content: errorMessageContent,
             createdAt: serverTimestamp(),
             uid: 'ai-assistant-error',
           };
-          await addDoc(messagesCollectionRef, errorMessage);
+          addDoc(messagesCollectionRef, errorMessage);
           toast({
             variant: "destructive",
             title: "Error del asistente",
             description: "No se pudo obtener una respuesta. Por favor, inténtalo de nuevo.",
           });
-        } finally {
-            // Limpiar el archivo solo después de que todo el proceso ha terminado
-            setAttachedFile(null);
-            if(fileInputRef.current) fileInputRef.current.value = '';
         }
       };
       processAndRespond();
     });
   };
+  
 
   const handleDeleteChat = async () => {
     if (!messagesCollectionRef) return;
@@ -301,61 +260,6 @@ export function ChatAssistant() {
     }
   };
 
-  const ManageChatDialog = () => {
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  
-    if (showDeleteConfirmation) {
-      return (
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Borrar historial de chat?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de la base de datos.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowDeleteConfirmation(false)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              handleDeleteChat();
-              setShowDeleteConfirmation(false);
-            }}>
-              Continuar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      );
-    }
-  
-    return (
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Gestionar Chat</AlertDialogTitle>
-          <AlertDialogDescription>
-            Selecciona la acción que quieres realizar.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="flex flex-col space-y-2 py-4">
-            <Button variant="outline" onClick={() => setShowDeleteConfirmation(true)}>
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Borrar Historial de Chat
-            </Button>
-            {attachedFile && (
-                <Button variant="destructive" onClick={() => {
-                    removeFile();
-                    const trigger = document.querySelector('[aria-haspopup="dialog"][data-state="open"]');
-                    if (trigger instanceof HTMLElement) trigger.click();
-                }}>
-                    <FileWarning className="mr-2 h-4 w-4" />
-                    Quitar &quot;{attachedFile.name}&quot;
-                </Button>
-            )}
-        </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cerrar</AlertDialogCancel>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    );
-  };
 
   if (isUserLoading || (user && isLoadingMessages)) {
      return (
@@ -380,24 +284,32 @@ export function ChatAssistant() {
       <SheetHeader className="p-4 border-b">
         <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <Bot /> 
-              <SheetTitle>
-                Asistente Geometra
-              </SheetTitle>
-              <VisuallyHidden>
-                  <SheetDescription>
-                      Haz una pregunta sobre matemáticas o GeoGebra.
-                  </SheetDescription>
-              </VisuallyHidden>
+              <Bot />
+              <SheetTitle>Asistente Geometra</SheetTitle>
+              <SheetDescription className="sr-only">
+                  Haz una pregunta sobre matemáticas o GeoGebra.
+              </SheetDescription>
             </div>
             {user && (
-                 <AlertDialog>
+                <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" title="Gestionar chat">
+                        <Button variant="ghost" size="icon" title="Borrar historial del chat">
                             <Trash2 className="w-5 h-5" />
                         </Button>
                     </AlertDialogTrigger>
-                    <ManageChatDialog />
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Se borrará permanentemente tu
+                            historial de chat de la base de datos.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteChat}>Continuar</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
                 </AlertDialog>
             )}
         </div>
@@ -524,12 +436,9 @@ export function ChatAssistant() {
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
-              <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" id="file-upload" accept="image/*,application/pdf,.docx,.doc" />
-              <Button type="button" variant="ghost" size="icon" disabled={!user || isPending} asChild>
-                <Label htmlFor="file-upload" className={cn("cursor-pointer", !user || isPending ? "cursor-not-allowed opacity-50" : "")}>
-                    <Paperclip className="w-5 h-5" />
-                    <span className="sr-only">Adjuntar archivo</span>
-                </Label>
+              <Button type="button" variant="ghost" size="icon" disabled>
+                <Paperclip className="w-5 h-5" />
+                <span className="sr-only">Adjuntar archivo</span>
               </Button>
               <Input
                 value={input}
@@ -537,7 +446,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedFile) || !user}>
+              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
