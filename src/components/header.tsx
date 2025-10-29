@@ -12,17 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut, User as UserIcon, Bot, MessageSquare } from "lucide-react";
+import { LogOut, User as UserIcon, Bot } from "lucide-react";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { GlobalChatAssistant } from "./global-chat-assistant";
 
 
 // SVG para el icono de Google
@@ -37,7 +32,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const AuthButton = () => {
-    const { user } = useUser();
+    const { user, isUserLoading } = useUser();
     const auth = useAuth();
 
     const handleSignIn = async () => {
@@ -59,9 +54,13 @@ const AuthButton = () => {
         }
     };
 
+    if (isUserLoading) {
+        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
+    }
+
     if (!user) {
         return (
-            <Button variant="outline" size="icon" onClick={handleSignIn} title="Iniciar sesión con Google">
+            <Button variant="outline" size="icon" onClick={handleSignIn}>
                 <GoogleIcon className="h-5 w-5" />
                  <span className="sr-only">Iniciar sesión con Google</span>
             </Button>
@@ -100,22 +99,22 @@ const AuthButton = () => {
 };
 
 const AIChatButton = () => {
-  const { user } = useUser();
+  const [open, setOpen] = useState(false);
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" disabled={!user}>
-          <Bot className="mr-2 h-5 w-5" />
-          Asistente de IA
+        <Button>
+            <Bot className="mr-2 h-5 w-5" />
+            Asistente
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px] p-0">
-        <GlobalChatAssistant />
+      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+        <ChatAssistant />
       </SheetContent>
     </Sheet>
   );
-};
+}
 
 
 export default function Header() {
