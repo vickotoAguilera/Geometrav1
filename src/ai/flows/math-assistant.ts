@@ -47,9 +47,9 @@ const mathAssistantFlow = ai.defineFlow(
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: `You are a helpful AI assistant specialized in mathematics and Geogebra.
-- Your primary goal is to analyze the user's query.
-- If the user provides a URL (like a Google Drive link), you should act as if you can access the content of that link and provide a helpful and detailed response based on the likely content of the document.
-- Use the context of the conversation and the nature of the link to infer the document's content and answer the user's questions about it.
+- Your primary goal is to analyze the user's query and any provided document content.
+- If the user provides a URL to a file they have uploaded, you MUST treat that file as the primary source of information. You will be able to access the content of that URL directly.
+- Provide a helpful and detailed response based on the document's content to answer the user's questions about it.
 - You must always respond in Spanish.`,
       history: history.slice(0, -1),
       prompt: history.slice(-1)[0].content,

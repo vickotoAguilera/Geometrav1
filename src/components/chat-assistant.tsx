@@ -14,13 +14,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2 } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
-import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import {
@@ -33,7 +32,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { getStorage, ref, listAll, deleteObject } from 'firebase/storage';
 
 interface Message {
   id: string;
@@ -98,6 +98,8 @@ const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => 
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -134,6 +136,12 @@ export function ChatAssistant() {
     }
   }, [allMessages, isPending]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -161,15 +169,19 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) return;
+    if (!input.trim() && !file || isPending || !user) return;
   
     const currentInput = input;
+    const currentFile = file;
     setInput('');
+    setFile(null);
   
+    const userMessageContent = currentInput + (currentFile ? `\n\nArchivo adjunto: ${currentFile.name}` : '');
+
     const optimisticUserMessage: Message = {
       id: `optimistic-user-${Date.now()}`,
       role: 'user',
-      content: currentInput,
+      content: userMessageContent,
       createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
     const optimisticAssistantMessage: Message = {
@@ -182,8 +194,33 @@ export function ChatAssistant() {
 
     startTransition(() => {
       const processAndRespond = async () => {
+        let finalQuery = currentInput;
         try {
-          await saveMessage('user', currentInput);
+          if (currentFile) {
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            const functionUrl = `https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile?uid=${user.uid}`;
+            
+            const response = await fetch(functionUrl, {
+              method: 'POST',
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Error del servidor: ${response.status} ${errorText}`);
+            }
+
+            const result = await response.json();
+            finalQuery += `\n\nAquí está el contenido del documento que he subido: ${result.downloadURL}`;
+            
+            toast({
+              title: "Archivo subido",
+              description: "Tu archivo se ha subido y está siendo analizado.",
+            });
+          }
+
+          await saveMessage('user', userMessageContent);
   
           const history: GenkitMessage[] = (messagesData || [])
             .map(m => ({
@@ -191,17 +228,17 @@ export function ChatAssistant() {
               content: [{ text: m.content as string }],
             }));
   
-          const { response: aiResponse } = await getAiResponse(currentInput, history);
+          const { response: aiResponse } = await getAiResponse(finalQuery, history);
           await saveMessage('assistant', aiResponse);
   
         } catch (error: any) {
-          console.error("Error in chat submission:", error);
-          const errorMessage = `Lo siento, ocurrió un error al contactar a la IA.`;
+          console.error("Error en la subida o el chat:", error);
+          const errorMessage = `Lo siento, ocurrió un error: ${error.message}`;
           await saveMessage('assistant', errorMessage);
           toast({
             variant: "destructive",
             title: "Error del asistente",
-            description: "No se pudo obtener una respuesta de la IA. Por favor, revisa la consola para más detalles.",
+            description: "No se pudo completar la acción. Por favor, revisa la consola para más detalles.",
           });
         } finally {
             setOptimisticMessages([]);
@@ -215,15 +252,13 @@ export function ChatAssistant() {
     if (!user || !firestore) return;
   
     try {
-      // 1. Delete all messages in the subcollection
       const messagesSnapshot = await getDocs(messagesRef!);
       const batch = writeBatch(firestore);
       messagesSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
       await batch.commit();
-  
-      // 2. Delete all files in the user's storage folder
+
       const storage = getStorage();
       const userStorageRef = ref(storage, `uploads/${user.uid}`);
       const fileList = await listAll(userStorageRef);
@@ -291,7 +326,7 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Usa este chat para hacer preguntas sobre matemáticas y GeoGebra. Puedes pegar enlaces a documentos de Google Drive.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Adjunta un archivo o haz una pregunta sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -368,17 +403,40 @@ export function ChatAssistant() {
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
             >
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending || !user}
+              >
+                <Paperclip className="w-5 h-5" />
+              </Button>
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={user ? "Escribe tu pregunta o pega un enlace..." : "Inicia sesión para chatear"}
+                placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
+              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !file) || !user}>
                 <Send className="w-4 h-4" />
                 <span className="sr-only">Enviar</span>
               </Button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange}
+                className="hidden" 
+              />
             </form>
+             {file && (
+              <div className="mt-2 text-sm text-muted-foreground flex items-center justify-between p-2 rounded-md bg-muted">
+                <span>{file.name}</span>
+                <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </div>
       </SheetFooter>
     </>
