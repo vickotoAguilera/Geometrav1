@@ -55,8 +55,11 @@ const AuthButton = () => {
         }
     };
 
+    // Esto evita el error de hidratación.
+    // Renderiza el estado final (botón de login o avatar) directamente.
+    // El estado de carga se maneja con la actualización del hook useUser.
     if (isUserLoading) {
-        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
+       return <div className="h-9 w-9 rounded-full bg-muted/50" />; // Muestra un placeholder simple
     }
 
     if (!user) {
@@ -101,6 +104,13 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
+  const { isUserLoading } = useUser();
+
+  // No renderizar el botón hasta que sepamos el estado del usuario para evitar saltos.
+  if (isUserLoading) {
+    return null;
+  }
+
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
