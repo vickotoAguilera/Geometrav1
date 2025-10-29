@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
@@ -10,11 +11,13 @@ import { Bot, User, Send, Trash2, Paperclip, GraduationCap, Sigma } from 'lucide
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser } from '@/firebase/provider';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs, where } from 'firebase/firestore';
+import { useCollection } from '@/firebase/firestore/use-collection';
 
 
 interface Message {
@@ -22,6 +25,15 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
+
+interface FirestoreMessage {
+  id?: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: any;
+  uid: string;
+}
+
 
 interface GenkitMessage {
   role: 'user' | 'model';
@@ -135,32 +147,21 @@ export function ChatAssistant() {
   const { toast } = useToast();
   
   const { user, isUserLoading } = useUser();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const firestore = useFirestore();
 
-  // Cargar mensajes desde localStorage al iniciar
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const storedMessages = localStorage.getItem('chatHistory');
-        if (storedMessages) {
-          setMessages(JSON.parse(storedMessages));
-        }
-      } catch (error) {
-        console.error("Failed to load messages from localStorage", error);
-      }
-    }
-  }, []);
+  const messagesCollectionRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'messages');
+  }, [firestore, user]);
+  
+  const messagesQuery = useMemoFirebase(() => {
+    if (!messagesCollectionRef) return null;
+    return query(messagesCollectionRef, orderBy('createdAt', 'asc'));
+  }, [messagesCollectionRef]);
 
-  // Guardar mensajes en localStorage cada vez que cambian
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('chatHistory', JSON.stringify(messages));
-      } catch (error) {
-        console.error("Failed to save messages to localStorage", error);
-      }
-    }
-  }, [messages]);
+  const { data: messages, isLoading: isLoadingMessages } = useCollection<FirestoreMessage>(messagesQuery);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
 
   useEffect(() => {
@@ -184,54 +185,49 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) return;
+    if (!input.trim() || isPending || !user || !messagesCollectionRef) return;
   
     const currentInput = input;
     setInput('');
     
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: currentInput,
-    };
-
-    const assistantPlaceholder: Message = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: '...',
-    }
-
-    const currentMessages = [...messages, userMessage];
-    setMessages([...currentMessages, assistantPlaceholder]);
-
     startTransition(() => {
       const processAndRespond = async () => {
+        // Optimistically add user message
+        const userMessage: FirestoreMessage = {
+          role: 'user',
+          content: currentInput,
+          createdAt: serverTimestamp(),
+          uid: user.uid,
+        };
+        await addDoc(messagesCollectionRef, userMessage);
+
         try {
+          const currentMessages = messagesRef.current || [];
           const history: GenkitMessage[] = currentMessages.map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: [{ text: m.content }],
           }));
-            
+
           const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode);
           
-          const newAssistantMessage: Message = {
-            id: `assistant-${Date.now()}-final`,
+          const newAssistantMessage: FirestoreMessage = {
             role: 'assistant',
             content: aiResponse,
+            createdAt: serverTimestamp(),
+            uid: 'ai-assistant',
           };
-          
-          // Reemplaza el placeholder con la respuesta real
-          setMessages(prev => prev.map(msg => msg.id === assistantPlaceholder.id ? newAssistantMessage : msg));
+          await addDoc(messagesCollectionRef, newAssistantMessage);
   
         } catch (error: any) {
           console.error("Error in chat:", error);
           const errorMessageContent = `Lo siento, ocurrió un error: ${error.message}`;
-          const errorMessage: Message = {
-            id: `assistant-${Date.now()}-error`,
+           const errorMessage: FirestoreMessage = {
             role: 'assistant',
             content: errorMessageContent,
-          }
-          setMessages(prev => prev.map(msg => msg.id === assistantPlaceholder.id ? errorMessage : msg));
+            createdAt: serverTimestamp(),
+            uid: 'ai-assistant-error',
+          };
+          await addDoc(messagesCollectionRef, errorMessage);
           toast({
             variant: "destructive",
             title: "Error del asistente",
@@ -243,18 +239,29 @@ export function ChatAssistant() {
     });
   };
 
-  const handleDeleteChat = () => {
-    setMessages([]);
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem('chatHistory');
+  const handleDeleteChat = async () => {
+    if (!messagesCollectionRef) return;
+
+    try {
+        const q = query(messagesCollectionRef);
+        const querySnapshot = await getDocs(q);
+        const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+        toast({
+            title: "Chat borrado",
+            description: "Tu historial de chat ha sido eliminado de la base de datos.",
+        });
+    } catch (error) {
+        console.error("Error deleting chat history: ", error);
+        toast({
+            variant: "destructive",
+            title: "Error al borrar",
+            description: "No se pudo eliminar el historial de chat.",
+        });
     }
-    toast({
-      title: "Chat borrado",
-      description: "Tu historial de chat local ha sido eliminado.",
-    });
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || (user && isLoadingMessages)) {
      return (
         <div className="flex-1 p-4 space-y-6 flex items-end">
             <div className="flex items-start gap-3 w-full">
@@ -290,7 +297,7 @@ export function ChatAssistant() {
                         <AlertDialogHeader>
                         <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de este navegador.
+                            Esta acción no se puede deshacer. Se borrará permanentemente tu historial de chat de la base de datos.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -312,10 +319,10 @@ export function ChatAssistant() {
              <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
                Inicia sesión con Google para comenzar a chatear.
              </div>
-          ) : messages.length === 0 && !isPending ? (
+          ) : (!messages || messages.length === 0) && !isPending ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            messages.map((message) => (
+            messages?.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -339,7 +346,7 @@ export function ChatAssistant() {
                   )}
                 >
                   <div className="whitespace-pre-wrap">
-                   {message.content === '...' ? (
+                   {isPending && messagesRef.current?.at(-1)?.id === message.id ? (
                       <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                           <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
