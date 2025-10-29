@@ -6,16 +6,17 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 interface BaseMessage {
   id: string;
@@ -40,6 +41,8 @@ interface GenkitMessage {
   content: Part[];
 }
 
+type TutorMode = 'math' | 'geogebra';
+
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +65,7 @@ const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => 
   return (
     <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full space-y-2">
       <p className="font-medium">
-        ¡Hola! Soy tu asistente de Geometra. ¿En qué puedo ayudarte hoy?
+        ¡Hola! Soy tu asistente Geometra. ¿En qué puedo ayudarte hoy?
       </p>
       {isLoading ? (
         <div className="space-y-2">
@@ -106,21 +109,27 @@ const parseResponse = (content: string) => {
       parts.push({ type: 'text', value: content.substring(lastIndex) });
     }
   
-    // Regex to find code blocks and wrap them
     const finalParts = parts.map(part => {
         if (part.type === 'text') {
             const codeRegex = /<code>(.*?)<\/code>/gs;
-            const textSubParts = [];
+            const textSubParts: ({type: 'text' | 'code' | 'bold', value: string})[] = [];
             let lastTextIndex = 0;
-            let codeMatch;
-            while((codeMatch = codeRegex.exec(part.value)) !== null) {
-                if (codeMatch.index > lastTextIndex) {
-                    textSubParts.push({type: 'text', value: part.value.substring(lastTextIndex, codeMatch.index)});
+            let combinedRegex = new RegExp(/<code>(.*?)<\/code>|\*\*(.*?)\*\*/gs);
+            let textMatch;
+
+            while((textMatch = combinedRegex.exec(part.value)) !== null) {
+                if (textMatch.index > lastTextIndex) {
+                    textSubParts.push({type: 'text', value: part.value.substring(lastTextIndex, textMatch.index)});
                 }
-                textSubParts.push({type: 'code', value: codeMatch[1]});
-                lastTextIndex = codeMatch.index + codeMatch[0].length;
+                if (textMatch[1]) { // <code> match
+                    textSubParts.push({type: 'code', value: textMatch[1]});
+                } else if (textMatch[2]) { // **bold** match
+                    textSubParts.push({type: 'bold', value: textMatch[2]});
+                }
+                lastTextIndex = textMatch.index + textMatch[0].length;
             }
-             if (lastTextIndex < part.value.length) {
+
+            if (lastTextIndex < part.value.length) {
                 textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex) });
             }
             return textSubParts;
@@ -129,10 +138,11 @@ const parseResponse = (content: string) => {
     }).flat();
 
     return finalParts;
-  };
+};
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
+  const [tutorMode, setTutorMode] = useState<TutorMode>('math');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -231,10 +241,8 @@ export function ChatAssistant() {
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
-    // Automatically submit the form
     const form = document.getElementById('chat-form') as HTMLFormElement;
     if(form) {
-        // We need to use a timeout to allow the state to update before submitting
         setTimeout(() => {
             form.requestSubmit();
         }, 0);
@@ -310,7 +318,7 @@ export function ChatAssistant() {
               content: [{ text: (m as TextMessage).content }],
             }));
             
-          const { response: aiResponse } = await getAiResponse(currentInput, history, fileDataUri, fileName);
+          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, fileDataUri, fileName);
           
           await saveMessage({
             role: 'assistant',
@@ -367,20 +375,19 @@ export function ChatAssistant() {
     const fileToToggle = fileMessages.find(f => f.id === fileId);
     if (!fileToToggle) return;
   
-    const newActiveState = !fileToToggle.isActive;
-  
     const batch = writeBatch(firestore);
-  
-    // Update all files
-    fileMessages.forEach(file => {
-      const docRef = doc(messagesRef, file.id);
-      if (file.id === fileId) {
-        batch.update(docRef, { isActive: newActiveState });
-      } else if (newActiveState) {
-        // If we are activating a file, all others must be deactivated.
-        batch.update(docRef, { isActive: false });
-      }
-    });
+    
+    // If the clicked file is already active, just deactivate it.
+    if (fileToToggle.isActive) {
+      const docRef = doc(messagesRef, fileId);
+      batch.update(docRef, { isActive: false });
+    } else {
+      // If the clicked file is not active, deactivate all others and activate this one.
+      fileMessages.forEach(file => {
+        const docRef = doc(messagesRef, file.id);
+        batch.update(docRef, { isActive: file.id === fileId });
+      });
+    }
   
     await batch.commit();
   };
@@ -538,7 +545,7 @@ export function ChatAssistant() {
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
                         </div>
                     ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-2 leading-relaxed">
                             {parseResponse(message.content).map((part, index) => {
                                 if (part.type === 'button') {
                                 return (
@@ -552,6 +559,8 @@ export function ChatAssistant() {
                                             {part.value}
                                         </code>
                                     )
+                                } else if (part.type === 'bold') {
+                                    return <strong key={index}>{part.value}</strong>
                                 }
                                 return <span key={index}>{part.value}</span>;
                             })}
@@ -572,7 +581,24 @@ export function ChatAssistant() {
       </ScrollArea>
 
       <SheetFooter className="p-4 border-t bg-background">
-          <div className="w-full">
+          <div className="w-full space-y-3">
+            { user && (
+              <div className="flex items-center justify-center gap-4 text-sm">
+                  <div className='flex items-center gap-2 text-muted-foreground'>
+                    <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-primary')}/>
+                    <Label htmlFor="tutor-mode">Tutor de Mates</Label>
+                  </div>
+                  <Switch
+                    id="tutor-mode"
+                    checked={tutorMode === 'geogebra'}
+                    onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
+                  />
+                  <div className='flex items-center gap-2 text-muted-foreground'>
+                     <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')}/>
+                     <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
+                  </div>
+              </div>
+            )}
             <form
               id="chat-form"
               onSubmit={handleSubmit}

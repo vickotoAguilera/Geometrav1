@@ -17,25 +17,20 @@ interface GenkitMessage {
 export async function getAiResponse(
   queryText: string,
   history: GenkitMessage[],
+  tutorMode: 'math' | 'geogebra',
   fileContent?: string,
   fileName?: string
 ): Promise<MathAssistantOutput> {
 
-  // If fileContent is provided, we pass it to the flow.
-  if (fileContent && fileName) {
-     return await mathAssistant({
-        query: queryText,
-        history: history,
-        fileDataUri: fileContent, // Assuming fileContent is a data URI
-        fileName: fileName,
-      });
-  }
-
-  // If not, just send the query.
-  return await mathAssistant({
+  const input = {
     query: queryText,
     history: history,
-  });
+    tutorMode: tutorMode,
+    fileDataUri: fileContent,
+    fileName: fileName,
+  };
+
+  return await mathAssistant(input);
 }
 
 export async function getInitialPrompts(): Promise<GetStartedPromptOutput> {
