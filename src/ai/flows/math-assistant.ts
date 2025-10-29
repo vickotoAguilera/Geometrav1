@@ -8,27 +8,16 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {Part} from 'genkit';
 import {z} from 'genkit';
-import mammoth from 'mammoth';
-import pdf from 'pdf-parse/lib/pdf-parse.js';
-
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'model']),
   content: z.array(z.any()),
 });
 
-const ContextFileSchema = z.object({
-  fileName: z.string(),
-  fileDataUri: z.string(),
-});
-
 const MathAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('The conversation history.'),
   query: z.string().describe('The user query related to math or Geogebra.'),
-  imageQueryDataUri: z.string().optional().describe("An image attached to the current query, as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
-  activeContextFiles: z.array(ContextFileSchema).optional().describe('A list of currently active documents to be used as context.'),
   tutorMode: z.enum(['math', 'geogebra']).optional().default('math').describe('The selected tutor personality.'),
 });
 export type MathAssistantInput = z.infer<typeof MathAssistantInputSchema>;
@@ -49,48 +38,8 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
-    let documentContext = '';
-    const prompt: Part[] = [];
-    
-    // 1. Handle image attached to the current query
-    if (input.imageQueryDataUri) {
-        prompt.push({ media: { url: input.imageQueryDataUri } });
-    }
-
-    // 2. Handle active context files (PDF, DOCX)
-    if (input.activeContextFiles && input.activeContextFiles.length > 0) {
-      let fileContents: string[] = [];
-      for (const file of input.activeContextFiles) {
-        try {
-          const base64Data = file.fileDataUri.split(',')[1];
-          const buffer = Buffer.from(base64Data, 'base64');
-          if (file.fileName.endsWith('.pdf')) {
-              const data = await pdf(buffer);
-              fileContents.push(`Contenido del archivo '${file.fileName}':\n${data.text}`);
-          } else if (file.fileName.endsWith('.docx')) {
-              const result = await mammoth.extractRawText({ buffer });
-              fileContents.push(`Contenido del archivo '${file.fileName}':\n${result.value}`);
-          }
-        } catch (e) {
-            console.error(`Error processing file ${file.fileName} in flow: `, e);
-            // Optionally notify user about the specific file that failed
-        }
-      }
-      if (fileContents.length > 0) {
-        documentContext = `--- INICIO DEL CONTEXTO DE ARCHIVOS ---\n${fileContents.join('\n\n')}\n--- FIN DEL CONTEXTO DE ARCHIVOS ---`;
-      }
-    }
-
-    let userQuery = input.query;
-    if (documentContext) {
-        userQuery = `Usando el siguiente contexto de uno o más documentos, responde la pregunta.\n\nCONTEXTO:\n${documentContext}\n\nPREGUNTA: ${input.query}`;
-    }
-
-    prompt.push({ text: userQuery });
-    
     const history = input.history || [];
-    const newHistory = [...history, { role: 'user', content: prompt }];
-    
+
     const mathTutorSystemPrompt = `Eres un erudito de las matemáticas, el mejor del mundo, y tu nombre es Geometra. Tu propósito es enseñar, no solo resolver. Eres paciente, alentador y extremadamente didáctico.
 
 Reglas estrictas de comportamiento:
@@ -132,8 +81,8 @@ Reglas estrictas de comportamiento:
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: systemPrompt,
-      history: newHistory.slice(0, -1),
-      prompt: newHistory.slice(-1)[0].content,
+      history,
+      prompt: input.query,
       output: {
         schema: MathAssistantOutputSchema,
       },

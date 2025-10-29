@@ -5,34 +5,22 @@ import {
   getStartedPrompt,
   GetStartedPromptOutput,
 } from '@/ai/flows/get-started-prompt';
-import { Part } from 'genkit';
 
 interface GenkitMessage {
   role: 'user' | 'model';
-  content: Part[];
-}
-
-interface ContextFile {
-    fileName: string;
-    fileDataUri: string;
+  content: { text: string }[];
 }
 
 export async function getAiResponse(
   queryText: string,
   history: GenkitMessage[],
-  tutorMode: 'math' | 'geogebra',
-  imageQueryDataUri?: string,
-  activeContextFiles?: ContextFile[],
+  tutorMode: 'math' | 'geogebra'
 ): Promise<MathAssistantOutput> {
-
   const input = {
     query: queryText,
     history: history,
     tutorMode: tutorMode,
-    imageQueryDataUri: imageQueryDataUri,
-    activeContextFiles: activeContextFiles,
   };
-
   return await mathAssistant(input);
 }
 
