@@ -175,10 +175,13 @@ export function ChatAssistant() {
   const fileContextMessages = allMessages.filter(m => m.type === 'fileContext') as FileContextMessage[];
 
   useEffect(() => {
-    if (viewportRef.current) {
-      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+    const viewport = viewportRef.current;
+    if (viewport) {
+      setTimeout(() => {
+        viewport.scrollTop = viewport.scrollHeight;
+      }, 0);
     }
-  }, [textMessages, isPending]);
+  }, [allMessages, isPending]);
 
   const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -478,8 +481,8 @@ export function ChatAssistant() {
         </div>
       )}
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-6" ref={viewportRef}>
+      <ScrollArea className="flex-1" viewportRef={viewportRef}>
+        <div className="p-4 space-y-6">
           {!user ? (
              <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full">
                Inicia sesión con Google para comenzar a chatear.
