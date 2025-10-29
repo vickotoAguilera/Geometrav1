@@ -61,5 +61,3 @@ const mathAssistantFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

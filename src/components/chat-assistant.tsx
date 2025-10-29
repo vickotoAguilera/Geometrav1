@@ -157,14 +157,16 @@ export function ChatAssistant() {
           }
           
           // Deactivate other files
-          const batch = writeBatch(firestore!);
-          fileMessages.forEach(msg => {
-            if (msg.metadata?.active) {
-              const docRef = doc(messagesRef, msg.id);
-              batch.update(docRef, { 'metadata.active': false });
-            }
-          });
-          await batch.commit();
+          if (firestore) {
+            const batch = writeBatch(firestore);
+            fileMessages.forEach(msg => {
+              if (msg.metadata?.active) {
+                const docRef = doc(messagesRef, msg.id);
+                batch.update(docRef, { 'metadata.active': false });
+              }
+            });
+            await batch.commit();
+          }
 
           await saveMessage('file', text, { fileName: file.name, active: true });
           
@@ -197,8 +199,7 @@ export function ChatAssistant() {
 
   const saveMessage = async (role: 'user' | 'assistant' | 'file', content: string, metadata?: Message['metadata']) => {
     if (!messagesRef || !user) return;
-    const messageData: Partial<Message> = {
-      userId: user.uid,
+    const messageData: any = {
       role,
       content,
       createdAt: serverTimestamp(),
@@ -534,5 +535,3 @@ export function ChatAssistant() {
     </>
   );
 }
-
-    
