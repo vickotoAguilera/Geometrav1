@@ -22,7 +22,7 @@ import { useUser, useFirestore, useCollection, useMemoFirebase, useFirebaseApp }
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 interface Message {
   id: string;
@@ -159,90 +159,85 @@ export function ChatAssistant() {
     }
 
     startTransition(() => {
-        const processAndRespond = async () => {
-            const userMessageContent = `Analiza el archivo: ${file.name}`;
+      const processAndRespond = async () => {
+          const userMessageContent = `Analiza el archivo: ${file.name}`;
+          
+          const optimisticUserMessage: Message = {
+              id: `optimistic-user-${Date.now()}`,
+              role: 'user',
+              content: userMessageContent,
+              createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+          };
+          const optimisticAssistantMessage: Message = {
+              id: `optimistic-assistant-${Date.now()}`,
+              role: 'assistant',
+              content: '...',
+              createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
+          };
+          setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
+
+          await saveMessage('user', userMessageContent);
+
+          try {
+            toast({
+              title: "Subiendo archivo...",
+              description: `Progreso: 0%`,
+            });
+            const reader = new FileReader();
+            reader.onload = async () => {
+              const base64Data = (reader.result as string).split(',')[1];
+              
+              const functions = getFunctions(firebaseApp);
+              const uploadFile = httpsCallable(functions, 'uploadFile');
+              
+              toast({
+                  title: "Archivo subido",
+                  description: "Analizando con la IA...",
+              });
+              
+              const result: any = await uploadFile({
+                fileData: base64Data,
+                fileName: file.name,
+                mimeType: file.type
+              });
+              
+              const downloadURL = result.data.downloadURL;
+              console.log('File uploaded:', downloadURL);
+
+              const photoDataUri = await new Promise<string>((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = (event) => resolve(event.target?.result as string);
+                  reader.onerror = (error) => reject(error);
+                  reader.readAsDataURL(file);
+              });
+              
+              const history: GenkitMessage[] = (messagesData || [])
+                  .map(m => ({
+                      role: m.role === 'assistant' ? 'model' : 'user',
+                      content: [{ text: m.content as string }],
+                  }));
+
+              const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
+              await saveMessage('assistant', aiResponse);
+            };
             
-            const optimisticUserMessage: Message = {
-                id: `optimistic-user-${Date.now()}`,
-                role: 'user',
-                content: userMessageContent,
-                createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-            };
-            const optimisticAssistantMessage: Message = {
-                id: `optimistic-assistant-${Date.now()}`,
-                role: 'assistant',
-                content: '...',
-                createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
-            };
-            setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
-
-            await saveMessage('user', userMessageContent);
-
-            const storage = getStorage(firebaseApp);
-            const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}-${file.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    toast({
-                        title: "Subiendo archivo...",
-                        description: `Progreso: ${Math.round(progress)}%`,
-                    });
-                },
-                (error) => {
-                    console.error("Error en la subida del archivo:", error);
-                    let errorMessage = `Lo siento, ocurrió un error al subir el archivo. Código: ${error.code}`;
-                    if (error.code === 'storage/unauthorized') {
-                        errorMessage = "Error de autorización. Revisa las reglas de seguridad de Storage.";
-                    } else if (error.code === 'storage/canceled') {
-                        errorMessage = "La subida del archivo fue cancelada.";
-                    } else if (error.code.includes('cors')) {
-                        errorMessage = "Error de CORS. La configuración del bucket de Storage no permite la subida desde este dominio.";
-                    }
-                    saveMessage('assistant', errorMessage);
-                    toast({
-                        variant: "destructive",
-                        title: "Error al subir archivo",
-                        description: error.message,
-                    });
-                    setOptimisticMessages([]);
-                },
-                async () => {
-                    try {
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        toast({
-                            title: "Archivo subido",
-                            description: "Analizando con la IA...",
-                        });
-                        
-                        const history: GenkitMessage[] = (messagesData || [])
-                            .map(m => ({
-                                role: m.role === 'assistant' ? 'model' : 'user',
-                                content: [{ text: m.content as string }],
-                            }));
-                        
-                        const photoDataUri = await new Promise<string>((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (event) => resolve(event.target?.result as string);
-                            reader.onerror = (error) => reject(error);
-                            reader.readAsDataURL(file);
-                        });
-                        
-                        const { response: aiResponse } = await getAiResponse(userMessageContent, history, photoDataUri);
-                        await saveMessage('assistant', aiResponse);
-                    } catch (aiError: any) {
-                        console.error("Error in AI processing:", aiError);
-                        await saveMessage('assistant', `Error al procesar el archivo con la IA: ${aiError.message}`);
-                    } finally {
-                        setOptimisticMessages([]);
-                    }
-                }
-            );
-        };
-        processAndRespond();
+            reader.readAsDataURL(file);
+          } catch (error: any) {
+              console.error("Error en la subida del archivo:", error);
+              const errorMessage = `Lo siento, ocurrió un error al subir el archivo. Código: ${error.code || 'desconocido'}. Mensaje: ${error.message || 'Error del servidor'}`;
+              await saveMessage('assistant', errorMessage);
+              toast({
+                  variant: "destructive",
+                  title: "Error al subir archivo",
+                  description: error.message,
+              });
+          } finally {
+            setOptimisticMessages([]);
+          }
+      };
+      processAndRespond();
     });
-};
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
