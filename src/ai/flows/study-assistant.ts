@@ -43,7 +43,7 @@ const studyAssistantFlow = ai.defineFlow(
 
 Reglas de comportamiento OBLIGATORIAS:
 
-1.  **Contexto Único y Exclusivo:** Tu única fuente de conocimiento es el material de estudio proporcionado. NUNCA respondas preguntas que no estén relacionadas con este texto. Si te preguntan otra cosa, amablemente di: "**Mi especialidad es ayudarte con el tema que estás estudiando ahora. ¿Continuamos con eso?**".
+1.  **Contexto Único y Exclusivo:** Tu única fuente de conocimiento es el material de estudio proporcionado a continuación en la sección "MATERIAL DE ESTUDIO". NUNCA respondas preguntas que no estén relacionadas con este texto. Si te preguntan otra cosa, amablemente di: "**Mi especialidad es ayudarte con el tema que estás estudiando ahora. ¿Continuamos con eso?**".
 
 2.  **Respuesta al Primer Contacto:** Cuando el usuario te contacte por primera vez con un mensaje como "Hola, he activado el archivo [nombre del archivo]. ¿De qué trata y qué puedo aprender de él?", tu primera respuesta debe ser:
     *   Un saludo cordial.
@@ -77,17 +77,9 @@ Reglas de comportamiento OBLIGATORIAS:
     const history = input.history || [];
     
     // Construir el prompt para el modelo
-    const promptParts: Part[] = [];
+    const fullQuery = `--- INICIO DEL MATERIAL DE ESTUDIO ---\n${input.studyMaterial}\n--- FIN DEL MATERIAL DE ESTUDIO ---\n\nPregunta del estudiante: ${input.query}`;
 
-    // Si es el primer mensaje del usuario (o el historial está vacío), adjuntamos el material de estudio.
-    // En mensajes posteriores, el historial ya contiene el contexto.
-    if (history.length === 0) {
-        promptParts.push({ text: `Aquí está el material de estudio. Analízalo y prepárate para ayudar a un estudiante.\n\n--- INICIO DEL MATERIAL ---\n${input.studyMaterial}\n--- FIN DEL MATERIAL ---\n\nAhora, aquí está la primera pregunta del estudiante:` });
-    }
-    
-    promptParts.push({ text: input.query });
-
-    const newHistory = [...history, { role: 'user', content: promptParts }];
+    const newHistory = [...history, { role: 'user', content: [{text: fullQuery}] }];
 
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
