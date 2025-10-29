@@ -22,7 +22,7 @@ export default async function StudyTopicPage({ params }: { params: { slug: strin
           <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
         </article>
       </main>
-       <div className="fixed bottom-8 right-8 z-50">
+       <div className="fixed bottom-8 left-8 z-50">
          <Sheet>
             <SheetTrigger asChild>
                 <Button size="lg" variant="destructive" className="rounded-full h-16 w-auto px-6 shadow-lg">
@@ -30,7 +30,7 @@ export default async function StudyTopicPage({ params }: { params: { slug: strin
                     Asistente de Estudio
                 </Button>
             </SheetTrigger>
-            <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+            <SheetContent side="bottom" className="h-[85vh] sm:h-[60vh] rounded-t-lg p-0 flex flex-col">
                 <StudyChatAssistant studyMaterial={post.contentHtml} topicTitle={post.title} />
             </SheetContent>
         </Sheet>

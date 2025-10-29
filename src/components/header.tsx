@@ -18,7 +18,6 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { usePathname } from "next/navigation";
 
 
 // SVG para el icono de Google
@@ -33,7 +32,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const AuthButton = () => {
-    const { user } = useUser();
+    const { user, isUserLoading } = useUser();
     const auth = useAuth();
 
     const handleSignIn = async () => {
@@ -55,9 +54,13 @@ const AuthButton = () => {
         }
     };
 
+    if (isUserLoading) {
+        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
+    }
+
     if (!user) {
         return (
-            <Button variant="outline" size="icon" onClick={handleSignIn} title="Iniciar sesión con Google">
+            <Button variant="outline" size="icon" onClick={handleSignIn}>
                 <GoogleIcon className="h-5 w-5" />
                  <span className="sr-only">Iniciar sesión con Google</span>
             </Button>
@@ -97,14 +100,13 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
-  const { user } = useUser();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button disabled={!user}>
+        <Button>
             <Bot className="mr-2 h-5 w-5" />
-            Asistente Geometra
+            Asistente
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
@@ -116,10 +118,6 @@ const AIChatButton = () => {
 
 
 export default function Header() {
-  const pathname = usePathname();
-  // El asistente global se oculta solo si la ruta es /estudia/[algo], no en /estudia
-  const isStudyTopicPage = /^\/estudia\/.+/.test(pathname);
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -132,7 +130,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          {!isStudyTopicPage && <AIChatButton />}
+          <AIChatButton />
           <AuthButton />
         </div>
       </div>
