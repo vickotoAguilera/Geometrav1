@@ -10,7 +10,10 @@ import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, Graduat
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser } from '@/firebase/provider';
+import { useFirestore } from '@/firebase/provider';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useMemoFirebase } from '@/firebase/provider';
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
@@ -265,13 +268,8 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) {
-      if(attachedImage && !isPending && user) {
-        // Allow sending image with empty prompt
-      } else {
-        return;
-      }
-    }
+    if (!input.trim() && !attachedImage) return;
+    if (isPending || !user) return;
   
     const currentInput = input;
     const currentAttachedImage = attachedImage;
@@ -327,11 +325,26 @@ export function ChatAssistant() {
             
           const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, activeFiles);
           
-          await saveMessage({
+          const newAssistantMessage: Omit<TextMessage, 'id'> = {
             role: 'assistant',
             type: 'text',
             content: aiResponse,
             createdAt: serverTimestamp() as Timestamp,
+          };
+          await saveMessage(newAssistantMessage);
+
+          setOptimisticMessages(prev => {
+            const newOptimistic = [...prev];
+            const assistantMsgIndex = newOptimistic.findIndex(m => m.id === optimisticAssistantMessage.id);
+            if(assistantMsgIndex > -1) {
+              // This message will be replaced by the real one from Firestore subscription
+              newOptimistic.splice(assistantMsgIndex, 1);
+            }
+            const userMsgIndex = newOptimistic.findIndex(m => m.id === optimisticUserMessage.id);
+             if(userMsgIndex > -1) {
+              newOptimistic.splice(userMsgIndex, 1);
+            }
+            return newOptimistic;
           });
   
         } catch (error: any) {
@@ -502,15 +515,19 @@ export function ChatAssistant() {
           ) : textMessages.length === 0 ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            textMessages.map((message) => (
+            allMessages.map((message) => {
+              if (message.type === 'fileContext') return null;
+              const textMessage = message as TextMessage;
+
+              return (
               <div
-                key={message.id}
+                key={textMessage.id}
                 className={cn(
                   'flex items-start gap-3',
-                  message.role === 'user' && 'justify-end'
+                  textMessage.role === 'user' && 'justify-end'
                 )}
               >
-                {message.role !== 'user' && (
+                {textMessage.role !== 'user' && (
                   <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
                       <Bot className="w-5 h-5" />
@@ -520,18 +537,18 @@ export function ChatAssistant() {
                   <div
                     className={cn(
                       'p-3 rounded-lg max-w-[80%] text-sm',
-                      message.role === 'user'
+                      textMessage.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-muted-foreground'
                     )}
                   >
-                    {message.imageUrl && (
+                    {textMessage.imageUrl && (
                         <div className="mb-2">
-                            <Image src={message.imageUrl} alt="Imagen adjunta" width={200} height={200} className="rounded-md object-cover"/>
+                            <Image src={textMessage.imageUrl} alt="Imagen adjunta" width={200} height={200} className="rounded-md object-cover"/>
                         </div>
                     )}
                     <div className="whitespace-pre-wrap">
-                     {message.content === '...' ? (
+                     {textMessage.content === '...' ? (
                         <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -539,7 +556,7 @@ export function ChatAssistant() {
                         </div>
                     ) : (
                         <div className="space-y-2 leading-relaxed">
-                            {parseResponse(message.content).map((part, index) => {
+                            {parseResponse(textMessage.content).map((part, index) => {
                                 if (part.type === 'button') {
                                 return (
                                     <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
@@ -561,7 +578,7 @@ export function ChatAssistant() {
                     )}
                     </div>
                   </div>
-                {message.role === 'user' && (
+                {textMessage.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
                     <AvatarFallback>
                       <User className="w-5 h-5" />
@@ -569,7 +586,7 @@ export function ChatAssistant() {
                   </Avatar>
                 )}
               </div>
-            ))
+            )})
           )}
         </div>
       </ScrollArea>
