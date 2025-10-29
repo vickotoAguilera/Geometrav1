@@ -120,7 +120,8 @@ const AIChatButton = () => {
 
 export default function Header() {
   const pathname = usePathname();
-  const isStudyPage = pathname.startsWith('/estudia');
+  // El asistente global se oculta solo si la ruta es /estudia/[algo], no en /estudia
+  const isStudyTopicPage = /^\/estudia\/.+/.test(pathname);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -134,7 +135,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          {!isStudyPage && <AIChatButton />}
+          {!isStudyTopicPage && <AIChatButton />}
           <AuthButton />
         </div>
       </div>
