@@ -18,7 +18,7 @@ El pilar de la plataforma son los materiales de estudio.
 1.  **Recepción de Contenido:** El usuario (experto en la materia) proporcionará el contenido de estudio en formato PDF.
 2.  **Creación de Archivos `.md`:** Yo (Gemini) analizaré cada PDF y lo transcribiré a un archivo Markdown (`.md`).
 3.  **Estructuración y Marcadores de Página:** Durante la transcripción, añadiré títulos y marcadores que referencien la estructura del PDF original. **Ejemplo:** Si un ejercicio está en la página 8 del PDF, el `.md` contendrá un título como `## Página 8: Ejercicios del Teorema de Pitágoras`. Esto es crucial para que la IA de Estudio pueda localizar información específica.
-4.  **Disponibilidad del PDF Original:** En cada página de estudio generada a partir de un `.md`, se incluirá un enlace para que el usuario pueda descargar el PDF original completo, manteniendo la correspondencia entre ambos formatos.
+4.  **Disponibilidad del PDF Original:** El usuario creará un Google Drive para almacenar los PDFs. En cada página de estudio generada a partir de un `.md`, se incluirá un enlace para que el alumno pueda descargar el PDF original completo, asegurando que el estudiante y la IA estén viendo el mismo contenido.
 
 ---
 
@@ -37,10 +37,10 @@ Modificaremos el componente del chat para que adopte uno de dos comportamientos.
 
 *   **Activación:** Se activa **únicamente** en las páginas de estudio (rutas `/estudia/...`).
 *   **Persistencia:** La conversación **NO usa Firestore**. Es temporal y se maneja localmente en el estado del componente (React `useState`). El historial persiste si se cierra y abre el panel, pero se borra si se recarga la página.
-*   **Contexto:** Es **automático y fijo**.
+*   **Contexto Automático y Fijo:**
     *   No hay opción para subir archivos.
     *   La IA es consciente del archivo `.md` de la página actual. Su conocimiento se limita estrictamente a ese contenido.
-    *   Un mensaje inicial predefinido (ej: "Estoy viendo el tema 'Teorema de Pitágoras'") puede ser enviado a la IA para iniciar la conversación contextual.
+    *   Dentro de la página de estudio, un botón de "Ayuda" enviará un **mensaje predefinido y automático** a la IA para iniciar la conversación. **Ejemplo de mensaje:** *"Estoy viendo el tema 'Teorema de Pitágoras'. Ayúdame a entenderlo."* Esto le da a la IA el contexto inmediato del documento que el usuario está estudiando.
 
 ---
 
@@ -51,7 +51,7 @@ Modificaremos el componente del chat para que adopte uno de dos comportamientos.
 | **Rutas** | Todas, excepto `/estudia/...` | Solo en `/estudia/...` |
 | **Base de Datos**| **Sí** (Firestore) | **No** (Estado local de React) |
 | **Subir Archivos**| **Sí** | **No** |
-| **Fuente de Contexto**| Archivos subidos por el usuario | Archivo `.md` de la página actual |
+| **Fuente de Contexto**| Archivos subidos por el usuario | Archivo `.md` de la página actual (automático) |
 | **Persistencia** | Permanente | Temporal (sesión del navegador) |
 
 ---
