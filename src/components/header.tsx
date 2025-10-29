@@ -33,7 +33,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const AuthButton = () => {
-    const { user, isUserLoading } = useUser();
+    const { user } = useUser();
     const auth = useAuth();
 
     const handleSignIn = async () => {
@@ -54,10 +54,6 @@ const AuthButton = () => {
             console.error("Error signing out", error);
         }
     };
-
-    if (isUserLoading) {
-       return <div className="h-9 w-9 rounded-full bg-muted/50 animate-pulse" />;
-    }
 
     if (!user) {
         return (
@@ -101,11 +97,12 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button disabled={!user}>
             <Bot className="mr-2 h-5 w-5" />
             Asistente Geometra
         </Button>
