@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { getAiResponse } from '@/app/actions';
-import { SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -187,11 +186,11 @@ export function ChatAssistant() {
 
   return (
     <div className="flex flex-col h-full">
-      <SheetHeader className="p-4 border-b">
+      <div className="p-4 border-b flex flex-col space-y-2 text-center sm:text-left">
         <div className="flex justify-between items-center">
-            <SheetTitle className="font-headline flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Bot /> Asistente de Mates (Local)
-            </SheetTitle>
+            </h2>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" title="Reiniciar chat">
@@ -212,7 +211,7 @@ export function ChatAssistant() {
                 </AlertDialogContent>
             </AlertDialog>
         </div>
-      </SheetHeader>
+      </div>
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-6">
@@ -286,7 +285,7 @@ export function ChatAssistant() {
         </div>
       </ScrollArea>
 
-      <SheetFooter className="p-4 border-t bg-background">
+      <div className="p-4 border-t bg-background flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
           <div className="w-full space-y-3">
             <form
               id="local-chat-form"
@@ -305,7 +304,7 @@ export function ChatAssistant() {
               </Button>
             </form>
           </div>
-      </SheetFooter>
+      </div>
     </div>
   );
 }
