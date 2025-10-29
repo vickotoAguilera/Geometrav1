@@ -92,50 +92,16 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
     }
   }, [messages]);
 
-  const handlePromptClick = (prompt: string) => {
-    setInput(prompt);
-    const form = document.getElementById("study-chat-form") as HTMLFormElement;
-    if (form) {
-      setTimeout(() => form.requestSubmit(), 0);
-    }
-  };
-
-  const handleToggleEjercicio = (ejercicio: Ejercicio) => {
-    setActiveEjercicio(prev => (prev?.slug === ejercicio.slug ? null : ejercicio));
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!input.trim() || isPending) return;
-
-    const currentInput = input;
-    setInput('');
-
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: currentInput,
-    };
-
-    const assistantPlaceholder: ChatMessage = {
-      id: `assistant-${Date.now()}`,
-      role: 'model',
-      content: '...',
-    };
-
-    setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
-
+  const sendQuery = (query: string, history: ChatMessage[], material: string) => {
     startTransition(() => {
       const processAndRespond = async () => {
         try {
-          const history: GenkitMessage[] = messages.map(m => ({
+          const genkitHistory: GenkitMessage[] = history.map(m => ({
             role: m.role,
             content: [{ text: m.content }],
           }));
           
-          const studyMaterial = activeEjercicio ? activeEjercicio.content : "";
-          
-          const { response: aiResponse } = await getStudyAiResponse(currentInput, history, studyMaterial);
+          const { response: aiResponse } = await getStudyAiResponse(query, genkitHistory, material);
           
           setMessages(prev => prev.slice(0, -1).concat({
             id: `assistant-${Date.now()}-final`,
@@ -155,6 +121,56 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
       };
       void processAndRespond();
     });
+  }
+
+  const handlePromptClick = (prompt: string) => {
+    setInput(prompt);
+    const form = document.getElementById("study-chat-form") as HTMLFormElement;
+    if (form) {
+      setTimeout(() => form.requestSubmit(), 0);
+    }
+  };
+
+  const handleToggleEjercicio = (ejercicio: Ejercicio) => {
+    const isActivating = activeEjercicio?.slug !== ejercicio.slug;
+    setActiveEjercicio(isActivating ? ejercicio : null);
+    setMessages([]); // Clear chat on any toggle
+    setInput('');
+
+    if (isActivating) {
+      const autoPrompt = `Hola, he activado el archivo '${ejercicio.title}'. ¿De qué trata y qué puedo aprender de él?`;
+      const assistantPlaceholder: ChatMessage = {
+        id: `assistant-intro-${Date.now()}`,
+        role: 'model',
+        content: '...',
+      };
+      setMessages([assistantPlaceholder]);
+      sendQuery(autoPrompt, [], ejercicio.content);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim() || isPending || !activeEjercicio) return;
+
+    const currentInput = input;
+    setInput('');
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: currentInput,
+    };
+
+    const assistantPlaceholder: ChatMessage = {
+      id: `assistant-${Date.now()}`,
+      role: 'model',
+      content: '...',
+    };
+
+    const newMessages = [...messages, userMessage, assistantPlaceholder];
+    setMessages(newMessages);
+    sendQuery(currentInput, [...messages, userMessage], activeEjercicio.content);
   };
 
   return (
@@ -199,7 +215,10 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                     <div className="p-4 space-y-4">
                     {messages.length === 0 ? (
                          <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground">
-                            ¡Hola! Soy tu asistente de estudio temporal. Activa un ejercicio y hazme una pregunta sobre él.
+                            {activeEjercicio 
+                                ? `Haz una pregunta sobre '${activeEjercicio.title}'.`
+                                : "Activa un ejercicio para comenzar a chatear."
+                            }
                          </div>
                     ) : (
                         messages.map((message) => (
@@ -269,9 +288,9 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Haz una pregunta sobre el ejercicio..."
-                    disabled={isPending}
+                    disabled={isPending || !activeEjercicio}
                     />
-                    <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
+                    <Button type="submit" size="icon" disabled={isPending || !input.trim() || !activeEjercicio}>
                     {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </Button>
                 </form>
