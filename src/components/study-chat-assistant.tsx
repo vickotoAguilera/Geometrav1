@@ -5,13 +5,14 @@ import { getStudyAiResponse } from '@/app/study-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2 } from 'lucide-react';
+import { Bot, User, Send, Loader2, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import type { Ejercicio } from '@/lib/ejercicios';
+import { Switch } from './ui/switch';
 
 
 interface ChatMessage {
@@ -23,6 +24,10 @@ interface ChatMessage {
 interface GenkitMessage {
   role: 'user' | 'model';
   content: Part[];
+}
+
+interface StudyChatAssistantProps {
+    ejercicios: Ejercicio[];
 }
 
 const parseResponse = (content: string) => {
@@ -73,12 +78,13 @@ const parseResponse = (content: string) => {
     return finalParts;
 };
 
-export function StudyChatAssistant() {
+export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const [activeEjercicio, setActiveEjercicio] = useState<Ejercicio | null>(null);
 
   useEffect(() => {
     if (viewportRef.current) {
@@ -92,6 +98,10 @@ export function StudyChatAssistant() {
     if (form) {
       setTimeout(() => form.requestSubmit(), 0);
     }
+  };
+
+  const handleToggleEjercicio = (ejercicio: Ejercicio) => {
+    setActiveEjercicio(prev => (prev?.slug === ejercicio.slug ? null : ejercicio));
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -123,7 +133,9 @@ export function StudyChatAssistant() {
             content: [{ text: m.content }],
           }));
           
-          const { response: aiResponse } = await getStudyAiResponse(currentInput, history, "");
+          const studyMaterial = activeEjercicio ? activeEjercicio.content : "";
+          
+          const { response: aiResponse } = await getStudyAiResponse(currentInput, history, studyMaterial);
           
           setMessages(prev => prev.slice(0, -1).concat({
             id: `assistant-${Date.now()}-final`,
@@ -146,24 +158,38 @@ export function StudyChatAssistant() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="lg:col-span-1">
             <Card>
                 <CardHeader>
                     <CardTitle>Ambiente de Aprendizaje</CardTitle>
                     <CardDescription>
-                        Este será tu espacio interactivo de aprendizaje.
+                        Activa un ejercicio para que la IA lo use como contexto.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="h-96 flex items-center justify-center bg-muted rounded-md">
-                        <p className="text-muted-foreground">Próximamente...</p>
-                    </div>
+                <CardContent className="space-y-2">
+                    {ejercicios.length > 0 ? (
+                        ejercicios.map(ejercicio => (
+                            <div key={ejercicio.slug} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                <FileText className="w-4 h-4 flex-shrink-0" />
+                                <span className="truncate" title={ejercicio.title}>{ejercicio.title}</span>
+                                </div>
+                                <Switch
+                                checked={activeEjercicio?.slug === ejercicio.slug}
+                                onCheckedChange={() => handleToggleEjercicio(ejercicio)}
+                                aria-label={`Activar contexto para ${ejercicio.title}`}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground text-sm">No hay ejercicios disponibles.</p>
+                    )}
                 </CardContent>
             </Card>
         </div>
 
-        <Card className="flex flex-col h-[600px]">
+        <Card className="lg:col-span-2 flex flex-col h-[600px]">
             <CardHeader>
                 <CardTitle>Asistente de Estudio</CardTitle>
                 <CardDescription>Esta conversación es temporal y se reinicia al recargar la página.</CardDescription>
@@ -173,7 +199,7 @@ export function StudyChatAssistant() {
                     <div className="p-4 space-y-4">
                     {messages.length === 0 ? (
                          <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground">
-                            ¡Hola! Soy tu asistente de estudio temporal. ¿En qué te puedo ayudar?
+                            ¡Hola! Soy tu asistente de estudio temporal. Activa un ejercicio y hazme una pregunta sobre él.
                          </div>
                     ) : (
                         messages.map((message) => (
@@ -242,7 +268,7 @@ export function StudyChatAssistant() {
                     <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Haz una pregunta sobre el texto..."
+                    placeholder="Haz una pregunta sobre el ejercicio..."
                     disabled={isPending}
                     />
                     <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
