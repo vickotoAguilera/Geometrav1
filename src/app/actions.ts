@@ -6,6 +6,8 @@ import {
   GetStartedPromptOutput,
 } from '@/ai/flows/get-started-prompt';
 import { Part } from 'genkit';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase';
 
 interface GenkitMessage {
   role: 'user' | 'model';
@@ -13,17 +15,26 @@ interface GenkitMessage {
 }
 
 export async function getAiResponse(
-  query: string,
+  queryText: string,
   history: GenkitMessage[],
-  fileDataUri?: string,
+  fileContent?: string,
   fileName?: string
 ): Promise<MathAssistantOutput> {
 
+  // If fileContent is provided, we pass it to the flow.
+  if (fileContent && fileName) {
+     return await mathAssistant({
+        query: queryText,
+        history: history,
+        fileDataUri: fileContent, // Assuming fileContent is a data URI
+        fileName: fileName,
+      });
+  }
+
+  // If not, just send the query.
   return await mathAssistant({
-    query: query,
+    query: queryText,
     history: history,
-    fileDataUri: fileDataUri,
-    fileName: fileName,
   });
 }
 

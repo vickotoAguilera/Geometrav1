@@ -73,8 +73,9 @@ const mathAssistantFlow = ai.defineFlow(
     
     // The user query is the main content.
     const prompt: Part[] = [{ text: userQuery }];
-    history.push({ role: 'user', content: prompt });
-
+    // The history should not be mutated. A new array should be created.
+    const newHistory = [...history, { role: 'user', content: prompt }];
+    
     const {output} = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: `Eres un útil asistente de IA especializado en matemáticas y GeoGebra.
@@ -82,8 +83,8 @@ const mathAssistantFlow = ai.defineFlow(
 - Si la consulta del usuario contiene un CONTEXTO, debes tratar ese texto como la fuente principal de información para responder a la PREGUNTA.
 - Proporciona una respuesta útil y detallada basada en el contenido del contexto para responder las preguntas del usuario sobre él.
 - Debes responder siempre en español.`,
-      history: history.slice(0, -1),
-      prompt: history.slice(-1)[0].content,
+      history: newHistory.slice(0, -1),
+      prompt: newHistory.slice(-1)[0].content,
       output: {
         schema: MathAssistantOutputSchema,
       },

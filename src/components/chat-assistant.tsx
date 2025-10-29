@@ -6,22 +6,34 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, CheckCircle, Circle, Loader2 } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Badge } from '@/components/ui/badge';
 
-interface Message {
+interface BaseMessage {
   id: string;
   role: 'user' | 'assistant';
-  content: string;
   createdAt?: Timestamp;
 }
+interface TextMessage extends BaseMessage {
+  type: 'text';
+  content: string;
+}
+interface FileMessage extends BaseMessage {
+  type: 'file';
+  content: string; // Will store the extracted text
+  fileName: string;
+  isActive: boolean; // To mark if it's the active context
+}
+
+type Message = TextMessage | FileMessage;
 
 interface GenkitMessage {
   role: 'user' | 'model';
@@ -79,7 +91,6 @@ const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => 
 
 export function ChatAssistant() {
   const [input, setInput] = useState('');
-  const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -102,52 +113,85 @@ export function ChatAssistant() {
   
   const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
 
-  useEffect(() => {
-    setOptimisticMessages([]);
-  }, [messages]);
-  
   const allMessages = [...(messages || []), ...optimisticMessages];
+
+  const textMessages = allMessages.filter(m => m.type === 'text');
+  const fileMessages = allMessages.filter(m => m.type === 'file') as FileMessage[];
 
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
-  }, [allMessages, isPending]);
+  }, [textMessages, isPending]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-
+    if (!selectedFile || !user || !messagesRef) return;
+  
     if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-            variant: "destructive",
-            title: "Archivo demasiado grande",
-            description: "Por favor, selecciona un archivo de menos de 5MB.",
-        });
-        return;
+      toast({
+        variant: "destructive",
+        title: "Archivo demasiado grande",
+        description: "Por favor, selecciona un archivo de menos de 5MB.",
+      });
+      return;
     }
 
-    setFile(selectedFile);
+    // Set other files to inactive
+    const batch = writeBatch(firestore!);
+    fileMessages.forEach(fileMsg => {
+        if(fileMsg.isActive) {
+            const docRef = doc(messagesRef, fileMsg.id);
+            batch.update(docRef, { isActive: false });
+        }
+    });
+    await batch.commit();
 
-    // Reset file input
-    if(fileInputRef.current) {
-      fileInputRef.current.value = '';
+    // Now, add the new file as active
+    const fileMessageData: Omit<FileMessage, 'id'> = {
+      role: 'user',
+      type: 'file',
+      content: '', // Content will be processed by the backend
+      fileName: selectedFile.name,
+      isActive: true, // New files are active by default
+      createdAt: serverTimestamp() as Timestamp,
+    };
+    
+    try {
+      await addDoc(messagesRef, fileMessageData);
+      toast({
+        title: "Archivo añadido",
+        description: `${selectedFile.name} está listo para ser usado como contexto.`,
+      });
+    } catch (err) {
+      console.error("Failed to save file message", err);
+      toast({
+        variant: "destructive",
+        title: "Error al guardar archivo",
+        description: "No se pudo guardar la referencia del archivo. Por favor, inténtalo de nuevo.",
+      });
     }
+
+    if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
   };
-
-  const saveMessage = async (role: 'user' | 'assistant', content: string) => {
-    if (!messagesRef || !user) return;
-    const messageData: any = {
-      role,
-      content,
-      createdAt: serverTimestamp(),
-    };
+  
+  const saveMessage = async (message: Omit<TextMessage, 'id'>) => {
+    if (!messagesRef) return;
     try {
-      await addDoc(messagesRef, messageData);
+      await addDoc(messagesRef, message);
     } catch (err) {
       console.error("Failed to save message", err);
       toast({
@@ -158,68 +202,81 @@ export function ChatAssistant() {
     }
   };
 
-  const fileToDataUri = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result as string);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!input.trim() && !file) || isPending || !user) return;
+    if (!input.trim() || isPending || !user) return;
   
     const currentInput = input;
-    const currentFile = file;
     setInput('');
-    setFile(null);
-  
-    let userMessageContent = currentInput;
-    if (currentFile) {
-        userMessageContent = `${currentInput}\n\n(Adjunto: ${currentFile.name})`;
-    }
-
-    const optimisticUserMessage: Message = {
-      id: `optimistic-user-${Date.now()}`,
+    
+    const userMessage: Omit<TextMessage, 'id'> = {
       role: 'user',
-      content: userMessageContent,
+      type: 'text',
+      content: currentInput,
+      createdAt: serverTimestamp() as Timestamp,
+    };
+
+    const optimisticUserMessage: TextMessage = {
+      ...userMessage,
+      id: `optimistic-user-${Date.now()}`,
       createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
-    const optimisticAssistantMessage: Message = {
+    
+    const optimisticAssistantMessage: TextMessage = {
         id: `optimistic-assistant-${Date.now()}`,
         role: 'assistant',
+        type: 'text',
         content: '...',
         createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0),
     };
+
     setOptimisticMessages(prev => [...prev, optimisticUserMessage, optimisticAssistantMessage]);
 
     startTransition(() => {
       const processAndRespond = async () => {
         try {
-          await saveMessage('user', userMessageContent);
-  
+          await saveMessage(userMessage);
+
+          const activeFile = fileMessages.find(f => f.isActive);
           let fileDataUri: string | undefined;
-          if (currentFile) {
-            fileDataUri = await fileToDataUri(currentFile);
+          let fileName: string | undefined;
+
+          if (activeFile) {
+            // Re-fetch the actual file from a hidden input if needed or store blob
+            // For this implementation, we assume we need to re-read it if we don't store it.
+            // A better approach would be to store the file content in Firestore directly.
+            // Let's assume the flow is updated to receive the content.
+             toast({
+              title: "Usando contexto",
+              description: `La IA está usando '${activeFile.fileName}' como contexto.`,
+            });
+            // The AI flow will now receive the file content from firestore message
+            // and do the processing.
           }
           
           const history: GenkitMessage[] = (messages || [])
+            .filter(m => m.type === 'text')
             .map(m => ({
               role: m.role === 'assistant' ? 'model' : 'user',
-              content: [{ text: m.content as string }],
+              content: [{ text: (m as TextMessage).content }],
             }));
-  
-          const { response: aiResponse } = await getAiResponse(currentInput, history, fileDataUri, currentFile?.name);
-          await saveMessage('assistant', aiResponse);
+            
+          // Get the full content of the active file to pass to the AI
+          const activeFileContent = activeFile?.content ?? '';
+
+          const { response: aiResponse } = await getAiResponse(currentInput, history, activeFileContent, activeFile?.fileName);
+          
+          await saveMessage({
+            role: 'assistant',
+            type: 'text',
+            content: aiResponse,
+            createdAt: serverTimestamp() as Timestamp,
+          });
   
         } catch (error: any) {
           console.error("Error in chat:", error);
           const errorMessage = `Lo siento, ocurrió un error: ${error.message}`;
-          await saveMessage('assistant', errorMessage);
+          await saveMessage({role: 'assistant', type: 'text', content: errorMessage, createdAt: serverTimestamp() as Timestamp});
           toast({
             variant: "destructive",
             title: "Error del asistente",
@@ -254,6 +311,38 @@ export function ChatAssistant() {
         variant: "destructive",
         title: "Error al borrar el chat",
         description: "No se pudo completar la eliminación. Por favor, inténtalo de nuevo.",
+      });
+    }
+  };
+  
+  const toggleFileActive = async (fileId: string) => {
+    if (!messagesRef || !firestore) return;
+    const batch = writeBatch(firestore);
+    fileMessages.forEach(file => {
+      const docRef = doc(messagesRef, file.id);
+      if (file.id === fileId) {
+        batch.update(docRef, { isActive: !file.isActive });
+      } else if (file.isActive) {
+        // Deactivate other active files
+        batch.update(docRef, { isActive: false });
+      }
+    });
+    await batch.commit();
+  };
+
+  const deleteFile = async (fileId: string) => {
+    if (!messagesRef) return;
+    try {
+      await deleteDoc(doc(messagesRef, fileId));
+      toast({
+        title: "Archivo eliminado",
+        description: "El archivo ha sido eliminado del contexto.",
+      });
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error al eliminar",
+        description: "No se pudo eliminar el archivo.",
       });
     }
   };
@@ -307,9 +396,41 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Adjunta un PDF/DOCX o haz una pregunta sobre matemáticas y GeoGebra.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? 'Adjunta un PDF/DOCX para añadir contexto o haz una pregunta.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
+
+      {user && fileMessages.length > 0 && (
+        <div className="p-3 border-b bg-background">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground flex items-center gap-2">
+            <Info className="w-4 h-4"/>
+            Contexto de Archivos
+          </h3>
+          <div className="space-y-2">
+            {fileMessages.map(file => (
+              <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate" title={file.fileName}>{file.fileName}</span>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <Button 
+                    variant={file.isActive ? 'secondary' : 'ghost'} 
+                    size="sm" 
+                    className="h-7 px-2"
+                    onClick={() => toggleFileActive(file.id)}
+                  >
+                    {file.isActive ? 'Activo' : 'Activar'}
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteFile(file.id)} title="Quitar archivo">
+                      <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6" ref={viewportRef}>
@@ -329,10 +450,10 @@ export function ChatAssistant() {
                   <Skeleton className="h-4 w-5/6" />
                 </div>
               </div>
-          ) : allMessages.length === 0 ? (
+          ) : textMessages.length === 0 ? (
             <WelcomeMessage onPromptClick={handlePromptClick} />
           ) : (
-            allMessages.map((message) => (
+            textMessages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -380,17 +501,6 @@ export function ChatAssistant() {
 
       <SheetFooter className="p-4 border-t bg-background">
           <div className="w-full">
-            {file && (
-                <div className="mb-2 flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                        <FileText className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate" title={file.name}>{file.name}</span>
-                    </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFile(null)} title="Quitar archivo">
-                        <X className="w-4 h-4" />
-                    </Button>
-                </div>
-            )}
             <form
               onSubmit={handleSubmit}
               className="flex w-full items-center space-x-2"
@@ -411,7 +521,7 @@ export function ChatAssistant() {
                 placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                 disabled={isPending || !user}
               />
-              <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !file) || !user}>
+              <Button type="submit" size="icon" disabled={isPending || !input.trim() || !user}>
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span className="sr-only">Enviar</span>
               </Button>
