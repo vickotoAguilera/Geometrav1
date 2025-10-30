@@ -1,3 +1,10 @@
+'use server';
+/**
+ * @fileOverview This file is the main entry point for Genkit development flows.
+ * It imports all the flow definitions so they can be discovered by the Genkit
+ * development server.
+ */
+
 import { config } from 'dotenv';
 config();
 
@@ -5,3 +12,4 @@ import '@/ai/flows/math-assistant.ts';
 import '@/ai/flows/get-started-prompt.ts';
 import '@/ai/flows/study-assistant.ts';
 import '@/ai/flows/generador-pruebas-flow.ts';
+import '@/ai/flows/retroalimentacion-ia-flow.ts';
