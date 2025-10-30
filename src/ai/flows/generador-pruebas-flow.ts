@@ -27,7 +27,7 @@ const PreguntaRespuestaCortaSchema = z.object({
 });
 
 // Unión de ambos tipos de preguntas
-const PreguntaSchema = z.union([
+export const PreguntaSchema = z.union([
   PreguntaSeleccionMultipleSchema,
   PreguntaRespuestaCortaSchema,
 ]);
