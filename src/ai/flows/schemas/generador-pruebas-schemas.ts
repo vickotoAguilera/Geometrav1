@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview Define los esquemas de Zod para la generación de pruebas.
  * Esto evita errores de 'use server' al separar los objetos de esquema de los flujos.
