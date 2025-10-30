@@ -2,7 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
-import html from 'remark-html';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+
 
 const postsDirectory = path.join(process.cwd(), 'src', 'content', 'estudia');
 
@@ -17,7 +22,13 @@ export async function getPostBySlug(slug: string[] | string) {
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(fileContents);
 
-  const processedContent = await remark().use(html).process(content);
+  const processedContent = await remark()
+    .use(remarkParse)
+    .use(remarkMath)
+    .use(remarkRehype)
+    .use(rehypeKatex)
+    .use(rehypeStringify)
+    .process(content);
   const contentHtml = processedContent.toString();
 
   return {
