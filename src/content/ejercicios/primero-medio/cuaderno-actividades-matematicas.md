@@ -1,5 +1,5 @@
 ---
-title: 'Cuaderno de Actividades: Matemática 1º Medio'
+title: 'Texto Escolar Muestra'
 ---
 
 # Página 1
@@ -248,7 +248,7 @@ Pirmer año de uso facultativo
     - c. 1.3 + 1.3... - 1/4 = 1.3 + 4/3 - 0.25 = 1.05 + 4/3 = 21/20 + 4/3 = (63 + 80)/60 = 143/60
     - d. 5 + (-1/2) - 1.2... = 5 - 0.5 - 11/9 = 4.5 - 11/9 = 9/2 - 11/9 = (81 - 22)/18 = 59/18
     - e. 3/4 - 8/10 + (-1/10) = 0.75 - 0.8 - 0.1 = -0.15 = -3/20
-    - f. -1.2 + 1.2... - 1 = -1.2 + 11/9 - 1 = -2.2 + 11/9 = -11/5 + 11/9 = (-99 + 55)/45 = -44/45
+    - f. -1.2 + 1.2... - 1 = -1.2 + 11/9 - 1 = -2.2 + 11/5 + 11/9 = (-99 + 55)/45 = -44/45
     - g. 3 1/4 - 5 2/8 - 1 = 13/4 - 42/8 - 1 = 13/4 - 21/4 - 1 = -8/4 - 1 = -2 - 1 = -3
     - h. -0.5... - 1 5/6 - 7 = -5/9 - 11/6 - 7 = (-10 - 33)/18 - 7 = -43/18 - 7 = (-43 - 126)/18 = -169/18
     *   Mi estrategia es convertir todo a fracciones para operar con exactitud. Los decimales periódicos hacen que operar con decimales sea propenso a errores de redondeo.
