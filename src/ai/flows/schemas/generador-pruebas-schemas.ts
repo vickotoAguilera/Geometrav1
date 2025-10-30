@@ -27,7 +27,7 @@ export const PreguntaSchema = z.union([
 ]);
 export type Pregunta = z.infer<typeof PreguntaSchema>;
 
-// Esquema para la entrada del flujo
+// Esquema para la entrada del flujo de generación de pruebas
 export const GeneradorPruebasInputSchema = z.object({
   tema: z.string().describe('El tema central de la prueba. Ejemplo: "Teorema de Pitágoras".'),
   cantidadPreguntas: z.number().int().positive().describe('El número de preguntas que debe contener la prueba.'),
@@ -35,8 +35,26 @@ export const GeneradorPruebasInputSchema = z.object({
 });
 export type GeneradorPruebasInput = z.infer<typeof GeneradorPruebasInputSchema>;
 
-// Esquema para la salida del flujo
+// Esquema para la salida del flujo de generación de pruebas
 export const GeneradorPruebasOutputSchema = z.object({
   preguntas: z.array(PreguntaSchema),
 });
 export type GeneradorPruebasOutput = z.infer<typeof GeneradorPruebasOutputSchema>;
+
+
+// Esquema de entrada para el flujo de retroalimentación
+export const RetroalimentacionInputSchema = z.object({
+  pregunta: PreguntaSchema.describe('La pregunta completa que se está evaluando.'),
+  respuestaUsuario: z.string().describe('La respuesta proporcionada por el usuario.'),
+  evidenciaUsuario: z.string().optional().describe('Argumento o texto proporcionado por el usuario que cuestiona la corrección.'),
+});
+export type RetroalimentacionInput = z.infer<typeof RetroalimentacionInputSchema>;
+
+
+// Esquema de salida para el flujo de retroalimentación
+export const RetroalimentacionOutputSchema = z.object({
+  esCorrecta: z.boolean().describe('Indica si la respuesta del usuario es correcta.'),
+  feedback: z.string().describe('La explicación detallada, paso a paso, para el usuario. Si la respuesta es correcta, es un mensaje de felicitación. Si es incorrecta, es una guía para entender el error. Si hay autocorrección, se debe indicar.'),
+  autocorreccion: z.boolean().describe('Indica si la IA ha tenido que corregir su propia evaluación inicial basándose en la evidencia del usuario.'),
+});
+export type RetroalimentacionOutput = z.infer<typeof RetroalimentacionOutputSchema>;

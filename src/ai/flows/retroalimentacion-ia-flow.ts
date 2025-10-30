@@ -8,25 +8,12 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-import { PreguntaSchema } from './schemas/generador-pruebas-schemas';
-
-// Esquema de entrada para el flujo de retroalimentación
-export const RetroalimentacionInputSchema = z.object({
-  pregunta: PreguntaSchema.describe('La pregunta completa que se está evaluando.'),
-  respuestaUsuario: z.string().describe('La respuesta proporcionada por el usuario.'),
-  evidenciaUsuario: z.string().optional().describe('Argumento o texto proporcionado por el usuario que cuestiona la corrección.'),
-});
-export type RetroalimentacionInput = z.infer<typeof RetroalimentacionInputSchema>;
-
-
-// Esquema de salida para el flujo de retroalimentación
-export const RetroalimentacionOutputSchema = z.object({
-  esCorrecta: z.boolean().describe('Indica si la respuesta del usuario es correcta.'),
-  feedback: z.string().describe('La explicación detallada, paso a paso, para el usuario. Si la respuesta es correcta, es un mensaje de felicitación. Si es incorrecta, es una guía para entender el error. Si hay autocorrección, se debe indicar.'),
-  autocorreccion: z.boolean().describe('Indica si la IA ha tenido que corregir su propia evaluación inicial basándose en la evidencia del usuario.'),
-});
-export type RetroalimentacionOutput = z.infer<typeof RetroalimentacionOutputSchema>;
+import {
+  RetroalimentacionInputSchema,
+  RetroalimentacionOutputSchema,
+  type RetroalimentacionInput,
+  type RetroalimentacionOutput,
+} from './schemas/generador-pruebas-schemas';
 
 
 // Función exportada que se llamará desde la aplicación
