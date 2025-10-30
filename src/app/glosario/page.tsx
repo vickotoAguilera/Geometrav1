@@ -133,8 +133,18 @@ const glossarioComandos = [
     comandos: [
        {
         nombre: "f(x) = <expresión>",
-        descripcion: "Define y grafica una función. Puedes usar sin(x), cos(x), tan(x), exp(x), log(x), sqrt(x), etc.",
-        ejemplo: "Escribe f(x) = sin(x^2) * exp(-x) para graficar una función compleja."
+        descripcion: "Define y grafica una función. GeoGebra entiende una gran variedad de expresiones matemáticas.",
+        ejemplo: "Escribe f(x) = x^3 - 2x^2 + x - 1 para graficar un polinomio. GeoGebra también entiende constantes como 'pi' y 'e'."
+      },
+      {
+        nombre: "sin(x), cos(x), tan(x)",
+        descripcion: "Funciones trigonométricas básicas (seno, coseno, tangente). GeoGebra también soporta las inversas (asin, acos, atan), sec, csc y cot.",
+        ejemplo: "Escribe f(x) = sin(x) para graficar la onda seno. Puedes combinarlas: g(x) = sin(x) + cos(2x)."
+      },
+      {
+        nombre: "exp(x), log(x), ln(x)",
+        descripcion: "Funciones exponencial y logarítmicas. 'log(x)' es el logaritmo en base 10, 'ln(x)' es el logaritmo natural (base e).",
+        ejemplo: "Escribe f(x) = exp(x) para la función exponencial. Escribe g(x) = ln(x+2) para un logaritmo desplazado."
       },
       {
         nombre: "Función( <Expresión>, <Variable>, <Valor Inicial>, <Valor Final> )",
