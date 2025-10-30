@@ -6,7 +6,7 @@ import { z } from 'genkit';
 
 // Esquema para las preguntas de Selección Múltiple
 const PreguntaSeleccionMultipleSchema = z.object({
-  tipo: z.literal('seleccion-multiple'),
+  tipo: z.enum(['seleccion-multiple']).describe("El tipo de pregunta, que para este caso es 'seleccion-multiple'."),
   pregunta: z.string().describe('El enunciado claro y conciso de la pregunta.'),
   alternativas: z.array(z.string()).length(5).describe('Un arreglo de 5 alternativas, donde una es la correcta y las otras cuatro son distractores plausibles.'),
   respuestaCorrecta: z.string().describe('El texto exacto de la alternativa correcta.'),
@@ -15,7 +15,7 @@ const PreguntaSeleccionMultipleSchema = z.object({
 
 // Esquema para las preguntas de Respuesta Corta
 const PreguntaRespuestaCortaSchema = z.object({
-  tipo: z.literal('respuesta-corta'),
+  tipo: z.enum(['respuesta-corta']).describe("El tipo de pregunta, que para este caso es 'respuesta-corta'."),
   pregunta: z.string().describe('El enunciado claro y conciso de la pregunta, que solicita una respuesta numérica o textual breve.'),
   respuestaCorrecta: z.string().describe('La respuesta exacta y precisa a la pregunta.'),
 });
