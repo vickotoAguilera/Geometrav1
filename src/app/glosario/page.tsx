@@ -5,11 +5,43 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Code } from 'lucide-react';
+import { Code, Sigma, FunctionSquare, Triangle, Move, Calculator, Milestone } from 'lucide-react';
 
 const glossarioComandos = [
   {
+    categoria: "Álgebra y Resolución",
+    icon: Sigma,
+    comandos: [
+      {
+        nombre: "Resuelve( <Ecuación> )",
+        descripcion: "Resuelve una ecuación para una variable. Devuelve las soluciones exactas.",
+        ejemplo: "Escribe Resuelve(x^2 - 4 = 0) para obtener las soluciones x = -2 y x = 2."
+      },
+      {
+        nombre: "Soluciones( <Ecuación> )",
+        descripcion: "Similar a Resuelve, pero devuelve las soluciones como una lista de puntos en el eje x.",
+        ejemplo: "Escribe Soluciones(x^2 - 5x + 6 = 0) y GeoGebra creará los puntos A=(2,0) y B=(3,0)."
+      },
+      {
+        nombre: "Factoriza( <Polinomio> )",
+        descripcion: "Factoriza un polinomio en sus factores irreducibles.",
+        ejemplo: "Escribe Factoriza(x^2 + 3x + 2) para obtener (x + 1)(x + 2)."
+      },
+      {
+        nombre: "Desarrolla( <Expresión> )",
+        descripcion: "Expande una expresión algebraica.",
+        ejemplo: "Escribe Desarrolla((x + 2)^3) para obtener x³ + 6x² + 12x + 8."
+      },
+       {
+        nombre: "Sustituye( <Expresión>, <Variable>, <Valor> )",
+        descripcion: "Sustituye una variable por un valor o por otra expresión en una fórmula.",
+        ejemplo: "Dada la función f(x) = 2x + 1, el comando Sustituye(f, x, 3) devolverá 7."
+      },
+    ]
+  },
+  {
     categoria: "Puntos, Vectores y Coordenadas",
+    icon: Milestone,
     comandos: [
       {
         nombre: "Punto( <Objeto> )",
@@ -35,6 +67,7 @@ const glossarioComandos = [
   },
   {
     categoria: "Rectas y Segmentos",
+    icon: FunctionSquare,
     comandos: [
       {
         nombre: "Recta( <Punto>, <Punto> )",
@@ -70,6 +103,7 @@ const glossarioComandos = [
   },
   {
     categoria: "Polígonos y Cónicas",
+    icon: Triangle,
     comandos: [
       {
         nombre: "Polígono( <Punto1>, <Punto2>, ..., <PuntoN> )",
@@ -95,7 +129,13 @@ const glossarioComandos = [
   },
   {
     categoria: "Funciones y Cálculo",
+    icon: FunctionSquare,
     comandos: [
+       {
+        nombre: "f(x) = <expresión>",
+        descripcion: "Define y grafica una función. Puedes usar sin(x), cos(x), tan(x), exp(x), log(x), sqrt(x), etc.",
+        ejemplo: "Escribe f(x) = sin(x^2) * exp(-x) para graficar una función compleja."
+      },
       {
         nombre: "Función( <Expresión>, <Variable>, <Valor Inicial>, <Valor Final> )",
         descripcion: "Grafica una función en un intervalo específico.",
@@ -125,11 +165,17 @@ const glossarioComandos = [
         nombre: "Tangente( <Punto>, <Función o Cónica> )",
         descripcion: "Crea la recta tangente a una curva en un punto dado de la misma.",
         ejemplo: "Crea la función f(x)=x^2 y un punto A en la función. El comando Tangente(A, f) dibujará la recta tangente en A."
+      },
+      {
+        nombre: "Límite( <Función>, <Valor> )",
+        descripcion: "Calcula el límite de una función cuando la variable tiende a un valor.",
+        ejemplo: "Escribe Límite((x^2 - 1)/(x - 1), 1) para calcular el límite y obtener el resultado 2."
       }
     ]
   },
   {
     categoria: "Medidas y Propiedades",
+    icon: Calculator,
     comandos: [
        {
         nombre: "Distancia( <Punto>, <Objeto> )",
@@ -150,11 +196,17 @@ const glossarioComandos = [
         nombre: "Ángulo( <Lado>, <Lado> )",
         descripcion: "Mide el ángulo entre dos rectas.",
         ejemplo: "Crea dos rectas f y g. El comando Ángulo(f, g) mostrará el ángulo que forman."
+      },
+       {
+        nombre: "Longitud( <Objeto> )",
+        descripcion: "Mide la longitud de un objeto como un segmento, una circunferencia o un arco.",
+        ejemplo: "Crea un segmento 's' entre dos puntos. El comando Longitud(s) te dará su medida."
       }
     ]
   },
   {
     categoria: "Transformaciones Geométricas",
+    icon: Move,
     comandos: [
       {
         nombre: "Rota( <Objeto>, <Ángulo>, <Punto de Rotación> )",
@@ -193,7 +245,8 @@ export default function GlosarioPage() {
            <Accordion type="single" collapsible className="w-full">
             {glossarioComandos.map((categoria) => (
               <AccordionItem key={categoria.categoria} value={categoria.categoria}>
-                <AccordionTrigger className="text-xl font-semibold text-foreground hover:no-underline">
+                <AccordionTrigger className="text-xl font-semibold text-foreground hover:no-underline flex items-center gap-3">
+                  <categoria.icon className="w-6 h-6 text-primary"/>
                   {categoria.categoria}
                 </AccordionTrigger>
                 <AccordionContent>
@@ -202,7 +255,7 @@ export default function GlosarioPage() {
                       <div key={comando.nombre} className="p-4 bg-card rounded-md border">
                         <h4 className="font-mono text-base font-semibold text-primary">{comando.nombre}</h4>
                         <p className="text-muted-foreground text-sm mt-1">{comando.descripcion}</p>
-                        <div className="mt-3 flex items-start gap-2 text-sm text-foreground/70">
+                        <div className="mt-3 flex items-start gap-2 text-sm text-foreground/80">
                             <Code className="w-4 h-4 mt-0.5 flex-shrink-0"/>
                             <div>
                                 <span className="font-semibold">Ejemplo:</span> {comando.ejemplo}
