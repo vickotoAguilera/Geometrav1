@@ -63,8 +63,13 @@ const generadorDePruebasPrompt = ai.definePrompt({
 
     El tipo de preguntas debe ser '{{{tipoPrueba}}}'.
 
-    - Si el tipo es 'seleccion-multiple', cada pregunta debe tener un enunciado, 5 alternativas (una correcta y cuatro distractores creíbles) y una justificación clara de la respuesta correcta.
-    - Si el tipo es 'respuesta-corta', cada pregunta debe tener un enunciado claro y la respuesta correcta exacta.
+    REGLAS ESTRICTAS DE FORMATO PARA LAS RESPUESTAS CORRECTAS:
+    1.  **Decimales:** Usa siempre un punto (.) como separador decimal. Si un resultado tiene más de dos decimales, debes **redondearlo** a dos decimales. Ejemplo: 5.564 se convierte en 5.56; 5.567 se convierte en 5.57.
+    2.  **Enteros:** Los números enteros, especialmente los miles, se escriben sin separadores. Ejemplo: Escribe 1000, no 1.000.
+    3.  **Truncamiento Lógico:** Si la pregunta se refiere a contar entidades que no pueden ser fraccionarias (como personas, objetos, etc.) y el cálculo resulta en un decimal, la respuesta correcta debe ser el número entero, ignorando la parte decimal. Ejemplo: si un cálculo da 5.8 alumnos, la respuesta correcta es 5.
+
+    - Si el tipo es 'seleccion-multiple', cada pregunta debe tener un enunciado, 5 alternativas (una correcta y cuatro distractores creíbles) y una justificación clara de la respuesta correcta. Asegúrate de que la 'respuestaCorrecta' coincida exactamente con una de las alternativas.
+    - Si el tipo es 'respuesta-corta', cada pregunta debe tener un enunciado claro y la 'respuestaCorrecta' debe seguir rigurosamente las reglas de formato anteriores.
 
     Es crucial que las preguntas y los valores numéricos utilizados sean variados y únicos en cada ejecución para asegurar que cada prueba sea diferente.
     Genera el resultado en el formato JSON especificado.
