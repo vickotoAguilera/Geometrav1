@@ -20,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from '@/lib/utils';
 
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
@@ -35,6 +36,18 @@ interface Resultado extends RetroalimentacionOutput {
   respuestaUsuario: string;
 }
 
+const TEMAS_DISPONIBLES = [
+    "Teorema de Pitágoras",
+    "Ecuaciones Lineales",
+    "Factorización y Productos Notables",
+    "Función Cuadrática",
+    "Función Exponencial",
+    "Función Logarítmica",
+    "Logaritmos",
+    "Probabilidad Condicional",
+    "Trigonometría Básica"
+];
+
 const FormatoRespuestasAlert = () => (
     <Alert>
         <AlertCircle className="h-4 w-4" />
@@ -47,7 +60,7 @@ const FormatoRespuestasAlert = () => (
 
 export function EnsayoInteractivo() {
   const [fase, setFase] = useState<Fase>('configuracion');
-  const [tema, setTema] = useState('');
+  const [temasSeleccionados, setTemasSeleccionados] = useState<string[]>([]);
   const [cantidadPreguntas, setCantidadPreguntas] = useState<number>(5);
   const [tipoPrueba, setTipoPrueba] = useState<TipoPrueba>('seleccion-multiple');
 
@@ -59,20 +72,38 @@ export function EnsayoInteractivo() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
+  const handleToggleTema = (tema: string) => {
+    setTemasSeleccionados(prev => {
+        if (prev.includes(tema)) {
+            return prev.filter(t => t !== tema);
+        }
+        if (prev.length < 3) {
+            return [...prev, tema];
+        }
+        toast({
+            variant: 'destructive',
+            title: 'Límite alcanzado',
+            description: 'Puedes seleccionar hasta 3 temas.',
+        })
+        return prev;
+    })
+  }
+
   const handleStart = () => {
-    if (!tema.trim()) {
+    if (temasSeleccionados.length === 0) {
       toast({
         variant: 'destructive',
-        title: 'Tema no especificado',
-        description: 'Por favor, escribe un tema para la prueba.',
+        title: 'No hay temas seleccionados',
+        description: 'Por favor, elige al menos un tema para la prueba.',
       });
       return;
     }
     setFase('cargando');
     startTransition(async () => {
       try {
+        const temaCompuesto = temasSeleccionados.join(', ');
         const result: GeneradorPruebasOutput = await generarPruebaAction({
-          tema,
+          tema: temaCompuesto,
           cantidadPreguntas,
           tipoPrueba,
         });
@@ -157,7 +188,7 @@ export function EnsayoInteractivo() {
 
   const reset = () => {
     setFase('configuracion');
-    setTema('');
+    setTemasSeleccionados([]);
     setCantidadPreguntas(5);
     setTipoPrueba('seleccion-multiple');
     setTestData(null);
@@ -174,9 +205,19 @@ export function EnsayoInteractivo() {
           <CardDescription>Define los parámetros para tu prueba personalizada.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="tema">1. Escribe el tema que quieres practicar</Label>
-            <Input id="tema" value={tema} onChange={e => setTema(e.target.value)} placeholder="Ej: Teorema de Pitágoras" />
+          <div className="space-y-3">
+            <Label>1. Elige hasta 3 temas que quieras practicar</Label>
+            <div className="flex flex-wrap gap-2">
+                {TEMAS_DISPONIBLES.map(tema => (
+                    <Button 
+                        key={tema}
+                        variant={temasSeleccionados.includes(tema) ? 'default' : 'outline'}
+                        onClick={() => handleToggleTema(tema)}
+                    >
+                        {tema}
+                    </Button>
+                ))}
+            </div>
           </div>
           <div className="space-y-3">
             <Label>2. Elige la modalidad</Label>
@@ -212,7 +253,7 @@ export function EnsayoInteractivo() {
           )}
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={handleStart} disabled={!tema.trim() || isPending}>
+          <Button className="w-full" onClick={handleStart} disabled={temasSeleccionados.length === 0 || isPending}>
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Comenzar Ensayo
           </Button>
