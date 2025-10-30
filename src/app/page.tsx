@@ -28,7 +28,7 @@ export default function HomePage() {
           <Link href="/estudia" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
               <span className="text-2xl mb-2">✏️</span>
-              <span className="font-semibold">Temas de Estudio</span>
+              <span className="font-semibold">Estudio de enseñanza media</span>
               <p className="text-sm text-muted-foreground mt-1">Tu espacio de aprendizaje.</p>
             </div>
           </Link>
@@ -52,7 +52,7 @@ export default function HomePage() {
           <Link href="/estudia-con-geogebra" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
                <span className="text-2xl mb-2">📐</span>
-               <span className="font-semibold">Estudia con GeoGebra</span>
+               <span className="font-semibold">Estudia con el Geometra</span>
                <p className="text-sm text-muted-foreground mt-1">Lecciones interactivas.</p>
             </div>
           </Link>
