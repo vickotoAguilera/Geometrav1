@@ -29,8 +29,13 @@ const generadorDePruebasPrompt = ai.definePrompt({
   prompt: `
     Eres un experto y meticuloso creador de exámenes de matemáticas para estudiantes de enseñanza media.
     Tu tarea es generar una prueba sobre el tema '{{{tema}}}' que contenga exactamente {{{cantidadPreguntas}}} preguntas.
-
     El tipo de preguntas debe ser '{{{tipoPrueba}}}'.
+
+    PASO 1: ANÁLISIS DEL TEMA
+    Analiza el '{{{tema}}}'. Si el tema se resuelve predominantemente con una fórmula matemática clave (como 'fórmula cuadrática', 'teorema de pitágoras', etc.), identifica un nombre clave para esa fórmula (ej: "formula_cuadratica", "teorema_pitagoras"). Asigna este identificador al campo 'formula' en la salida. Si no hay una única fórmula dominante, deja ese campo en blanco.
+
+    PASO 2: GENERACIÓN DE PREGUNTAS
+    Crea las {{{cantidadPreguntas}}} preguntas según el '{{{tipoPrueba}}}'.
 
     REGLAS ESTRICTAS DE FORMATO PARA LAS RESPUESTAS CORRECTAS:
     1.  **Decimales:** Usa siempre un punto (.) como separador decimal. Si un resultado tiene más de dos decimales, debes **redondearlo** a dos decimales. Ejemplo: 5.564 se convierte en 5.56; 5.567 se convierte en 5.57.
@@ -60,6 +65,3 @@ const generadorDePruebasFlow = ai.defineFlow(
     return output;
   }
 );
-
-// Re-exportar tipos para que no se rompan otras partes del código.
-export type { Pregunta, GeneradorPruebasInput, GeneradorPruebasOutput } from './schemas/generador-pruebas-schemas';

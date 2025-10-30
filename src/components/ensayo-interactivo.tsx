@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 import {
   generarPruebaAction,
   retroalimentacionAction,
@@ -34,13 +35,23 @@ interface Resultado extends RetroalimentacionOutput {
   respuestaUsuario: string;
 }
 
+const FormatoRespuestasAlert = () => (
+    <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>¡A tener en cuenta!</AlertTitle>
+        <AlertDescription>
+            Para respuestas numéricas: usa punto (.) para decimales, redondea a dos decimales (ej: 5.57) y no uses separadores de miles (ej: 1500). Para respuestas sobre objetos o personas, usa números enteros.
+        </AlertDescription>
+    </Alert>
+);
+
 export function EnsayoInteractivo() {
   const [fase, setFase] = useState<Fase>('configuracion');
   const [tema, setTema] = useState('');
   const [cantidadPreguntas, setCantidadPreguntas] = useState<number>(5);
   const [tipoPrueba, setTipoPrueba] = useState<TipoPrueba>('seleccion-multiple');
 
-  const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
+  const [testData, setTestData] = useState<GeneradorPruebasOutput | null>(null);
   const [respuestas, setRespuestas] = useState<RespuestaUsuario[]>([]);
   const [preguntaActualIndex, setPreguntaActualIndex] = useState(0);
   const [resultados, setResultados] = useState<Resultado[]>([]);
@@ -66,7 +77,7 @@ export function EnsayoInteractivo() {
           tipoPrueba,
         });
         if (result.preguntas && result.preguntas.length > 0) {
-          setPreguntas(result.preguntas);
+          setTestData(result);
           setRespuestas(
             result.preguntas.map((_, index) => ({
               preguntaIndex: index,
@@ -97,12 +108,13 @@ export function EnsayoInteractivo() {
   };
 
   const irAPregunta = (index: number) => {
-    if (index >= 0 && index < preguntas.length) {
+    if (testData && index >= 0 && index < testData.preguntas.length) {
       setPreguntaActualIndex(index);
     }
   };
 
   const handleFinish = () => {
+    if (!testData) return;
     const todasRespondidas = respuestas.every(r => r.respuesta.trim() !== '');
     if (!todasRespondidas) {
         toast({
@@ -117,7 +129,7 @@ export function EnsayoInteractivo() {
     startTransition(async () => {
         try {
             const revisiones = await Promise.all(
-                preguntas.map((pregunta, index) => 
+                testData.preguntas.map((pregunta, index) => 
                     retroalimentacionAction({
                         pregunta: pregunta,
                         respuestaUsuario: respuestas[index].respuesta,
@@ -126,7 +138,7 @@ export function EnsayoInteractivo() {
             );
             const resultadosFinales = revisiones.map((revision, index) => ({
                 ...revision,
-                pregunta: preguntas[index],
+                pregunta: testData.preguntas[index],
                 respuestaUsuario: respuestas[index].respuesta,
             }));
             setResultados(resultadosFinales);
@@ -148,7 +160,7 @@ export function EnsayoInteractivo() {
     setTema('');
     setCantidadPreguntas(5);
     setTipoPrueba('seleccion-multiple');
-    setPreguntas([]);
+    setTestData(null);
     setRespuestas([]);
     setResultados([]);
     setPreguntaActualIndex(0);
@@ -196,13 +208,7 @@ export function EnsayoInteractivo() {
             </div>
           </div>
           {tipoPrueba === 'respuesta-corta' && (
-              <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>¡A tener en cuenta!</AlertTitle>
-                  <AlertDescription>
-                      Para respuestas numéricas: usa punto (.) para decimales, redondea a dos decimales (ej: 5.56) y no uses separadores de miles (ej: 1500). Para respuestas sobre objetos o personas, usa números enteros.
-                  </AlertDescription>
-              </Alert>
+              <FormatoRespuestasAlert />
           )}
         </CardContent>
         <CardFooter>
@@ -224,56 +230,71 @@ export function EnsayoInteractivo() {
     )
   }
 
-  if (fase === 'realizando') {
-    const pregunta = preguntas[preguntaActualIndex];
+  if (fase === 'realizando' && testData) {
+    const pregunta = testData.preguntas[preguntaActualIndex];
+    const showFormula = preguntaActualIndex === 0 && testData.formula === 'formula_cuadratica';
+
     return (
-        <Card className="max-w-4xl mx-auto">
-            <CardHeader>
-                <CardTitle>Pregunta {preguntaActualIndex + 1} de {preguntas.length}</CardTitle>
-                <CardDescription className="text-lg pt-4">{pregunta.pregunta}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {pregunta.tipo === 'seleccion-multiple' ? (
-                    <RadioGroup 
-                        value={respuestas[preguntaActualIndex].respuesta}
-                        onValueChange={handleRespuestaChange}
-                        className="space-y-2"
-                    >
-                        {pregunta.alternativas.map((alt, i) => (
-                            <div key={i} className="flex items-center space-x-2 p-3 border rounded-md has-[:checked]:bg-secondary has-[:checked]:border-primary">
-                                <RadioGroupItem value={alt} id={`alt-${i}`} />
-                                <Label htmlFor={`alt-${i}`} className="flex-1 cursor-pointer">{alt}</Label>
-                            </div>
-                        ))}
-                    </RadioGroup>
-                ) : (
-                    <Input 
-                        placeholder="Escribe tu respuesta aquí..."
-                        value={respuestas[preguntaActualIndex].respuesta}
-                        onChange={e => handleRespuestaChange(e.target.value)}
-                    />
-                )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => irAPregunta(preguntaActualIndex - 1)} disabled={preguntaActualIndex === 0}>
-                    <ArrowLeft className="mr-2" /> Anterior
-                </Button>
-                {preguntaActualIndex < preguntas.length - 1 ? (
-                    <Button onClick={() => irAPregunta(preguntaActualIndex + 1)}>
-                        Siguiente <ArrowRight className="ml-2" />
+        <div className='max-w-4xl mx-auto space-y-4'>
+            {showFormula && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Fórmula Clave: Ecuación Cuadrática</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                       <Image src="https://storage.googleapis.com/genkit-assets/formula-cuadratica.png" alt="Fórmula cuadrática" width={400} height={250} />
+                    </CardContent>
+                </Card>
+            )}
+            {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>
+                    <CardDescription className="text-lg pt-4">{pregunta.pregunta}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {pregunta.tipo === 'seleccion-multiple' ? (
+                        <RadioGroup 
+                            value={respuestas[preguntaActualIndex].respuesta}
+                            onValueChange={handleRespuestaChange}
+                            className="space-y-2"
+                        >
+                            {pregunta.alternativas.map((alt, i) => (
+                                <div key={i} className="flex items-center space-x-2 p-3 border rounded-md has-[:checked]:bg-secondary has-[:checked]:border-primary">
+                                    <RadioGroupItem value={alt} id={`alt-${i}`} />
+                                    <Label htmlFor={`alt-${i}`} className="flex-1 cursor-pointer">{alt}</Label>
+                                </div>
+                            ))}
+                        </RadioGroup>
+                    ) : (
+                        <Input 
+                            placeholder="Escribe tu respuesta aquí..."
+                            value={respuestas[preguntaActualIndex].respuesta}
+                            onChange={e => handleRespuestaChange(e.target.value)}
+                        />
+                    )}
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                    <Button variant="outline" onClick={() => irAPregunta(preguntaActualIndex - 1)} disabled={preguntaActualIndex === 0}>
+                        <ArrowLeft className="mr-2" /> Anterior
                     </Button>
-                ) : (
-                    <Button onClick={handleFinish} disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Terminar Prueba
-                    </Button>
-                )}
-            </CardFooter>
-        </Card>
+                    {preguntaActualIndex < testData.preguntas.length - 1 ? (
+                        <Button onClick={() => irAPregunta(preguntaActualIndex + 1)}>
+                            Siguiente <ArrowRight className="ml-2" />
+                        </Button>
+                    ) : (
+                        <Button onClick={handleFinish} disabled={isPending}>
+                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Terminar Prueba
+                        </Button>
+                    )}
+                </CardFooter>
+            </Card>
+        </div>
     )
   }
 
-  if (fase === 'resultados') {
+  if (fase === 'resultados' && testData) {
     const correctas = resultados.filter(r => r.esCorrecta).length;
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -283,7 +304,7 @@ export function EnsayoInteractivo() {
                     <CardDescription className="text-xl">Obtuviste</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-6xl font-bold text-primary">{correctas} / {preguntas.length}</p>
+                    <p className="text-6xl font-bold text-primary">{correctas} / {testData.preguntas.length}</p>
                     <p className="text-2xl font-semibold">respuestas correctas</p>
                 </CardContent>
                  <CardFooter className="justify-center">

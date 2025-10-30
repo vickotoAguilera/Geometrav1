@@ -38,6 +38,7 @@ export type GeneradorPruebasInput = z.infer<typeof GeneradorPruebasInputSchema>;
 // Esquema para la salida del flujo de generación de pruebas
 export const GeneradorPruebasOutputSchema = z.object({
   preguntas: z.array(PreguntaSchema),
+  formula: z.string().optional().describe('Un identificador para la fórmula clave utilizada en la prueba, si aplica (ej. "formula_cuadratica").'),
 });
 export type GeneradorPruebasOutput = z.infer<typeof GeneradorPruebasOutputSchema>;
 

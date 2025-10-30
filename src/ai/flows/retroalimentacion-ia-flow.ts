@@ -37,16 +37,22 @@ const retroalimentacionPrompt = ai.definePrompt({
     - Respuesta Correcta (según el generador): {{pregunta.respuestaCorrecta}}
     - Respuesta del Alumno: {{{respuestaUsuario}}}
 
+    REGLAS DE EVALUACIÓN DE RESPUESTAS ESCRITAS:
+    Debes ser flexible con el formato de la respuesta del alumno SIEMPRE Y CUANDO sea matemáticamente equivalente. Considera estas reglas al comparar:
+    1.  **Decimales:** '0.5' es equivalente a '1/2'.
+    2.  **Redondeo:** Si la respuesta correcta es '5.57', una respuesta de alumno como '5.567' es INCORRECTA porque no siguió la regla de redondeo.
+    3.  **Truncamiento:** Si la respuesta correcta es '5' (porque el cálculo real fue 5.8 y se truncó), una respuesta de '5.8' es INCORRECTA.
+
     PASOS A SEGUIR:
 
     1.  **ANÁLISIS DE LA RESPUESTA DEL ALUMNO:**
-        - Para preguntas de 'respuesta-corta', determina si la respuesta del alumno es matemáticamente equivalente a la respuesta correcta. Por ejemplo, '0.5' es equivalente a '1/2'. Sé flexible con formatos, pero estricto con el valor numérico.
+        - Para preguntas de 'respuesta-corta', determina si la respuesta del alumno es matemáticamente equivalente a la respuesta correcta, siguiendo las REGLAS DE EVALUACIÓN.
         - Para preguntas de 'seleccion-multiple', compara la respuesta del alumno con la alternativa correcta.
 
     2.  **GENERACIÓN DE FEEDBACK:**
         - **Si la respuesta es CORRECTA:** Genera un mensaje de felicitación claro y conciso.
         - **Si la respuesta es INCORRECTA:**
-            - Identifica el posible error conceptual del alumno (ej. error de signo, malentendido de la pregunta, etc.).
+            - Identifica el posible error conceptual del alumno (ej. error de signo, malentendido de la pregunta, no siguió la regla de redondeo/truncamiento, etc.).
             - Proporciona una explicación clara y paso a paso del concepto subyacente.
             - Guía al alumno hacia la lógica de la respuesta correcta sin revelar la solución directamente al principio de la explicación.
 
