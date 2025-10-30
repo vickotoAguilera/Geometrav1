@@ -9,7 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { PreguntaSchema } from './generador-pruebas-flow';
+import { PreguntaSchema } from './schemas/generador-pruebas-schemas';
 
 // Esquema de entrada para el flujo de retroalimentación
 export const RetroalimentacionInputSchema = z.object({
