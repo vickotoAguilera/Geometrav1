@@ -11,8 +11,9 @@ import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
-import type { Ejercicio } from '@/lib/ejercicios';
+import type { Ejercicio, EjercicioPorCurso } from '@/lib/ejercicios';
 import { Switch } from './ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 interface ChatMessage {
@@ -27,7 +28,7 @@ interface GenkitMessage {
 }
 
 interface StudyChatAssistantProps {
-    ejercicios: Ejercicio[];
+    ejercicios: EjercicioPorCurso[];
 }
 
 const parseResponse = (content: string) => {
@@ -91,6 +92,14 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   }, [messages]);
+  
+  useEffect(() => {
+    // Reset state when switching tabs
+    setActiveEjercicio(null);
+    setMessages([]);
+    setInput('');
+  }, [ejercicios]);
+
 
   const sendQuery = (query: string, history: ChatMessage[], material: string) => {
     startTransition(() => {
@@ -131,23 +140,24 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
     }
   };
 
-  const handleToggleEjercicio = (ejercicio: Ejercicio) => {
-    const isActivating = activeEjercicio?.slug !== ejercicio.slug;
-    setActiveEjercicio(isActivating ? ejercicio : null);
-    setMessages([]); // Clear chat on any toggle
-    setInput('');
+  const handleToggleEjercicio = (ejercicio: Ejercicio, currentCourse: EjercicioPorCurso) => {
+      const isActivating = activeEjercicio?.slug !== ejercicio.slug;
+      setActiveEjercicio(isActivating ? ejercicio : null);
+      setMessages([]); // Clear chat on any toggle
+      setInput('');
 
-    if (isActivating) {
-      const autoPrompt = `Hola, he activado el archivo '${ejercicio.title}'. ¿De qué trata y qué puedo aprender de él?`;
-      const assistantPlaceholder: ChatMessage = {
-        id: `assistant-intro-${Date.now()}`,
-        role: 'model',
-        content: '...',
-      };
-      setMessages([assistantPlaceholder]);
-      sendQuery(autoPrompt, [], ejercicio.content);
-    }
+      if (isActivating) {
+        const autoPrompt = `Hola, he activado el archivo '${ejercicio.title}'. ¿De qué trata y qué puedo aprender de él?`;
+        const assistantPlaceholder: ChatMessage = {
+          id: `assistant-intro-${Date.now()}`,
+          role: 'model',
+          content: '...',
+        };
+        setMessages([assistantPlaceholder]);
+        sendQuery(autoPrompt, [], ejercicio.content);
+      }
   };
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -172,6 +182,12 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
     setMessages(newMessages);
     sendQuery(currentInput, [...messages, userMessage], activeEjercicio.content);
   };
+  
+  const handleTabChange = () => {
+    setActiveEjercicio(null);
+    setMessages([]);
+    setInput('');
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -180,32 +196,46 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                 <CardHeader>
                     <CardTitle>Ambiente de Aprendizaje</CardTitle>
                     <CardDescription>
-                        Activa un ejercicio para que la IA lo use como contexto.
+                        Selecciona un curso y activa un ejercicio para que la IA lo use como contexto.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                    {ejercicios.length > 0 ? (
-                        ejercicios.map(ejercicio => (
-                            <div key={ejercicio.slug} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                <FileText className="w-4 h-4 flex-shrink-0" />
-                                <span className="truncate" title={ejercicio.title}>{ejercicio.title}</span>
-                                </div>
-                                <Switch
-                                checked={activeEjercicio?.slug === ejercicio.slug}
-                                onCheckedChange={() => handleToggleEjercicio(ejercicio)}
-                                aria-label={`Activar contexto para ${ejercicio.title}`}
-                                />
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-muted-foreground text-sm">No hay ejercicios disponibles.</p>
-                    )}
+                <CardContent>
+                    <Tabs defaultValue={ejercicios[0]?.course || 'primero-medio'} className="w-full" onValueChange={handleTabChange}>
+                        <TabsList className="grid w-full grid-cols-4">
+                           {ejercicios.map(courseData => (
+                             <TabsTrigger key={courseData.course} value={courseData.course}>{courseData.label}</TabsTrigger>
+                           ))}
+                        </TabsList>
+                        {ejercicios.map(courseData => (
+                           <TabsContent key={courseData.course} value={courseData.course}>
+                             <div className="space-y-2 pt-4">
+                                {courseData.ejercicios.length > 0 ? (
+                                    courseData.ejercicios.map(ejercicio => (
+                                        <div key={ejercicio.slug} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                            <FileText className="w-4 h-4 flex-shrink-0" />
+                                            <span className="truncate" title={ejercicio.title}>{ejercicio.title}</span>
+                                            </div>
+                                            <Switch
+                                                id={`${courseData.course}-${ejercicio.slug}`}
+                                                checked={activeEjercicio?.slug === ejercicio.slug}
+                                                onCheckedChange={() => handleToggleEjercicio(ejercicio, courseData)}
+                                                aria-label={`Activar contexto para ${ejercicio.title}`}
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-muted-foreground text-sm text-center pt-4">No hay ejercicios para este curso.</p>
+                                )}
+                             </div>
+                           </TabsContent>
+                        ))}
+                    </Tabs>
                 </CardContent>
             </Card>
         </div>
 
-        <Card className="lg:col-span-2 flex flex-col h-[600px]">
+        <Card className="lg:col-span-2 flex flex-col h-[70vh] min-h-[600px]">
             <CardHeader>
                 <CardTitle>Asistente de Estudio</CardTitle>
                 <CardDescription>Esta conversación es temporal y se reinicia al recargar la página.</CardDescription>
