@@ -5,7 +5,7 @@ import { getStudyAiResponse } from '@/app/study-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, FileText } from 'lucide-react';
+import { Bot, User, Send, Loader2, FileText, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -209,6 +209,14 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                         {ejercicios.map(courseData => (
                            <TabsContent key={courseData.course} value={courseData.course}>
                              <div className="space-y-2 pt-4">
+                                {courseData.course === 'primero-medio' && (
+                                   <a href="https://drive.google.com/drive/folders/1CaGWiZz0I1I0-IY63JUrMUaHUbFlTI-2?usp=sharing" target="_blank" rel="noopener noreferrer" className="w-full">
+                                        <Button variant="outline" className="w-full justify-start gap-2">
+                                            <Download className="w-4 h-4" />
+                                            Descargar material de estudio
+                                        </Button>
+                                    </a>
+                                )}
                                 {courseData.ejercicios.length > 0 ? (
                                     courseData.ejercicios.map(ejercicio => (
                                         <div key={ejercicio.slug} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
