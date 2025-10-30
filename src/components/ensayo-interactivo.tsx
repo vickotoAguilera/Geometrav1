@@ -10,14 +10,14 @@ import type {
   Pregunta,
   GeneradorPruebasOutput,
   RetroalimentacionOutput,
-} from '@/ai/flows/generador-pruebas-flow';
+} from '@/ai/flows/schemas/generador-pruebas-schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -246,7 +246,7 @@ export function EnsayoInteractivo() {
                     </CardContent>
                 </Card>
             )}
-            {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
+            <FormatoRespuestasAlert />
             <Card>
                 <CardHeader>
                     <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>
@@ -296,16 +296,40 @@ export function EnsayoInteractivo() {
 
   if (fase === 'resultados' && testData) {
     const correctas = resultados.filter(r => r.esCorrecta).length;
+    const total = testData.preguntas.length;
+    const porcentajeCorrectas = Math.round((correctas / total) * 100);
+    const porcentajeIncorrectas = 100 - porcentajeCorrectas;
+    const aprobado = porcentajeCorrectas >= 60;
+
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Card className="text-center">
                 <CardHeader>
                     <CardTitle className="text-3xl">Resultados de la Prueba</CardTitle>
-                    <CardDescription className="text-xl">Obtuviste</CardDescription>
+                    {aprobado ? (
+                        <CardDescription className="text-xl text-blue-500 flex items-center justify-center gap-2">
+                           <CheckCircle2 /> ¡Prueba Aprobada!
+                        </CardDescription>
+                    ) : (
+                        <CardDescription className="text-xl text-red-500 flex items-center justify-center gap-2">
+                           <XCircle /> Prueba Reprobada
+                        </CardDescription>
+                    )}
                 </CardHeader>
-                <CardContent>
-                    <p className="text-6xl font-bold text-primary">{correctas} / {testData.preguntas.length}</p>
+                <CardContent className="space-y-4">
+                    <p className="text-5xl font-bold text-primary">{correctas} / {total}</p>
                     <p className="text-2xl font-semibold">respuestas correctas</p>
+
+                    <div className="flex justify-center gap-6 text-lg">
+                        <span className="font-semibold text-blue-500">Correctas: {porcentajeCorrectas}%</span>
+                        <span className="font-semibold text-red-500">Incorrectas: {porcentajeIncorrectas}%</span>
+                    </div>
+
+                     {!aprobado && (
+                        <p className="text-muted-foreground pt-2">
+                            ¡Sigue practicando! Revisar tus errores es la mejor forma de aprender.
+                        </p>
+                    )}
                 </CardContent>
                  <CardFooter className="justify-center">
                     <Button onClick={reset}>
@@ -317,12 +341,12 @@ export function EnsayoInteractivo() {
             <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-center">Revisión detallada</h2>
                 {resultados.map((res, index) => (
-                    <Card key={index} className={res.esCorrecta ? 'border-green-500' : 'border-red-500'}>
+                    <Card key={index} className={res.esCorrecta ? 'border-blue-500' : 'border-red-500'}>
                          <CardHeader>
                             <CardTitle className="flex justify-between items-start">
                                 <span>Pregunta {index + 1}</span>
                                 {res.esCorrecta ? (
-                                    <span className="text-sm font-medium text-green-600 bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded-full">Correcta</span>
+                                    <span className="text-sm font-medium text-blue-600 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded-full">Correcta</span>
                                 ) : (
                                     <span className="text-sm font-medium text-red-600 bg-red-100 dark:bg-red-900/50 px-2 py-1 rounded-full">Incorrecta</span>
                                 )}
