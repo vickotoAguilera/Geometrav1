@@ -8,7 +8,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center text-center p-8">
         <Logo className="w-24 h-24 text-primary mb-6" />
-        <h1 className="text-5xl font-bold font-headline mb-4 text-primary-foreground/90">
+        <h1 className="text-5xl font-bold font-headline mb-4 text-foreground">
           Bienvenido a Geometra
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
