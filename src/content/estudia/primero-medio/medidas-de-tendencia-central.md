@@ -46,3 +46,16 @@ Consideremos las edades de un grupo de 7 amigos: `12, 14, 12, 13, 15, 14, 14`.
         - 15 aparece 1 vez.
     - El dato que más se repite es el 14.
     - Moda = `14` años.
+
+## ¿Y en la calculadora científica?
+
+Calcular la media, mediana y moda en una calculadora a menudo requiere usar el **modo estadístico (STAT o SD)**.
+
+1.  **Activa el modo estadístico:** Busca un botón `MODE` y selecciona la opción `STAT` o `SD`.
+2.  **Ingresa los datos:** La calculadora te permitirá introducir cada dato (`12, 14, 12, ...`) uno por uno, usualmente presionando un botón como `M+` o `DATA` después de cada número.
+3.  **Calcula los resultados:** Una vez ingresados todos los datos, busca los símbolos estadísticos (a menudo usando la tecla `SHIFT` o `ALPHA`).
+    - La **media** se representa como `x̄`.
+    - La **mediana** se representa como `Med`.
+    - La **moda** se representa como `Mod`.
+
+*Nota: La mediana y la moda no están disponibles en todos los modelos de calculadoras.* La media, en cambio, es una función estándar.

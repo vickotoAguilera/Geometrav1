@@ -42,3 +42,11 @@ Imagina un triángulo rectángulo donde un cateto (`a`) mide **3 cm** y el otro 
 4.  Sobre la perpendicular, crea otro segmento de longitud 4.
 5.  Usa la herramienta `Polígono` para unir los tres puntos y formar el triángulo rectángulo.
 6.  Finalmente, usa la herramienta `Distancia o Longitud` para medir la hipotenusa. ¡Verás que mide 5!
+
+## ¿Y en la calculadora científica?
+
+Para resolver `3² + 4² = c²`:
+1.  Para `3²`, usa el botón `x²`. Escribe `3` y luego `x²` para obtener `9`.
+2.  Para `4²`, haz lo mismo: `4`, luego `x²` para obtener `16`.
+3.  Suma los resultados: `9 + 16 = 25`.
+4.  Para encontrar `c`, necesitas calcular la raíz cuadrada de `25`. Usa el botón `√`. Escribe `√` y luego `25` para obtener `5`.

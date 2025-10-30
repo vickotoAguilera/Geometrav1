@@ -46,3 +46,11 @@ Por ejemplo, `√a = a^(1/2)` y `³√a² = a^(2/3)`. Esta propiedad es muy úti
     `x⁶ * x⁴ = x⁶⁺⁴ = x¹⁰`
 
 **Respuesta:** La expresión simplificada es `x¹⁰`.
+
+## ¿Y en la calculadora científica?
+
+- **Potencias:** Para calcular `aⁿ`, usa el botón `x^y`, `y^x` o `^`. Ejemplo: para `5³`, teclea `5`, luego `x^y`, luego `3` y presiona `=` para obtener `125`. Para cuadrados, puedes usar el botón `x²`.
+- **Raíces:**
+  - **Raíz cuadrada:** Usa el botón `√`. Ejemplo: `√`, luego `81`, luego `=` para obtener `9`.
+  - **Raíz cúbica:** Busca el botón `³√`.
+  - **Raíz n-ésima:** Busca el botón `ⁿ√` o `ˣ√`. Ejemplo: para `⁴√16`, teclea `4`, luego `ⁿ√`, luego `16` y presiona `=` para obtener `2`.
