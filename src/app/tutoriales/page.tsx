@@ -69,6 +69,112 @@ const tutoriales = [
       "Aparecerá un cuadro de diálogo pidiéndote el radio. Escribe un número, por ejemplo, 3.",
       "Presiona OK. ¡Listo! Tendrás una circunferencia con centro en A y radio 3."
     ]
+  },
+  {
+    titulo: "Guía 7: Calcula la derivada de una función",
+    descripcion: "Visualiza la función derivada y entiende su relación con la pendiente de la función original.",
+    pasos: [
+      "Primero, grafica la función que quieres derivar. Por ejemplo, escribe en la Entrada: f(x) = x^3 - 3x",
+      "Ahora, en la barra de Entrada, escribe el comando 'Derivada'.",
+      "Dentro del paréntesis, escribe el nombre de tu función: Derivada(f)",
+      "Presiona Enter. GeoGebra dibujará una nueva función (en otro color), que es la derivada f'(x) = 3x^2 - 3."
+    ]
+  },
+  {
+    titulo: "Guía 8: Calcula una integral definida y sombrea el área",
+    descripcion: "Usa el comando Integral para calcular el área bajo una curva entre dos puntos.",
+    pasos: [
+      "Grafica una función, por ejemplo: f(x) = -x^2 + 4x",
+      "En la barra de Entrada, escribe el comando 'Integral'.",
+      "GeoGebra te sugerirá varias opciones. Elige la que dice 'Integral(<Función>, <Extremo inferior del intervalo>, <Extremo superior del intervalo>)'",
+      "Escribe: Integral(f, 0, 4)",
+      "Al presionar Enter, GeoGebra sombreará el área bajo la parábola entre x=0 y x=4, y te dará el valor numérico del área."
+    ]
+  },
+  {
+    titulo: "Guía 9: Construye la mediatriz de un segmento",
+    descripcion: "Aprende a trazar la recta perpendicular que divide un segmento en dos partes iguales.",
+    pasos: [
+      "Usa la herramienta 'Punto' para crear dos puntos en la Vista Gráfica, por ejemplo A y B.",
+      "Selecciona la herramienta 'Mediatriz'. La encontrarás en el mismo grupo que 'Recta Perpendicular'.",
+      "Haz clic sobre el punto A y luego sobre el punto B (o viceversa).",
+      "Inmediatamente, GeoGebra dibujará la recta mediatriz del segmento que une A y B."
+    ]
+  },
+  {
+    titulo: "Guía 10: Rota un objeto alrededor de un punto",
+    descripcion: "Aprende a usar la herramienta de rotación para girar figuras un ángulo determinado.",
+    pasos: [
+      "Primero, crea un objeto para rotar, por ejemplo, un 'Polígono' (un triángulo).",
+      "Crea un 'Punto' que será el centro de rotación.",
+      "Selecciona la herramienta 'Rota en torno a un Punto'.",
+      "Haz clic primero en el objeto que quieres rotar (el triángulo) y luego en el punto que es el centro de rotación.",
+      "Aparecerá un cuadro de diálogo pidiéndote el ángulo. Escribe, por ejemplo, 90° y elige un sentido (horario o antihorario).",
+      "Presiona OK y verás tu objeto rotado."
+    ]
+  },
+  {
+    titulo: "Guía 11: Encuentra las raíces de una función",
+    descripcion: "Usa un comando para marcar automáticamente los puntos donde una función corta el eje X.",
+    pasos: [
+        "Grafica una función que corte el eje X varias veces, por ejemplo: f(x) = x^3 - 4x",
+        "En la barra de Entrada, escribe el comando 'Raíces'.",
+        "Elige la opción 'Raíces(<Función>, <Extremo inferior>, <Extremo superior>)' para buscar en un intervalo.",
+        "Escribe: Raíces(f, -5, 5)",
+        "GeoGebra creará automáticamente los puntos en las intersecciones con el eje X: (-2, 0), (0, 0) y (2, 0)."
+    ]
+  },
+  {
+    titulo: "Guía 12: Crea un punto medio",
+    descripcion: "Encuentra fácilmente el punto medio entre dos puntos dados o de un segmento.",
+    pasos: [
+      "Crea dos puntos, A y B, en la Vista Gráfica.",
+      "Selecciona la herramienta 'Medio o Centro'.",
+      "Haz clic en el punto A y luego en el punto B.",
+      "GeoGebra creará un nuevo punto, C, que es exactamente el punto medio entre A y B."
+    ]
+  },
+  {
+    titulo: "Guía 13: Refleja un objeto (simetría axial)",
+    descripcion: "Crea una imagen especular de una figura a través de una recta (eje de simetría).",
+    pasos: [
+      "Dibuja un objeto, por ejemplo un 'Polígono'.",
+      "Dibuja una 'Recta' que actuará como el espejo o eje de simetría.",
+      "Selecciona la herramienta 'Refleja Objeto en Recta'.",
+      "Haz clic primero en el objeto (el polígono) y luego en la recta.",
+      "Verás una copia idéntica de tu polígono al otro lado de la recta."
+    ]
+  },
+  {
+    titulo: "Guía 14: Crea texto dinámico",
+    descripcion: "Muestra valores de variables y objetos directamente en la Vista Gráfica.",
+    pasos: [
+      "Crea un deslizador llamado 'a'.",
+      "Selecciona la herramienta 'Texto'. Haz clic en la Vista Gráfica.",
+      "En el cuadro de texto, escribe: 'El valor actual es: '",
+      "Luego, ve a la pestaña 'Avanzado' o busca un botón 'Objetos'. Selecciona tu deslizador 'a' de la lista. Se insertará en el texto.",
+      "Presiona OK. Ahora, cuando muevas el deslizador, el texto se actualizará en tiempo real mostrando su valor."
+    ]
+  },
+  {
+    titulo: "Guía 15: Mide la distancia entre dos puntos",
+    descripcion: "Calcula y muestra la distancia entre dos puntos, un punto y una recta, etc.",
+    pasos: [
+      "Crea dos puntos, A y B.",
+      "Selecciona la herramienta 'Distancia o Longitud'.",
+      "Haz clic en el punto A y luego en el punto B.",
+      "GeoGebra mostrará una etiqueta con la distancia exacta entre ellos. Este valor se actualizará si mueves cualquiera de los puntos."
+    ]
+  },
+  {
+    titulo: "Guía 16: Construye un vector entre dos puntos",
+    descripcion: "Aprende a representar un vector y a ver sus componentes en la Vista Algebraica.",
+    pasos: [
+      "Crea dos puntos, A (origen) y B (extremo).",
+      "Selecciona la herramienta 'Vector'.",
+      "Haz clic primero en el punto de origen (A) y luego en el punto extremo (B).",
+      "GeoGebra dibujará una flecha desde A hasta B. En la Vista Algebraica, mostrará el vector con sus componentes, por ejemplo, u = (3, 2)."
+    ]
   }
 ]
 
