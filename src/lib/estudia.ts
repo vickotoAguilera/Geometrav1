@@ -28,12 +28,24 @@ export async function getPostBySlug(slug: string[] | string) {
 }
 
 export async function getAllPostsByCourse() {
+    const courseOrder = ["primero-medio", "segundo-medio", "tercero-medio", "cuarto-medio"];
+    
     const courses = fs.readdirSync(postsDirectory).filter(file => 
         fs.statSync(path.join(postsDirectory, file)).isDirectory()
     );
 
+    // Ordenar los cursos según el array courseOrder
+    const sortedCourses = courses.sort((a, b) => {
+        const indexA = courseOrder.indexOf(a);
+        const indexB = courseOrder.indexOf(b);
+        // Si un curso no está en la lista, se va al final
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+
     const allPosts = await Promise.all(
-        courses.map(async course => {
+        sortedCourses.map(async course => {
             const coursePath = path.join(postsDirectory, course);
             const filenames = fs.readdirSync(coursePath);
 
