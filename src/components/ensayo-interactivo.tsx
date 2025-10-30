@@ -200,7 +200,7 @@ export function EnsayoInteractivo() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>¡A tener en cuenta!</AlertTitle>
                   <AlertDescription>
-                      Para respuestas numéricas: usa punto (.) para decimales (ej: 5.56) y no uses separadores de miles (ej: 1500). Para respuestas sobre objetos o personas, usa números enteros.
+                      Para respuestas numéricas: usa punto (.) para decimales, redondea a dos decimales (ej: 5.56) y no uses separadores de miles (ej: 1500). Para respuestas sobre objetos o personas, usa números enteros.
                   </AlertDescription>
               </Alert>
           )}
