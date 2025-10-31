@@ -12,13 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut, User as UserIcon, Bot } from "lucide-react";
+import { LogOut, User as UserIcon, Bot, MessageSquareHeart } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { usePathname } from 'next/navigation';
+import { ScreenshotGuide } from "./screenshot-guide";
 
 
 // SVG para el icono de Google
@@ -125,6 +126,30 @@ const AIChatButton = () => {
   );
 }
 
+const ScreenshotGuideButton = () => {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const hiddenRoutes = ['/ensaya', '/paes'];
+
+  if (hiddenRoutes.includes(pathname)) {
+    return null;
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline">
+            <MessageSquareHeart className="mr-2 h-5 w-5"/>
+            Guía IA
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+        <ScreenshotGuide />
+      </SheetContent>
+    </Sheet>
+  )
+}
+
 
 export default function Header() {
   return (
@@ -139,6 +164,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <ScreenshotGuideButton />
           <AIChatButton />
           <AuthButton />
         </div>
