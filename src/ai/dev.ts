@@ -14,3 +14,6 @@ import '@/ai/flows/study-assistant.ts';
 import '@/ai/flows/generador-pruebas-flow.ts';
 import '@/ai/flows/retroalimentacion-ia-flow.ts';
 import '@/ai/flows/schemas/generador-pruebas-schemas.ts';
+import '@/ai/flows/schemas/generador-paes-schemas.ts';
+import '@/ai/flows/generador-paes-flow.ts';
+import '@/ai/flows/retroalimentacion-paes-flow.ts';
