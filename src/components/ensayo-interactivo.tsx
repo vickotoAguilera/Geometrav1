@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import Image from 'next/image';
 import {
   generarPruebaAction,
   retroalimentacionAction,
@@ -17,9 +16,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle, Flag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
 
@@ -83,6 +83,7 @@ export function EnsayoInteractivo() {
   const [respuestas, setRespuestas] = useState<RespuestaUsuario[]>([]);
   const [preguntaActualIndex, setPreguntaActualIndex] = useState(0);
   const [resultados, setResultados] = useState<Resultado[]>([]);
+  const [flaggedQuestions, setFlaggedQuestions] = useState<number[]>([]);
   
   const [isPending, startTransition] = useTransition();
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -156,7 +157,7 @@ export function EnsayoInteractivo() {
   };
 
   useEffect(() => {
-    if (fase !== 'realizando' || (testData?.preguntas.length ?? 0) >= cantidadPreguntas) {
+    if (fase !== 'realizando' || !testData || (testData?.preguntas.length ?? 0) >= cantidadPreguntas) {
       return;
     }
 
@@ -164,15 +165,29 @@ export function EnsayoInteractivo() {
       setIsFetchingMore(true);
       const temaCompuesto = temasSeleccionados.join(', ');
       let currentQuestions = testData?.preguntas ?? [];
-      const lotesRestantes = Math.ceil((cantidadPreguntas - currentQuestions.length) / BATCH_SIZE);
+      
+      const lotesNecesarios = Math.ceil(cantidadPreguntas / BATCH_SIZE);
+      const lotesActuales = Math.ceil(currentQuestions.length / BATCH_SIZE);
 
-      for (let i = 0; i < lotesRestantes; i++) {
+
+      for (let i = lotesActuales; i < lotesNecesarios; i++) {
+        if(currentQuestions.length >= cantidadPreguntas) break;
         try {
-          const result = await generarPruebaAction({ tema: temaCompuesto, cantidadPreguntas: BATCH_SIZE, tipoPrueba });
+          const preguntasFaltantes = cantidadPreguntas - currentQuestions.length;
+          const preguntasApedir = Math.min(BATCH_SIZE, preguntasFaltantes);
+
+          const result = await generarPruebaAction({ tema: temaCompuesto, cantidadPreguntas: preguntasApedir, tipoPrueba });
           currentQuestions = [...currentQuestions, ...result.preguntas];
           
           setTestData({ ...testData, preguntas: currentQuestions });
-          setRespuestas(currentQuestions.map((_, index) => respuestas[index] || { preguntaIndex: index, respuesta: '' }));
+          // Extend responses array with empty responses for new questions
+           setRespuestas(prev => {
+              const newResponses = [...prev];
+              for(let j = prev.length; j < currentQuestions.length; j++) {
+                  newResponses[j] = {preguntaIndex: j, respuesta: ''};
+              }
+              return newResponses;
+          });
           
           const progress = (currentQuestions.length / cantidadPreguntas) * 100;
           setLoadingProgress({ 
@@ -192,9 +207,11 @@ export function EnsayoInteractivo() {
       setIsFetchingMore(false);
     };
 
-    fetchMoreQuestions();
+    if(!isFetchingMore) {
+        fetchMoreQuestions();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fase]);
+  }, [fase, testData]);
   
   const handleRespuestaChange = (respuesta: string) => {
     const nuevasRespuestas = [...respuestas];
@@ -208,38 +225,38 @@ export function EnsayoInteractivo() {
     }
   };
 
+  const handleToggleFlag = (index: number) => {
+    setFlaggedQuestions(prev => {
+      if(prev.includes(index)) {
+        return prev.filter(i => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    })
+  }
+
   const handleFinish = () => {
     if (!testData) return;
-    
-    // Solo valida las preguntas cargadas
-    const preguntasCargadas = testData.preguntas.length;
-    const respuestasCargadas = respuestas.slice(0, preguntasCargadas);
-
-    const todasRespondidas = respuestasCargadas.every(r => r.respuesta.trim() !== '');
-    if (!todasRespondidas) {
-        toast({
-            variant: 'destructive',
-            title: 'Preguntas sin responder',
-            description: 'Por favor, responde todas las preguntas cargadas antes de finalizar.',
-        });
-        return;
-    }
-    
     setFase('revisando');
     startTransition(async () => {
         try {
+            // Fill empty answers for questions not answered
+            const finalRespuestas = testData.preguntas.map((_, index) => {
+                return respuestas[index] || { preguntaIndex: index, respuesta: '' };
+            });
+
             const revisiones = await Promise.all(
                 testData.preguntas.map((pregunta, index) => 
                     retroalimentacionAction({
                         pregunta: pregunta,
-                        respuestaUsuario: respuestas[index].respuesta,
+                        respuestaUsuario: finalRespuestas[index].respuesta,
                     })
                 )
             );
             const resultadosFinales = revisiones.map((revision, index) => ({
                 ...revision,
                 pregunta: testData.preguntas[index],
-                respuestaUsuario: respuestas[index].respuesta,
+                respuestaUsuario: finalRespuestas[index].respuesta,
             }));
             setResultados(resultadosFinales);
             setFase('resultados');
@@ -265,6 +282,7 @@ export function EnsayoInteractivo() {
     setResultados([]);
     setPreguntaActualIndex(0);
     setLoadingProgress({ progress: 0, message: '' });
+    setFlaggedQuestions([]);
   }
 
   if (fase === 'configuracion') {
@@ -356,6 +374,8 @@ export function EnsayoInteractivo() {
     const pregunta = testData.preguntas[preguntaActualIndex];
     const totalPreguntasCargadas = testData.preguntas.length;
 
+    const preguntasSinResponder = respuestas.slice(0, totalPreguntasCargadas).filter(r => !r.respuesta.trim()).length;
+
     return (
         <div className='max-w-4xl mx-auto space-y-6'>
             {isFetchingMore && (
@@ -373,19 +393,25 @@ export function EnsayoInteractivo() {
                     <CardTitle>Navegación de Preguntas</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                    {Array.from({ length: totalPreguntasCargadas }, (_, i) => i).map(index => (
-                        <Button
-                            key={index}
-                            variant={respuestas[index]?.respuesta ? 'default' : 'outline'}
-                            className={cn(
-                                "h-10 w-10",
-                                preguntaActualIndex === index && 'ring-2 ring-ring ring-offset-2'
-                            )}
-                            onClick={() => irAPregunta(index)}
-                        >
-                            {index + 1}
-                        </Button>
-                    ))}
+                    {Array.from({ length: totalPreguntasCargadas }, (_, i) => i).map(index => {
+                         const isAnswered = respuestas[index]?.respuesta.trim() !== '';
+                         const isFlagged = flaggedQuestions.includes(index);
+                         
+                         return (
+                            <Button
+                                key={index}
+                                variant={isAnswered ? 'default' : 'outline'}
+                                className={cn(
+                                    "h-10 w-10",
+                                    preguntaActualIndex === index && 'ring-2 ring-ring ring-offset-2',
+                                    isFlagged && !isAnswered && "bg-yellow-400/20 border-yellow-500 hover:bg-yellow-400/30 text-yellow-700 dark:text-yellow-400"
+                                )}
+                                onClick={() => irAPregunta(index)}
+                            >
+                                {index + 1}
+                            </Button>
+                         )
+                    })}
                 </CardContent>
             </Card>
 
@@ -393,7 +419,12 @@ export function EnsayoInteractivo() {
             
             <Card>
                 <CardHeader>
-                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
+                    <div className="flex justify-between items-start">
+                        <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
+                        <Button variant="ghost" size="icon" onClick={() => handleToggleFlag(preguntaActualIndex)} title="Marcar pregunta para revisar">
+                            <Flag className={cn("h-5 w-5", flaggedQuestions.includes(preguntaActualIndex) ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground')}/>
+                        </Button>
+                    </div>
                     <CardDescription className="text-lg pt-4">{pregunta.pregunta}</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -427,10 +458,32 @@ export function EnsayoInteractivo() {
                             Siguiente <ArrowRight className="ml-2" />
                         </Button>
                     ) : (
-                        <Button onClick={handleFinish} disabled={isPending || isFetchingMore}>
-                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {isFetchingMore ? 'Cargando...' : 'Terminar Prueba'}
-                        </Button>
+                         <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button disabled={isPending || isFetchingMore}>
+                                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {isFetchingMore ? 'Cargando...' : 'Terminar Prueba'}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>¿Finalizar la prueba?</AlertDialogTitle>
+                                {preguntasSinResponder > 0 ? (
+                                    <AlertDialogDescription>
+                                        Hay {preguntasSinResponder} pregunta(s) sin responder. Si continúas, se contarán como incorrectas. ¿Deseas finalizar la prueba de todas formas?
+                                    </AlertDialogDescription>
+                                ) : (
+                                    <AlertDialogDescription>
+                                        ¿Estás seguro de que quieres finalizar y revisar tu prueba?
+                                    </AlertDialogDescription>
+                                )}
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Volver a la prueba</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleFinish}>Finalizar de todas formas</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     )}
                 </CardFooter>
             </Card>
