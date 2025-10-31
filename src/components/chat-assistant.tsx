@@ -7,7 +7,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waveform } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -613,7 +613,7 @@ export function ChatAssistant() {
                                 {isGeneratingAudio === message.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin"/>
                                 ) : audioState?.id === message.id && audioState.isPlaying ? (
-                                    <Waveform className="h-4 w-4" />
+                                    <Waves className="h-4 w-4" />
                                 ) : (
                                     <Volume2 className="h-4 w-4"/>
                                 )}
