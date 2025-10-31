@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import {
   generarPruebaAction,
@@ -21,6 +21,7 @@ import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, X
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
+import { Progress } from "@/components/ui/progress";
 
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
@@ -48,6 +49,8 @@ const TEMAS_DISPONIBLES = [
     "Trigonometría Básica"
 ];
 
+const BATCH_SIZE = 5;
+
 const FormatoRespuestasAlert = () => (
     <Alert>
         <AlertCircle className="h-4 w-4" />
@@ -70,6 +73,9 @@ export function EnsayoInteractivo() {
   const [resultados, setResultados] = useState<Resultado[]>([]);
   
   const [isPending, startTransition] = useTransition();
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState({ progress: 0, message: '' });
+
   const { toast } = useToast();
 
   const handleToggleTema = (tema: string) => {
@@ -99,26 +105,31 @@ export function EnsayoInteractivo() {
       return;
     }
     setFase('cargando');
+    const numBatches = Math.ceil(cantidadPreguntas / BATCH_SIZE);
+    setLoadingProgress({ progress: 10, message: 'Generando primer lote de preguntas...' });
+
     startTransition(async () => {
       try {
         const temaCompuesto = temasSeleccionados.join(', ');
+        const preguntasPorLote = numBatches > 1 ? BATCH_SIZE : cantidadPreguntas;
+
         const result: GeneradorPruebasOutput = await generarPruebaAction({
           tema: temaCompuesto,
-          cantidadPreguntas,
+          cantidadPreguntas: preguntasPorLote,
           tipoPrueba,
         });
+
         if (result.preguntas && result.preguntas.length > 0) {
           setTestData(result);
-          setRespuestas(
-            result.preguntas.map((_, index) => ({
-              preguntaIndex: index,
-              respuesta: '',
-            }))
-          );
+          setRespuestas(result.preguntas.map((_, index) => ({ preguntaIndex: index, respuesta: '' })));
           setPreguntaActualIndex(0);
+          setLoadingProgress({ 
+            progress: (result.preguntas.length / cantidadPreguntas) * 100, 
+            message: `Preguntas cargadas: ${result.preguntas.length} de ${cantidadPreguntas}`
+          });
           setFase('realizando');
         } else {
-            throw new Error("La IA no generó preguntas. Inténtalo de nuevo.");
+          throw new Error("La IA no generó el primer lote de preguntas.");
         }
       } catch (error) {
         console.error(error);
@@ -131,6 +142,47 @@ export function EnsayoInteractivo() {
       }
     });
   };
+
+  useEffect(() => {
+    if (fase !== 'realizando' || (testData?.preguntas.length ?? 0) >= cantidadPreguntas) {
+      return;
+    }
+
+    const fetchMoreQuestions = async () => {
+      setIsFetchingMore(true);
+      const temaCompuesto = temasSeleccionados.join(', ');
+      let currentQuestions = testData?.preguntas ?? [];
+      const lotesRestantes = Math.ceil((cantidadPreguntas - currentQuestions.length) / BATCH_SIZE);
+
+      for (let i = 0; i < lotesRestantes; i++) {
+        try {
+          const result = await generarPruebaAction({ tema: temaCompuesto, cantidadPreguntas: BATCH_SIZE, tipoPrueba });
+          currentQuestions = [...currentQuestions, ...result.preguntas];
+          
+          setTestData({ ...testData, preguntas: currentQuestions });
+          setRespuestas(currentQuestions.map((_, index) => respuestas[index] || { preguntaIndex: index, respuesta: '' }));
+          
+          const progress = (currentQuestions.length / cantidadPreguntas) * 100;
+          setLoadingProgress({ 
+            progress: progress, 
+            message: `Preguntas cargadas: ${currentQuestions.length} de ${cantidadPreguntas}` 
+          });
+
+        } catch (error) {
+           toast({
+            variant: 'destructive',
+            title: 'Error al cargar más preguntas',
+            description: "No se pudieron cargar más preguntas. Puedes continuar con las actuales.",
+          });
+          break; 
+        }
+      }
+      setIsFetchingMore(false);
+    };
+
+    fetchMoreQuestions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fase]);
   
   const handleRespuestaChange = (respuesta: string) => {
     const nuevasRespuestas = [...respuestas];
@@ -146,12 +198,17 @@ export function EnsayoInteractivo() {
 
   const handleFinish = () => {
     if (!testData) return;
-    const todasRespondidas = respuestas.every(r => r.respuesta.trim() !== '');
+    
+    // Solo valida las preguntas cargadas
+    const preguntasCargadas = testData.preguntas.length;
+    const respuestasCargadas = respuestas.slice(0, preguntasCargadas);
+
+    const todasRespondidas = respuestasCargadas.every(r => r.respuesta.trim() !== '');
     if (!todasRespondidas) {
         toast({
             variant: 'destructive',
             title: 'Preguntas sin responder',
-            description: 'Por favor, responde todas las preguntas antes de finalizar.',
+            description: 'Por favor, responde todas las preguntas cargadas antes de finalizar.',
         });
         return;
     }
@@ -195,6 +252,7 @@ export function EnsayoInteractivo() {
     setRespuestas([]);
     setResultados([]);
     setPreguntaActualIndex(0);
+    setLoadingProgress({ progress: 0, message: '' });
   }
 
   if (fase === 'configuracion') {
@@ -262,41 +320,51 @@ export function EnsayoInteractivo() {
     );
   }
 
-  if (fase === 'cargando' || fase === 'revisando') {
+  if (fase === 'cargando') {
+    return (
+        <div className="text-center max-w-md mx-auto space-y-4">
+            <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+            <p className="text-lg text-muted-foreground">La IA está generando tu prueba...</p>
+            <Progress value={loadingProgress.progress} className="w-full" />
+            <p className="text-sm text-muted-foreground">{loadingProgress.message}</p>
+        </div>
+    )
+  }
+
+  if (fase === 'revisando') {
     return (
         <div className="text-center">
             <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-            <p className="text-lg text-muted-foreground">{fase === 'cargando' ? 'La IA está generando tu prueba...' : 'El Tutor IA está revisando tus respuestas...'}</p>
+            <p className="text-lg text-muted-foreground">El Tutor IA está revisando tus respuestas...</p>
         </div>
     )
   }
 
   if (fase === 'realizando' && testData) {
     const pregunta = testData.preguntas[preguntaActualIndex];
-    const showFormula = preguntaActualIndex === 0 && testData.formula === 'formula_cuadratica';
+    const totalPreguntasCargadas = testData.preguntas.length;
 
     return (
         <div className='max-w-4xl mx-auto space-y-4'>
-            {showFormula && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Fórmula Clave: Ecuación Cuadrática</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-center">
-                       <Image src="https://storage.googleapis.com/genkit-assets/formula-cuadratica.png" alt="Fórmula cuadrática" width={400} height={250} />
-                    </CardContent>
-                </Card>
+            {isFetchingMore && (
+                <div className="p-2 rounded-lg bg-secondary">
+                    <div className="flex justify-between items-center text-sm text-secondary-foreground mb-1 px-1">
+                        <span>Cargando más preguntas en segundo plano...</span>
+                        <span>{totalPreguntasCargadas}/{cantidadPreguntas}</span>
+                    </div>
+                    <Progress value={(totalPreguntasCargadas / cantidadPreguntas) * 100} className="w-full h-2" />
+                </div>
             )}
-            <FormatoRespuestasAlert />
+            {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
             <Card>
                 <CardHeader>
-                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>
+                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
                     <CardDescription className="text-lg pt-4">{pregunta.pregunta}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {pregunta.tipo === 'seleccion-multiple' ? (
                         <RadioGroup 
-                            value={respuestas[preguntaActualIndex].respuesta}
+                            value={respuestas[preguntaActualIndex]?.respuesta || ''}
                             onValueChange={handleRespuestaChange}
                             className="space-y-2"
                         >
@@ -310,7 +378,7 @@ export function EnsayoInteractivo() {
                     ) : (
                         <Input 
                             placeholder="Escribe tu respuesta aquí..."
-                            value={respuestas[preguntaActualIndex].respuesta}
+                            value={respuestas[preguntaActualIndex]?.respuesta || ''}
                             onChange={e => handleRespuestaChange(e.target.value)}
                         />
                     )}
@@ -319,14 +387,14 @@ export function EnsayoInteractivo() {
                     <Button variant="outline" onClick={() => irAPregunta(preguntaActualIndex - 1)} disabled={preguntaActualIndex === 0}>
                         <ArrowLeft className="mr-2" /> Anterior
                     </Button>
-                    {preguntaActualIndex < testData.preguntas.length - 1 ? (
+                    {preguntaActualIndex < totalPreguntasCargadas - 1 ? (
                         <Button onClick={() => irAPregunta(preguntaActualIndex + 1)}>
                             Siguiente <ArrowRight className="ml-2" />
                         </Button>
                     ) : (
-                        <Button onClick={handleFinish} disabled={isPending}>
+                        <Button onClick={handleFinish} disabled={isPending || isFetchingMore}>
                             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Terminar Prueba
+                            {isFetchingMore ? 'Cargando...' : 'Terminar Prueba'}
                         </Button>
                     )}
                 </CardFooter>
