@@ -6,7 +6,7 @@ import { generateSpeech } from '@/app/tts-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, FileText, Download, Volume2, Waves, Mic } from 'lucide-react';
+import { Bot, User, Send, Loader2, FileText, Download, Volume2, Waves } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -61,9 +61,9 @@ const parseResponse = (content: string) => {
                 if (textMatch.index > lastTextIndex) {
                     textSubParts.push({type: 'text', value: part.value.substring(lastTextIndex, textMatch.index)});
                 }
-                if (textMatch[1]) {
+                if (textMatch[1]) { // <code> match
                     textSubParts.push({type: 'code', value: textMatch[1]});
-                } else if (textMatch[2]) {
+                } else if (textMatch[2]) { // **bold** match
                     textSubParts.push({type: 'bold', value: textMatch[2]});
                 }
                 lastTextIndex = textMatch.index + textMatch[0].length;
@@ -112,7 +112,7 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
         audioRef.current.onended = () => setAudioState(null);
       }
       audioRef.current.src = audioState.src;
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.error("Audio playback error", e));
     } else if (audioRef.current) {
       audioRef.current.pause();
     }
