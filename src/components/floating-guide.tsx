@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useTransition } from 'react';
-import { HelpCircle, Bot, X, Send, Loader2, Mic, Volume2, Waves, Move } from 'lucide-react';
+import { HelpCircle, Bot, X, Send, Loader2, Mic, Volume2, Waves } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card';
 import { Input } from './ui/input';
@@ -54,11 +54,6 @@ const parseResponse = (content: string) => {
 
 export default function FloatingGuide() {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartPos = useRef({ x: 0, y: 0 });
-  const nodeRef = useRef<HTMLDivElement>(null);
-  
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -94,43 +89,6 @@ export default function FloatingGuide() {
     }
   }, [audioState]);
 
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Only start dragging if the target is the drag handle
-    if ((e.target as HTMLElement).closest('.drag-handle')) {
-        setIsDragging(true);
-        dragStartPos.current = {
-            x: e.clientX - position.x,
-            y: e.clientY - position.y,
-        };
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const newX = e.clientX - dragStartPos.current.x;
-      const newY = e.clientY - dragStartPos.current.y;
-      setPosition({ x: newX, y: newY });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    } else {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -177,23 +135,18 @@ export default function FloatingGuide() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed z-50 rounded-full shadow-lg"
-        style={{ left: `${position.x}px`, top: `${position.y}px` }}
-        onMouseDown={handleMouseDown}
-        ref={nodeRef}
+        className="fixed bottom-5 right-5 z-50 rounded-full shadow-lg h-14 w-14"
       >
-        <HelpCircle className="h-6 w-6" />
+        <HelpCircle className="h-7 w-7" />
       </Button>
     );
   }
 
   return (
     <Card
-      className="fixed z-50 w-[380px] h-[550px] flex flex-col shadow-xl"
-      style={{ left: `${position.x}px`, top: `${position.y}px` }}
-      ref={nodeRef}
+      className="fixed bottom-5 right-5 z-50 w-[380px] h-[550px] flex flex-col shadow-xl"
     >
-      <CardHeader className="flex flex-row items-center justify-between p-3 border-b drag-handle cursor-move" onMouseDown={handleMouseDown}>
+      <CardHeader className="flex flex-row items-center justify-between p-3 border-b">
         <CardTitle className="text-md flex items-center gap-2">
             <Bot className="h-5 w-5" /> Geometra Guía
         </CardTitle>
@@ -213,7 +166,7 @@ export default function FloatingGuide() {
           <div className="p-4 space-y-4">
              {messages.length === 0 ? <WelcomeMessage /> : messages.map((message) => (
                <div key={message.id} className={cn('flex items-start gap-3', message.role === 'user' && 'justify-end')}>
-                 {message.role !== 'user' && <Avatar className="w-8 h-8 border"><AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback></Avatar>}
+                 {message.role !== 'user' && <Avatar className="w-8 h-8 border"><AvatarFallback><Bot className="w-5 w-5" /></AvatarFallback></Avatar>}
                  <div className={cn('p-3 rounded-lg max-w-[85%] text-sm', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
                    {message.content === '...' ? (
                      <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div><div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div><div className="w-2 h-2 bg-current rounded-full animate-bounce"></div></div>
