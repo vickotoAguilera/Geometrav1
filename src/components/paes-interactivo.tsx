@@ -17,6 +17,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2, ArrowRight, ArrowLeft, RefreshCw, CheckCircle2, XCircle, BrainCircuit, BookCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Progress } from "@/components/ui/progress";
+
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
 type TipoPrueba = 'M1' | 'M2';
@@ -31,6 +33,9 @@ interface Resultado extends RetroalimentacionPaesOutput {
   respuestaUsuario: string;
 }
 
+const TOTAL_PREGUNTAS = 50;
+const LOTE_PREGUNTAS = 5;
+
 export function PaesInteractivo() {
   const [fase, setFase] = useState<Fase>('configuracion');
   const [tipoPrueba, setTipoPrueba] = useState<TipoPrueba | null>(null);
@@ -41,19 +46,38 @@ export function PaesInteractivo() {
   const [resultados, setResultados] = useState<Resultado[]>([]);
   
   const [isPending, startTransition] = useTransition();
+  const [loadingProgress, setLoadingProgress] = useState({ progress: 0, message: '' });
   const { toast } = useToast();
 
   const handleStart = (prueba: TipoPrueba) => {
     setTipoPrueba(prueba);
     setFase('cargando');
+    setLoadingProgress({ progress: 0, message: 'Iniciando generación de prueba...' });
+
     startTransition(async () => {
+      let todasLasPreguntas: PaesPregunta[] = [];
+      const numeroDeLotes = TOTAL_PREGUNTAS / LOTE_PREGUNTAS;
+
       try {
-        const result: GeneradorPaesOutput = await generarPruebaPaesAction({ tipoPrueba: prueba });
-        
-        if (result.preguntas && result.preguntas.length > 0) { // Check for any questions
-          setTestData(result);
+        for (let i = 0; i < numeroDeLotes; i++) {
+          const progress = Math.round(((i + 1) / numeroDeLotes) * 100);
+          setLoadingProgress({ 
+            progress: progress, 
+            message: `Generando preguntas ${i * LOTE_PREGUNTAS + 1} a ${(i + 1) * LOTE_PREGUNTAS} de ${TOTAL_PREGUNTAS}...` 
+          });
+
+          const result: GeneradorPaesOutput = await generarPruebaPaesAction({ tipoPrueba: prueba });
+          if (result.preguntas && result.preguntas.length > 0) {
+            todasLasPreguntas = [...todasLasPreguntas, ...result.preguntas];
+          } else {
+            throw new Error(`El lote ${i+1} de preguntas no pudo ser generado.`);
+          }
+        }
+
+        if (todasLasPreguntas.length === TOTAL_PREGUNTAS) {
+          setTestData({ preguntas: todasLasPreguntas });
           setRespuestas(
-            result.preguntas.map((_, index) => ({
+            todasLasPreguntas.map((_, index) => ({
               preguntaIndex: index,
               respuesta: '',
             }))
@@ -61,7 +85,7 @@ export function PaesInteractivo() {
           setPreguntaActualIndex(0);
           setFase('realizando');
         } else {
-            throw new Error("La IA no generó preguntas. Por favor, inténtalo de nuevo.");
+          throw new Error("No se pudo generar la cantidad total de preguntas. Por favor, inténtalo de nuevo.");
         }
       } catch (error) {
         console.error(error);
@@ -136,6 +160,7 @@ export function PaesInteractivo() {
     setRespuestas([]);
     setResultados([]);
     setPreguntaActualIndex(0);
+    setLoadingProgress({ progress: 0, message: '' });
   }
 
   if (fase === 'configuracion') {
@@ -143,7 +168,7 @@ export function PaesInteractivo() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Elige tu Ensayo PAES</CardTitle>
-          <CardDescription>Selecciona la prueba de matemática que deseas rendir. Se generará un ensayo de 5 preguntas.</CardDescription>
+          <CardDescription>Selecciona la prueba de matemática que deseas rendir. Se generará un ensayo de {TOTAL_PREGUNTAS} preguntas.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button className="w-full h-20 text-lg" onClick={() => handleStart('M1')} disabled={isPending}>
@@ -159,11 +184,22 @@ export function PaesInteractivo() {
     );
   }
 
-  if (fase === 'cargando' || fase === 'revisando') {
+  if (fase === 'cargando') {
     return (
+        <div className="text-center max-w-md mx-auto space-y-4">
+            <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
+            <p className="text-lg text-muted-foreground">La IA está generando tu prueba PAES...</p>
+            <Progress value={loadingProgress.progress} className="w-full" />
+            <p className="text-sm text-muted-foreground">{loadingProgress.message}</p>
+        </div>
+    )
+  }
+
+  if (fase === 'revisando') {
+     return (
         <div className="text-center">
             <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-            <p className="text-lg text-muted-foreground">{fase === 'cargando' ? 'La IA está generando tu prueba PAES...' : 'El Tutor IA está revisando tus respuestas...'}</p>
+            <p className="text-lg text-muted-foreground">El Tutor IA está revisando tus respuestas...</p>
         </div>
     )
   }

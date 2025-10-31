@@ -2,9 +2,9 @@
 /**
  * @fileOverview Flujo de Genkit para generar pruebas PAES de matemáticas (M1 y M2).
  *
- * - generarPruebaPaes - Genera una prueba de 50 preguntas basada en el temario oficial.
+ * - generarPruebaPaes - Genera una prueba de 5 preguntas basada en el temario oficial.
  * - GeneradorPaesInput - El tipo de entrada para el flujo (M1 o M2).
- * - GeneradorPaesOutput - El tipo de salida, que es un array de 50 Preguntas.
+ * - GeneradorPaesOutput - El tipo de salida, que es un array de 5 Preguntas.
  */
 import { ai } from '@/ai/genkit';
 import {
