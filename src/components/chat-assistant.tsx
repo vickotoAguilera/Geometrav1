@@ -688,25 +688,28 @@ export function ChatAssistant() {
               >
                 <Paperclip className="w-5 h-5" />
               </Button>
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={user ? (isListening ? "Escuchando..." : "Escribe tu pregunta...") : "Inicia sesión para chatear"}
-                disabled={isPending || !user}
-              />
-               {isSupported && user && (
-                 <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={isListening ? stopListening : startListening}
-                    disabled={isPending}
-                    title={isListening ? "Dejar de grabar" : "Grabar voz"}
-                    className={cn(isListening && 'text-red-500 hover:text-red-600')}
-                >
-                    <Mic className="w-5 h-5" />
-                </Button>
-               )}
+              <div className="relative flex-grow">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={user ? (isListening ? "Escuchando..." : "Escribe tu pregunta...") : "Inicia sesión para chatear"}
+                  disabled={isPending || !user}
+                  className="pr-10"
+                />
+                {isSupported && user && (
+                  <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={isListening ? stopListening : startListening}
+                      disabled={isPending}
+                      title={isListening ? "Dejar de grabar" : "Grabar voz"}
+                      className={cn("absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8", isListening && 'text-red-500 hover:text-red-600')}
+                  >
+                      <Mic className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
               <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedImage) || !user}>
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span className="sr-only">Enviar</span>
