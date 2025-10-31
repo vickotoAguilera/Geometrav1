@@ -60,8 +60,16 @@ export default function HomePage() {
           <Link href="/ensaya" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
               <span className="text-2xl mb-2">📝</span>
-              <span className="font-semibold">Ensaya para tus pruebas con el Geometra</span>
+              <span className="font-semibold">Ensaya para tus pruebas</span>
               <p className="text-sm text-muted-foreground mt-1">Pruebas con IA.</p>
+            </div>
+          </Link>
+
+           <Link href="/paes" passHref className="group lg:col-span-3">
+            <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-primary text-primary-foreground border-2 border-primary-foreground/50 shadow-lg hover:shadow-2xl hover:bg-primary/90 transition-all">
+              <span className="text-3xl mb-2">🚀</span>
+              <span className="text-2xl font-bold">Prepárate para la PAES 2025 con el Geometra</span>
+              <p className="text-md text-primary-foreground/80 mt-1">Módulo de ensayo especializado.</p>
             </div>
           </Link>
 

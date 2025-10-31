@@ -27,17 +27,25 @@ const generadorDePruebasPrompt = ai.definePrompt({
   input: { schema: GeneradorPruebasInputSchema },
   output: { schema: GeneradorPruebasOutputSchema },
   prompt: `
-    Actúas como un experto creador de exámenes de matemáticas. Eres extremadamente meticuloso.
+    Eres un experto y meticuloso creador de exámenes de matemáticas para estudiantes de enseñanza media.
     Tu tarea es generar una prueba sobre el tema '{{{tema}}}' que contenga exactamente {{{cantidadPreguntas}}} preguntas.
     El tipo de preguntas debe ser '{{{tipoPrueba}}}'.
 
-    REGLAS ESTRICTAS DE GENERACIÓN:
-    1.  **Formato de Preguntas de Selección Múltiple:** Debes crear 5 alternativas. Una debe ser la respuesta correcta, y las otras cuatro deben ser "distractores" plausibles, es decir, respuestas que un estudiante podría obtener si comete un error común.
-    2.  **Formato de Preguntas de Respuesta Corta:** La respuesta debe ser un número o una expresión muy breve. Para respuestas numéricas, usa punto (.) como separador decimal, redondea a dos decimales si es necesario y no uses separadores de miles (ej: 1500, no 1.500). Para conteo de objetos/personas, la respuesta debe ser un número entero (trunca el resultado si es decimal).
-    3.  **Justificación (solo para selección múltiple):** Proporciona una explicación clara y directa de por qué la respuesta es correcta.
-    4.  **Fórmula Clave (solo para temas específicos):** Si el tema se resuelve con una fórmula matemática muy conocida (ej: 'fórmula cuadrática' para resolver ecuaciones de segundo grado, o 'teorema de pitágoras'), identifica un nombre clave para esa fórmula (ej: "formula_cuadratica" o "teorema_pitagoras"). Asigna este identificador al campo 'formula'. Si no aplica, déjalo en blanco.
-    5.  **Variabilidad:** Es crucial que las preguntas y los valores numéricos sean variados para que cada prueba generada sea única.
+    PASO 1: ANÁLISIS DEL TEMA
+    Analiza el '{{{tema}}}'. Si el tema se resuelve predominantemente con una fórmula matemática clave (como 'fórmula cuadrática', 'teorema de pitágoras', etc.), identifica un nombre clave para esa fórmula (ej: "formula_cuadratica", "teorema_pitagoras"). Asigna este identificador al campo 'formula' en la salida. Si no hay una única fórmula dominante, deja ese campo en blanco.
 
+    PASO 2: GENERACIÓN DE PREGUNTAS
+    Crea las {{{cantidadPreguntas}}} preguntas según el '{{{tipoPrueba}}}'.
+
+    REGLAS ESTRICTAS DE FORMATO PARA LAS RESPUESTAS CORRECTAS:
+    1.  **Decimales:** Usa siempre un punto (.) como separador decimal. Si un resultado tiene más de dos decimales, debes **redondearlo** a dos decimales. Ejemplo: 5.564 se convierte en 5.56; 5.567 se convierte en 5.57.
+    2.  **Enteros:** Los números enteros, especialmente los miles, se escriben sin separadores. Ejemplo: Escribe 1000, no 1.000.
+    3.  **Truncamiento Lógico:** Si la pregunta se refiere a contar entidades que no pueden ser fraccionarias (como personas, objetos, etc.) y el cálculo resulta en un decimal, la respuesta correcta debe ser el número entero, ignorando la parte decimal. Ejemplo: si un cálculo da 5.8 alumnos, la respuesta correcta es 5.
+
+    - Si el tipo es 'seleccion-multiple', cada pregunta debe tener un enunciado, 5 alternativas (una correcta y cuatro distractores creíbles) y una justificación clara de la respuesta correcta. Asegúrate de que la 'respuestaCorrecta' coincida exactamente con una de las alternativas.
+    - Si el tipo es 'respuesta-corta', cada pregunta debe tener un enunciado claro y la 'respuestaCorrecta' debe seguir rigurosamente las reglas de formato anteriores.
+
+    Es crucial que las preguntas y los valores numéricos utilizados sean variados y únicos en cada ejecución para asegurar que cada prueba sea diferente.
     Genera el resultado en el formato JSON especificado.
   `,
 });

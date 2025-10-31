@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 import {
   generarPruebaAction,
   retroalimentacionAction,
@@ -19,7 +20,8 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import Image from 'next/image';
+import { cn } from '@/lib/utils';
+
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
 type TipoPrueba = 'seleccion-multiple' | 'respuesta-corta';
@@ -58,7 +60,7 @@ const FormatoRespuestasAlert = () => (
 
 export function EnsayoInteractivo() {
   const [fase, setFase] = useState<Fase>('configuracion');
-  const [tema, setTema] = useState<string>('');
+  const [temasSeleccionados, setTemasSeleccionados] = useState<string[]>([]);
   const [cantidadPreguntas, setCantidadPreguntas] = useState<number>(5);
   const [tipoPrueba, setTipoPrueba] = useState<TipoPrueba>('seleccion-multiple');
 
@@ -70,20 +72,38 @@ export function EnsayoInteractivo() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
+  const handleToggleTema = (tema: string) => {
+    setTemasSeleccionados(prev => {
+        if (prev.includes(tema)) {
+            return prev.filter(t => t !== tema);
+        }
+        if (prev.length < 3) {
+            return [...prev, tema];
+        }
+        toast({
+            variant: 'destructive',
+            title: 'Límite alcanzado',
+            description: 'Puedes seleccionar hasta 3 temas.',
+        })
+        return prev;
+    })
+  }
+
   const handleStart = () => {
-    if (!tema) {
+    if (temasSeleccionados.length === 0) {
       toast({
         variant: 'destructive',
-        title: 'Selecciona un tema',
-        description: 'Por favor, elige un tema para comenzar la prueba.',
+        title: 'No hay temas seleccionados',
+        description: 'Por favor, elige al menos un tema para la prueba.',
       });
       return;
     }
     setFase('cargando');
     startTransition(async () => {
       try {
+        const temaCompuesto = temasSeleccionados.join(', ');
         const result: GeneradorPruebasOutput = await generarPruebaAction({
-          tema,
+          tema: temaCompuesto,
           cantidadPreguntas,
           tipoPrueba,
         });
@@ -168,7 +188,7 @@ export function EnsayoInteractivo() {
 
   const reset = () => {
     setFase('configuracion');
-    setTema('');
+    setTemasSeleccionados([]);
     setCantidadPreguntas(5);
     setTipoPrueba('seleccion-multiple');
     setTestData(null);
@@ -179,29 +199,29 @@ export function EnsayoInteractivo() {
 
   if (fase === 'configuracion') {
     return (
-      <Card className="max-w-3xl mx-auto">
+      <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Configura tu Ensayo</CardTitle>
-          <CardDescription>Elige el tema, la modalidad y el tipo de preguntas para tu prueba.</CardDescription>
+          <CardDescription>Define los parámetros para tu prueba personalizada.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3">
-            <Label>1. Elige un tema</Label>
+            <Label>1. Elige hasta 3 temas que quieras practicar</Label>
             <div className="flex flex-wrap gap-2">
-                {TEMAS_DISPONIBLES.map(t => (
+                {TEMAS_DISPONIBLES.map(tema => (
                     <Button 
-                        key={t}
-                        variant={tema === t ? 'default' : 'outline'}
-                        onClick={() => setTema(t)}
+                        key={tema}
+                        variant={temasSeleccionados.includes(tema) ? 'default' : 'outline'}
+                        onClick={() => handleToggleTema(tema)}
                     >
-                        {t}
+                        {tema}
                     </Button>
                 ))}
             </div>
           </div>
           <div className="space-y-3">
             <Label>2. Elige la modalidad</Label>
-            <RadioGroup defaultValue="5" value={String(cantidadPreguntas)} onValueChange={(value) => setCantidadPreguntas(parseInt(value))}>
+             <RadioGroup defaultValue="5" onValueChange={(value) => setCantidadPreguntas(parseInt(value))}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="5" id="r1" />
                 <Label htmlFor="r1">Ensayo (5 preguntas)</Label>
@@ -218,7 +238,7 @@ export function EnsayoInteractivo() {
           </div>
           <div className="flex items-center space-x-4">
             <Label>3. Elige el tipo de pregunta</Label>
-             <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
                 <Label htmlFor="tipo-prueba" className={tipoPrueba === 'seleccion-multiple' ? 'text-primary' : 'text-muted-foreground'}>Selección Múltiple</Label>
                 <Switch 
                     id="tipo-prueba" 
@@ -228,10 +248,12 @@ export function EnsayoInteractivo() {
                 <Label htmlFor="tipo-prueba" className={tipoPrueba === 'respuesta-corta' ? 'text-primary' : 'text-muted-foreground'}>Respuesta Escrita</Label>
             </div>
           </div>
-           {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
+          {tipoPrueba === 'respuesta-corta' && (
+              <FormatoRespuestasAlert />
+          )}
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={handleStart} disabled={!tema || isPending}>
+          <Button className="w-full" onClick={handleStart} disabled={temasSeleccionados.length === 0 || isPending}>
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Comenzar Ensayo
           </Button>
@@ -265,7 +287,7 @@ export function EnsayoInteractivo() {
                     </CardContent>
                 </Card>
             )}
-            {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
+            <FormatoRespuestasAlert />
             <Card>
                 <CardHeader>
                     <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>
