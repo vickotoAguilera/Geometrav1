@@ -41,7 +41,7 @@ const generadorPaesPrompt = ai.definePrompt({
   output: { schema: GeneradorPaesOutputSchema },
   prompt: `
     Actúas como un experto del DEMRE, encargado de crear la Prueba de Acceso a la Educación Superior (PAES) de Competencia Matemática.
-    Tu tarea es generar un ensayo completo de 50 preguntas de selección múltiple (con 4 alternativas: A, B, C, D) para la prueba '{{{tipoPrueba}}}'.
+    Tu tarea es generar un ensayo de 5 preguntas de selección múltiple (con 4 alternativas: A, B, C, D) para la prueba '{{{tipoPrueba}}}'.
 
     INSTRUCCIONES ESTRICTAS:
     1.  **Temario:** Basa TODAS las preguntas exclusivamente en el temario correspondiente.
@@ -58,7 +58,7 @@ const generadorPaesPrompt = ai.definePrompt({
         - **Temario M1 (Obligatorio):** ${temarioM1}
         - **Temario M2 (Electivo):** ${temarioM2}
 
-    Genera el resultado en el formato JSON especificado, con exactamente 50 preguntas.
+    Genera el resultado en el formato JSON especificado, con exactamente 5 preguntas.
   `,
 });
 
@@ -71,8 +71,8 @@ const generadorPaesFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await generadorPaesPrompt(input);
-    if (!output || output.preguntas.length !== 50) {
-      throw new Error('La IA no pudo generar las 50 preguntas de la prueba PAES.');
+    if (!output || output.preguntas.length !== 5) {
+      throw new Error('La IA no pudo generar las 5 preguntas de la prueba PAES.');
     }
     return output;
   }

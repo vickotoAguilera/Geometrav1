@@ -50,7 +50,7 @@ export function PaesInteractivo() {
       try {
         const result: GeneradorPaesOutput = await generarPruebaPaesAction({ tipoPrueba: prueba });
         
-        if (result.preguntas && result.preguntas.length === 50) {
+        if (result.preguntas && result.preguntas.length > 0) { // Check for any questions
           setTestData(result);
           setRespuestas(
             result.preguntas.map((_, index) => ({
@@ -61,7 +61,7 @@ export function PaesInteractivo() {
           setPreguntaActualIndex(0);
           setFase('realizando');
         } else {
-            throw new Error("La IA no generó las 50 preguntas. Por favor, inténtalo de nuevo.");
+            throw new Error("La IA no generó preguntas. Por favor, inténtalo de nuevo.");
         }
       } catch (error) {
         console.error(error);
@@ -143,7 +143,7 @@ export function PaesInteractivo() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Elige tu Ensayo PAES</CardTitle>
-          <CardDescription>Selecciona la prueba de matemática que deseas rendir.</CardDescription>
+          <CardDescription>Selecciona la prueba de matemática que deseas rendir. Se generará un ensayo de 5 preguntas.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button className="w-full h-20 text-lg" onClick={() => handleStart('M1')} disabled={isPending}>

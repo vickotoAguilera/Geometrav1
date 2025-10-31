@@ -19,7 +19,7 @@ export type GeneradorPaesInput = z.infer<typeof GeneradorPaesInputSchema>;
 
 // Esquema para la salida del flujo generador de pruebas PAES.
 export const GeneradorPaesOutputSchema = z.object({
-  preguntas: z.array(PaesPreguntaSchema).length(50).describe('Un array que contiene exactamente 50 preguntas para la prueba.'),
+  preguntas: z.array(PaesPreguntaSchema).length(5).describe('Un array que contiene exactamente 5 preguntas para la prueba.'),
 });
 export type GeneradorPaesOutput = z.infer<typeof GeneradorPaesOutputSchema>;
 
