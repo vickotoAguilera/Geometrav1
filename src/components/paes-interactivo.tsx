@@ -14,10 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowRight, ArrowLeft, RefreshCw, CheckCircle2, XCircle, BrainCircuit, BookCheck } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, RefreshCw, CheckCircle2, XCircle, BrainCircuit, BookCheck, Flag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
@@ -44,6 +45,7 @@ export function PaesInteractivo() {
   const [respuestas, setRespuestas] = useState<RespuestaUsuario[]>([]);
   const [preguntaActualIndex, setPreguntaActualIndex] = useState(0);
   const [resultados, setResultados] = useState<Resultado[]>([]);
+  const [flaggedQuestions, setFlaggedQuestions] = useState<number[]>([]);
   
   const [isPending, startTransition] = useTransition();
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -61,12 +63,20 @@ export function PaesInteractivo() {
       let currentQuestions = testData?.preguntas ?? [];
 
       for (let i = 0; i < lotesRestantes; i++) {
+        if(currentQuestions.length >= TOTAL_PREGUNTAS) break;
+
         try {
           const result = await generarPruebaPaesAction({ tipoPrueba });
           currentQuestions = [...currentQuestions, ...result.preguntas];
           
           setTestData({ preguntas: currentQuestions });
-          setRespuestas(currentQuestions.map((_, index) => ({ preguntaIndex: index, respuesta: '' })));
+          setRespuestas(prev => {
+              const newResponses = [...prev];
+              for(let j = prev.length; j < currentQuestions.length; j++) {
+                  newResponses[j] = {preguntaIndex: j, respuesta: ''};
+              }
+              return newResponses;
+          });
           
           const progress = ((i + 2) / (TOTAL_PREGUNTAS / LOTE_PREGUNTAS)) * 100;
           setLoadingProgress({ 
@@ -86,7 +96,9 @@ export function PaesInteractivo() {
       setIsFetchingMore(false);
     };
 
-    fetchMoreQuestions();
+    if(!isFetchingMore) {
+        fetchMoreQuestions();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fase, tipoPrueba]);
 
@@ -102,7 +114,7 @@ export function PaesInteractivo() {
         if (result.preguntas && result.preguntas.length > 0) {
           setTestData(result);
           setRespuestas(
-            result.preguntas.map((_, index) => ({
+            Array.from({ length: TOTAL_PREGUNTAS }, (_, index) => ({
               preguntaIndex: index,
               respuesta: '',
             }))
@@ -137,33 +149,37 @@ export function PaesInteractivo() {
     }
   };
 
+  const handleToggleFlag = (index: number) => {
+    setFlaggedQuestions(prev => {
+      if(prev.includes(index)) {
+        return prev.filter(i => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    })
+  }
+
   const handleFinish = () => {
     if (!testData) return;
-    const todasRespondidas = respuestas.every(r => r.respuesta.trim() !== '');
-    if (!todasRespondidas) {
-        toast({
-            variant: 'destructive',
-            title: 'Preguntas sin responder',
-            description: 'Por favor, responde todas las preguntas antes de finalizar.',
-        });
-        return;
-    }
-    
     setFase('revisando');
     startTransition(async () => {
         try {
+            const finalRespuestas = testData.preguntas.map((_, index) => {
+                return respuestas[index] || { preguntaIndex: index, respuesta: '' };
+            });
+
             const revisiones = await Promise.all(
                 testData.preguntas.map((pregunta, index) => 
                     retroalimentacionPaesAction({
                         pregunta: pregunta,
-                        respuestaUsuario: respuestas[index].respuesta,
+                        respuestaUsuario: finalRespuestas[index].respuesta,
                     })
                 )
             );
             const resultadosFinales = revisiones.map((revision, index) => ({
                 ...revision,
                 pregunta: testData.preguntas[index],
-                respuestaUsuario: respuestas[index].respuesta,
+                respuestaUsuario: finalRespuestas[index].respuesta,
             }));
             setResultados(resultadosFinales);
             setFase('resultados');
@@ -187,6 +203,7 @@ export function PaesInteractivo() {
     setResultados([]);
     setPreguntaActualIndex(0);
     setLoadingProgress({ progress: 0, message: '' });
+    setFlaggedQuestions([]);
   }
 
   if (fase === 'configuracion') {
@@ -233,6 +250,7 @@ export function PaesInteractivo() {
   if (fase === 'realizando' && testData) {
     const pregunta = testData.preguntas[preguntaActualIndex];
     const totalPreguntasCargadas = testData.preguntas.length;
+    const preguntasSinResponder = respuestas.slice(0, totalPreguntasCargadas).filter(r => !r.respuesta.trim()).length;
 
     return (
         <div className='max-w-4xl mx-auto space-y-4'>
@@ -245,9 +263,42 @@ export function PaesInteractivo() {
                     <Progress value={(totalPreguntasCargadas / TOTAL_PREGUNTAS) * 100} className="w-full h-2" />
                 </div>
             )}
+            
             <Card>
                 <CardHeader>
-                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
+                    <CardTitle>Navegación de Preguntas</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                    {Array.from({ length: totalPreguntasCargadas }, (_, i) => i).map(index => {
+                         const isAnswered = respuestas[index]?.respuesta.trim() !== '';
+                         const isFlagged = flaggedQuestions.includes(index);
+                         
+                         return (
+                            <Button
+                                key={index}
+                                variant={isAnswered ? 'default' : 'outline'}
+                                className={cn(
+                                    "h-10 w-10",
+                                    preguntaActualIndex === index && 'ring-2 ring-ring ring-offset-2',
+                                    isFlagged && !isAnswered && "bg-yellow-400/20 border-yellow-500 hover:bg-yellow-400/30 text-yellow-700 dark:text-yellow-400"
+                                )}
+                                onClick={() => irAPregunta(index)}
+                            >
+                                {index + 1}
+                            </Button>
+                         )
+                    })}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
+                        <Button variant="ghost" size="icon" onClick={() => handleToggleFlag(preguntaActualIndex)} title="Marcar pregunta para revisar">
+                            <Flag className={cn("h-5 w-5", flaggedQuestions.includes(preguntaActualIndex) ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground')}/>
+                        </Button>
+                    </div>
                     <CardDescription className="text-lg pt-4 whitespace-pre-wrap">{pregunta.pregunta}</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -273,10 +324,32 @@ export function PaesInteractivo() {
                             Siguiente <ArrowRight className="ml-2" />
                         </Button>
                     ) : (
-                        <Button onClick={handleFinish} disabled={isPending || isFetchingMore}>
-                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {isFetchingMore ? 'Cargando...' : 'Terminar Ensayo'}
-                        </Button>
+                         <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button disabled={isPending || isFetchingMore}>
+                                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {isFetchingMore ? 'Cargando...' : 'Terminar Ensayo'}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>¿Finalizar la prueba?</AlertDialogTitle>
+                                {preguntasSinResponder > 0 ? (
+                                    <AlertDialogDescription>
+                                        Hay {preguntasSinResponder} pregunta(s) sin responder. Si continúas, se contarán como incorrectas. ¿Deseas finalizar la prueba de todas formas?
+                                    </AlertDialogDescription>
+                                ) : (
+                                    <AlertDialogDescription>
+                                        ¿Estás seguro de que quieres finalizar y revisar tu prueba?
+                                    </AlertDialogDescription>
+                                )}
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Volver a la prueba</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleFinish}>Finalizar de todas formas</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     )}
                 </CardFooter>
             </Card>
