@@ -472,6 +472,19 @@ export function ChatAssistant() {
         <div className="flex justify-between items-center">
             <SheetTitle className="font-headline flex items-center gap-2">
                 <Bot /> Asistente Geometra
+                {isSupported && user && (
+                  <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={isListening ? stopListening : startListening}
+                      disabled={isPending}
+                      title={isListening ? "Dejar de grabar" : "Grabar voz"}
+                      className={cn("h-8 w-8 ml-2", isListening && 'text-red-500 hover:text-red-600')}
+                  >
+                      <Mic className="w-5 h-5" />
+                  </Button>
+                )}
             </SheetTitle>
             {user && (
                  <AlertDialog>
@@ -496,7 +509,7 @@ export function ChatAssistant() {
             )}
         </div>
         <SheetDescription>
-            {user ? 'Adjunta un archivo para añadir contexto o haz una pregunta.' : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+            {user ? (isListening ? 'Escuchando... Di tu pregunta.' : 'Adjunta un archivo para añadir contexto o haz una pregunta.') : 'Inicia sesión para usar el asistente y guardar tu historial.'}
         </SheetDescription>
       </SheetHeader>
 
@@ -692,23 +705,9 @@ export function ChatAssistant() {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={user ? (isListening ? "Escuchando..." : "Escribe tu pregunta...") : "Inicia sesión para chatear"}
+                  placeholder={user ? "Escribe tu pregunta..." : "Inicia sesión para chatear"}
                   disabled={isPending || !user}
-                  className="pr-10"
                 />
-                {isSupported && user && (
-                  <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={isListening ? stopListening : startListening}
-                      disabled={isPending}
-                      title={isListening ? "Dejar de grabar" : "Grabar voz"}
-                      className={cn("absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8", isListening && 'text-red-500 hover:text-red-600')}
-                  >
-                      <Mic className="w-5 h-5" />
-                  </Button>
-                )}
               </div>
               <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !attachedImage) || !user}>
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
