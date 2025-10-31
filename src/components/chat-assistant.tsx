@@ -383,9 +383,15 @@ export function ChatAssistant() {
       return;
     }
 
+    // Clean the text by removing code, bold, and button tags before sending to TTS
+    const cleanText = text
+      .replace(/<code>(.*?)<\/code>/gs, '$1')
+      .replace(/\*\*(.*?)\*\*/gs, '$1')
+      .replace(/\[button:(.*?)\]/g, '');
+
     setIsGeneratingAudio(messageId);
     try {
-      const { audio } = await generateSpeech(text);
+      const { audio } = await generateSpeech(cleanText);
       setAudioState({ id: messageId, src: audio, isPlaying: true });
     } catch (error) {
       console.error("Error generating speech:", error);
