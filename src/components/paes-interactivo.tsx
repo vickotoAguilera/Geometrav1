@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import {
   generarPruebaPaesAction,
   retroalimentacionPaesAction,
@@ -46,46 +46,72 @@ export function PaesInteractivo() {
   const [resultados, setResultados] = useState<Resultado[]>([]);
   
   const [isPending, startTransition] = useTransition();
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState({ progress: 0, message: '' });
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (fase !== 'realizando' || !tipoPrueba || (testData?.preguntas.length ?? 0) >= TOTAL_PREGUNTAS) {
+      return;
+    }
+
+    const fetchMoreQuestions = async () => {
+      setIsFetchingMore(true);
+      const lotesRestantes = (TOTAL_PREGUNTAS / LOTE_PREGUNTAS) - 1;
+      let currentQuestions = testData?.preguntas ?? [];
+
+      for (let i = 0; i < lotesRestantes; i++) {
+        try {
+          const result = await generarPruebaPaesAction({ tipoPrueba });
+          currentQuestions = [...currentQuestions, ...result.preguntas];
+          
+          setTestData({ preguntas: currentQuestions });
+          setRespuestas(currentQuestions.map((_, index) => ({ preguntaIndex: index, respuesta: '' })));
+          
+          const progress = ((i + 2) / (TOTAL_PREGUNTAS / LOTE_PREGUNTAS)) * 100;
+          setLoadingProgress({ 
+            progress: progress, 
+            message: `Preguntas cargadas: ${currentQuestions.length} de ${TOTAL_PREGUNTAS}` 
+          });
+
+        } catch (error) {
+           toast({
+            variant: 'destructive',
+            title: 'Error al cargar más preguntas',
+            description: "No se pudieron cargar más preguntas. Puedes continuar con las actuales.",
+          });
+          break; 
+        }
+      }
+      setIsFetchingMore(false);
+    };
+
+    fetchMoreQuestions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fase, tipoPrueba]);
+
 
   const handleStart = (prueba: TipoPrueba) => {
     setTipoPrueba(prueba);
     setFase('cargando');
-    setLoadingProgress({ progress: 0, message: 'Iniciando generación de prueba...' });
+    setLoadingProgress({ progress: 10, message: 'Generando primer lote de preguntas...' });
 
     startTransition(async () => {
-      let todasLasPreguntas: PaesPregunta[] = [];
-      const numeroDeLotes = TOTAL_PREGUNTAS / LOTE_PREGUNTAS;
-
       try {
-        for (let i = 0; i < numeroDeLotes; i++) {
-          const progress = Math.round(((i + 1) / numeroDeLotes) * 100);
-          setLoadingProgress({ 
-            progress: progress, 
-            message: `Generando preguntas ${i * LOTE_PREGUNTAS + 1} a ${(i + 1) * LOTE_PREGUNTAS} de ${TOTAL_PREGUNTAS}...` 
-          });
-
-          const result: GeneradorPaesOutput = await generarPruebaPaesAction({ tipoPrueba: prueba });
-          if (result.preguntas && result.preguntas.length > 0) {
-            todasLasPreguntas = [...todasLasPreguntas, ...result.preguntas];
-          } else {
-            throw new Error(`El lote ${i+1} de preguntas no pudo ser generado.`);
-          }
-        }
-
-        if (todasLasPreguntas.length === TOTAL_PREGUNTAS) {
-          setTestData({ preguntas: todasLasPreguntas });
+        const result: GeneradorPaesOutput = await generarPruebaPaesAction({ tipoPrueba: prueba });
+        if (result.preguntas && result.preguntas.length > 0) {
+          setTestData(result);
           setRespuestas(
-            todasLasPreguntas.map((_, index) => ({
+            result.preguntas.map((_, index) => ({
               preguntaIndex: index,
               respuesta: '',
             }))
           );
           setPreguntaActualIndex(0);
+          setLoadingProgress({ progress: (LOTE_PREGUNTAS / TOTAL_PREGUNTAS) * 100, message: `Preguntas cargadas: ${result.preguntas.length} de ${TOTAL_PREGUNTAS}`});
           setFase('realizando');
         } else {
-          throw new Error("No se pudo generar la cantidad total de preguntas. Por favor, inténtalo de nuevo.");
+          throw new Error("La IA no generó el primer lote de preguntas.");
         }
       } catch (error) {
         console.error(error);
@@ -188,7 +214,7 @@ export function PaesInteractivo() {
     return (
         <div className="text-center max-w-md mx-auto space-y-4">
             <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary mb-4" />
-            <p className="text-lg text-muted-foreground">La IA está generando tu prueba PAES...</p>
+            <p className="text-lg text-muted-foreground">Preparando tu ensayo PAES...</p>
             <Progress value={loadingProgress.progress} className="w-full" />
             <p className="text-sm text-muted-foreground">{loadingProgress.message}</p>
         </div>
@@ -206,16 +232,27 @@ export function PaesInteractivo() {
 
   if (fase === 'realizando' && testData) {
     const pregunta = testData.preguntas[preguntaActualIndex];
+    const totalPreguntasCargadas = testData.preguntas.length;
+
     return (
         <div className='max-w-4xl mx-auto space-y-4'>
+            {isFetchingMore && (
+                <div className="p-2 rounded-lg bg-secondary">
+                    <div className="flex justify-between items-center text-sm text-secondary-foreground mb-1 px-1">
+                        <span>Cargando más preguntas en segundo plano...</span>
+                        <span>{totalPreguntasCargadas}/{TOTAL_PREGUNTAS}</span>
+                    </div>
+                    <Progress value={(totalPreguntasCargadas / TOTAL_PREGUNTAS) * 100} className="w-full h-2" />
+                </div>
+            )}
             <Card>
                 <CardHeader>
-                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>
+                    <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
                     <CardDescription className="text-lg pt-4 whitespace-pre-wrap">{pregunta.pregunta}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <RadioGroup 
-                        value={respuestas[preguntaActualIndex].respuesta}
+                        value={respuestas[preguntaActualIndex]?.respuesta || ''}
                         onValueChange={handleRespuestaChange}
                         className="space-y-2"
                     >
@@ -231,14 +268,14 @@ export function PaesInteractivo() {
                     <Button variant="outline" onClick={() => irAPregunta(preguntaActualIndex - 1)} disabled={preguntaActualIndex === 0}>
                         <ArrowLeft className="mr-2" /> Anterior
                     </Button>
-                    {preguntaActualIndex < testData.preguntas.length - 1 ? (
+                    {preguntaActualIndex < totalPreguntasCargadas - 1 ? (
                         <Button onClick={() => irAPregunta(preguntaActualIndex + 1)}>
                             Siguiente <ArrowRight className="ml-2" />
                         </Button>
                     ) : (
-                        <Button onClick={handleFinish} disabled={isPending}>
+                        <Button onClick={handleFinish} disabled={isPending || isFetchingMore}>
                             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Terminar Ensayo
+                            {isFetchingMore ? 'Cargando...' : 'Terminar Ensayo'}
                         </Button>
                     )}
                 </CardFooter>
