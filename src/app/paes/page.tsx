@@ -1,4 +1,5 @@
 import Header from '@/components/header';
+import { PaesInteractivo } from '@/components/paes-interactivo';
 
 export default function PaesPage() {
   return (
@@ -8,16 +9,11 @@ export default function PaesPage() {
         <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground">Módulo de Preparación PAES</h1>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                Este es un nuevo ambiente dedicado a tu preparación para la Prueba de Acceso a la Educación Superior. ¡Próximamente con contenido especializado!
+                Pon a prueba tus conocimientos con ensayos de 50 preguntas para las pruebas de Competencia Matemática M1 y M2, generados por IA y con retroalimentación detallada.
             </p>
         </div>
 
-        {/* Aquí construiremos el nuevo componente para la PAES */}
-        <div className="p-8 border-2 border-dashed rounded-lg text-center bg-card">
-            <p className="text-muted-foreground">
-                Contenido del módulo PAES en construcción.
-            </p>
-        </div>
+        <PaesInteractivo />
 
       </main>
     </div>
