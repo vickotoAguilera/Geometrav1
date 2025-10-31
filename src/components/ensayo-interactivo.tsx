@@ -357,7 +357,7 @@ export function EnsayoInteractivo() {
     const totalPreguntasCargadas = testData.preguntas.length;
 
     return (
-        <div className='max-w-4xl mx-auto space-y-4'>
+        <div className='max-w-4xl mx-auto space-y-6'>
             {isFetchingMore && (
                 <div className="p-2 rounded-lg bg-secondary">
                     <div className="flex justify-between items-center text-sm text-secondary-foreground mb-1 px-1">
@@ -367,7 +367,30 @@ export function EnsayoInteractivo() {
                     <Progress value={(totalPreguntasCargadas / cantidadPreguntas) * 100} className="w-full h-2" />
                 </div>
             )}
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Navegación de Preguntas</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                    {Array.from({ length: totalPreguntasCargadas }, (_, i) => i).map(index => (
+                        <Button
+                            key={index}
+                            variant={respuestas[index]?.respuesta ? 'default' : 'outline'}
+                            className={cn(
+                                "h-10 w-10",
+                                preguntaActualIndex === index && 'ring-2 ring-ring ring-offset-2'
+                            )}
+                            onClick={() => irAPregunta(index)}
+                        >
+                            {index + 1}
+                        </Button>
+                    ))}
+                </CardContent>
+            </Card>
+
             {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
+            
             <Card>
                 <CardHeader>
                     <CardTitle>Pregunta {preguntaActualIndex + 1} de {totalPreguntasCargadas}</CardTitle>
