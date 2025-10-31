@@ -53,7 +53,11 @@ export const useSpeechRecognition = ({ onTranscript }: UseSpeechRecognitionOptio
     };
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
+      // The 'aborted' error is common and not critical (e.g., mic stopped manually).
+      // We'll log other errors but ignore this one to keep the console clean.
+      if (event.error !== 'aborted') {
+        console.error('Speech recognition error:', event.error);
+      }
       setIsListening(false);
     };
 
