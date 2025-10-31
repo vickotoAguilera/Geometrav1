@@ -17,3 +17,4 @@ import '@/ai/flows/schemas/generador-pruebas-schemas.ts';
 import '@/ai/flows/schemas/generador-paes-schemas.ts';
 import '@/ai/flows/generador-paes-flow.ts';
 import '@/ai/flows/retroalimentacion-paes-flow.ts';
+import '@/ai/flows/tts-flow.ts';

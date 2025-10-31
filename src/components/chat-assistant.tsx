@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { getAiResponse, getInitialPrompts } from '@/app/actions';
+import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waveform } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
@@ -152,6 +153,10 @@ export function ChatAssistant() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
+  const [audioState, setAudioState] = useState<{ id: string, src: string, isPlaying: boolean } | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
@@ -182,6 +187,20 @@ export function ChatAssistant() {
       }, 0);
     }
   }, [allMessages, isPending]);
+
+   useEffect(() => {
+    if (audioState && audioState.src) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.onended = () => setAudioState(null);
+      }
+      audioRef.current.src = audioState.src;
+      audioRef.current.play();
+    } else if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [audioState]);
+
 
   const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -349,6 +368,28 @@ export function ChatAssistant() {
       };
       processAndRespond();
     });
+  };
+
+  const handlePlayAudio = async (messageId: string, text: string) => {
+    if (audioState?.id === messageId && audioState.isPlaying) {
+      setAudioState(null); // Stop playing
+      return;
+    }
+
+    setIsGeneratingAudio(messageId);
+    try {
+      const { audio } = await generateSpeech(text);
+      setAudioState({ id: messageId, src: audio, isPlaying: true });
+    } catch (error) {
+      console.error("Error generating speech:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de audio",
+        description: "No se pudo generar la voz.",
+      });
+    } finally {
+      setIsGeneratingAudio(null);
+    }
   };
 
   const handleDeleteChat = async () => {
@@ -560,6 +601,25 @@ export function ChatAssistant() {
                         </div>
                     )}
                     </div>
+                     {message.role === 'assistant' && message.content !== '...' && (
+                        <div className='-mb-2 -mr-2 mt-2 flex justify-end'>
+                             <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-7 w-7 text-muted-foreground"
+                                onClick={() => handlePlayAudio(message.id, message.content)}
+                                disabled={!!isGeneratingAudio}
+                            >
+                                {isGeneratingAudio === message.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin"/>
+                                ) : audioState?.id === message.id && audioState.isPlaying ? (
+                                    <Waveform className="h-4 w-4" />
+                                ) : (
+                                    <Volume2 className="h-4 w-4"/>
+                                )}
+                            </Button>
+                        </div>
+                    )}
                   </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
