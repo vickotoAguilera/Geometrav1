@@ -35,7 +35,7 @@ Esta carpeta contiene todas las páginas y la lógica de enrutamiento de la apli
 
 - **`/page.tsx` (Página de Inicio)**
   - **Función:** Es la página principal que ven los usuarios. Presenta las diferentes secciones de la aplicación (Pizarra Interactiva, Estudio, Glosario, etc.) a través de tarjetas de navegación.
-  - **Redirige a:** `/applet`, `/estudia`, `/tutoriales`, `/glosario`, `/estudia-con-geogebra`, `/ensaya`.
+  - **Redirige a:** `/applet`, `/estudia`, `/tutoriales`, `/glosario`, `/estudia-con-geogebra`, `/ensaya`, `/paes`.
 
 - **`/applet/page.tsx` (Pizarra Interactiva)**
   - **Función:** Contiene el applet de GeoGebra a pantalla completa. Permite a los usuarios experimentar, construir figuras libremente y aplicar lo que aprenden.
@@ -49,6 +49,9 @@ Esta carpeta contiene todas las páginas y la lógica de enrutamiento de la apli
 
 - **`/ensaya/page.tsx` (Módulo de Pruebas con IA)**
   - **Función:** Permite a los usuarios generar pruebas de matemáticas personalizadas. Pueden elegir el tema, la cantidad de preguntas y el tipo (selección múltiple o respuesta corta).
+
+- **`/paes/page.tsx` (Módulo de Pruebas PAES con IA)**
+  - **Función:** Permite a los usuarios generar pruebas PAES de matemáticas M1 y M2. Las pruebas se generan en lotes para mejorar el rendimiento y la experiencia del usuario.
 
 - **`/glosario/page.tsx` (Glosario de GeoGebra)**
   - **Función:** Una página de referencia que lista y explica los comandos y funciones más importantes de GeoGebra, organizados por categorías.
@@ -73,7 +76,9 @@ Esta carpeta contiene los componentes de React que se usan en varias partes de l
 
 - **`study-chat-assistant.tsx`**: Una variante del chat, específica para la página `/estudia-con-geogebra`. La conversación aquí es temporal (no usa Firestore) y su contexto está limitado al ejercicio que el usuario haya seleccionado.
 
-- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA.
+- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas generales. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. Implementa la lógica de carga progresiva para una experiencia de usuario fluida.
+
+- **`paes-interactivo.tsx`**: La interfaz completa para el módulo de pruebas PAES. Gestiona la selección de prueba (M1/M2), la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. También implementa la lógica de carga progresiva.
 
 - **`geogebra-applet.tsx`**: El componente que carga e inicializa el applet interactivo de GeoGebra.
 
@@ -87,9 +92,13 @@ Aquí reside toda la lógica de la inteligencia artificial.
 
 - **`/flows/study-assistant.ts`**: **IA DE APOYO (ESTUDIO CONTEXTUAL)**. Un flujo especializado con instrucciones diferentes para el asistente de la sección de estudio. Le indica a la IA que su conocimiento debe limitarse estrictamente al material de estudio seleccionado por el usuario.
 
-- **`/flows/generador-pruebas-flow.ts`**: **IA DE APOYO (GENERADOR DE PRUEBAS)**. El flujo que genera las pruebas. Recibe un tema y una cantidad de preguntas, y le pide a la IA que cree preguntas, alternativas, respuestas correctas y justificaciones.
+- **`/flows/generador-pruebas-flow.ts`**: **IA DE APOYO (GENERADOR DE PRUEBAS GENERALES)**. El flujo que genera las pruebas generales. Recibe un tema y una cantidad de preguntas, y le pide a la IA que cree preguntas, alternativas, respuestas correctas y justificaciones.
 
-- **`/flows/retroalimentacion-ia-flow.ts`**: **IA DE APOYO (EVALUADOR DE PRUEBAS)**. El flujo que revisa las respuestas del usuario en el módulo de ensayos. Recibe la pregunta, la respuesta del usuario y la respuesta correcta, y le pide a la IA que evalúe si es correcta y que genere una explicación detallada.
+- **`/flows/retroalimentacion-ia-flow.ts`**: **IA DE APOYO (EVALUADOR DE PRUEBAS GENERALES)**. El flujo que revisa las respuestas del usuario en el módulo de ensayos. Recibe la pregunta, la respuesta del usuario y la respuesta correcta, y le pide a la IA que evalúe si es correcta y que genere una explicación detallada.
+
+- **`/flows/generador-paes-flow.ts`**: **IA DE APOYO (GENERADOR DE PRUEBAS PAES)**. Flujo altamente especializado que genera preguntas para los ensayos PAES M1 y M2 en lotes de 5, basándose en temarios oficiales.
+
+- **`/flows/retroalimentacion-paes-flow.ts`**: **IA DE APOYO (EVALUADOR DE PRUEBAS PAES)**. Flujo que evalúa las respuestas del ensayo PAES y genera una explicación pedagógica detallada al estilo DEMRE.
 
 ---
 
@@ -124,25 +133,26 @@ Cada IA del proyecto tiene un "razonamiento" y una fuente de información difere
   3.  La IA genera una respuesta basada **exclusivamente** en ese texto. Si se le pregunta algo fuera de ese contexto, tiene la instrucción de negarse amablemente.
 - **Objetivo:** Ser un tutor focalizado que guía al estudiante a través de un material de estudio específico, sin distracciones y sin dar respuestas directas.
 
-#### c) El Generador y Evaluador de Pruebas (`ensayo-interactivo.tsx`)
+#### c) El Generador y Evaluador de Pruebas (`ensayo-interactivo.tsx` y `paes-interactivo.tsx`)
 
-Esta sección utiliza dos IAs especializadas.
+Estas secciones utilizan dos IAs especializadas, con una lógica de carga progresiva.
 
-1.  **IA Generadora (`generador-pruebas-flow.ts`)**
-    - **Fuente de Información:** Recibe un **tema** (ej. "Teorema de Pitágoras") y un **número de preguntas**.
-    - **Flujo Lógico:**
+1.  **IA Generadora (`generador-pruebas-flow.ts` y `generador-paes-flow.ts`)**
+    - **Fuente de Información:** Recibe un **tema** (ej. "Teorema de Pitágoras" o "PAES M1") y un **número de preguntas**.
+    - **Flujo Lógico (Carga Progresiva):**
         1.  Recibe la configuración de la prueba (tema, cantidad, tipo).
-        2.  El prompt le instruye: "Actúa como un experto creador de exámenes. Genera X preguntas sobre [tema] con alternativas, respuesta correcta y justificación".
-        3.  La IA utiliza su conocimiento matemático para inventar problemas y sus soluciones, incluyendo "distractores" (respuestas incorrectas pero creíbles) basados en errores comunes.
-        4.  Devuelve un JSON estructurado con toda la prueba.
+        2.  En lugar de pedir todas las preguntas de una vez, la aplicación llama a la IA en **lotes**. Por ejemplo, pide primero 5 preguntas.
+        3.  El prompt le instruye: "Actúa como un experto creador de exámenes. Genera X preguntas sobre [tema] con alternativas, respuesta correcta y justificación".
+        4.  La IA devuelve el primer lote. La aplicación se lo muestra al usuario para que empiece a responder.
+        5.  **En segundo plano**, la aplicación sigue pidiendo a la IA más lotes de preguntas hasta completar el total requerido.
 
-2.  **IA Evaluadora (`retroalimentacion-ia-flow.ts`)**
+2.  **IA Evaluadora (`retroalimentacion-ia-flow.ts` y `retroalimentacion-paes-flow.ts`)**
     - **Fuente de Información:** Recibe la pregunta original, la respuesta correcta y la respuesta que dio el usuario.
     - **Flujo Lógico:**
         1.  Compara la respuesta del usuario con la respuesta correcta.
         2.  El prompt le instruye: "Evalúa si la respuesta del usuario es correcta. Si no lo es, no te limites a decir 'incorrecto'. Explica el error conceptual y guía al estudiante hacia la solución correcta paso a paso".
         3.  La IA genera una explicación pedagógica del error.
-- **Objetivo:** Crear una experiencia de evaluación completa, desde la generación dinámica de contenido hasta la retroalimentación personalizada e inteligente.
+- **Objetivo:** Crear una experiencia de evaluación completa y fluida, desde la generación dinámica de contenido hasta la retroalimentación personalizada e inteligente, sin largos tiempos de espera.
 
 ---
 
