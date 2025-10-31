@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import 'katex/dist/katex.min.css';
-import FloatingGuide from '@/components/floating-guide';
 
 export const metadata: Metadata = {
   title: 'Geometra',
@@ -24,7 +23,6 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           {children}
-          <FloatingGuide />
         </FirebaseClientProvider>
       </body>
     </html>
