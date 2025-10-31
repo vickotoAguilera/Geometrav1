@@ -14,7 +14,7 @@ interface GenkitMessage {
 
 interface ContextFile {
     fileName: string;
-    downloadURL: string;
+    fileDataUri: string;
 }
 
 export async function getAiResponse(
