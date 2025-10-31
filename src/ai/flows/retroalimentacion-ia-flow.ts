@@ -75,15 +75,7 @@ const retroalimentacionIAFlow = ai.defineFlow(
     outputSchema: RetroalimentacionOutputSchema,
   },
   async (input) => {
-    // Usamos el modelo por defecto de Genkit para mayor estabilidad.
-    const { output } = await ai.generate({
-      prompt: retroalimentacionPrompt.prompt,
-      model: ai.model, 
-      input: input,
-      output: {
-        schema: RetroalimentacionOutputSchema,
-      }
-    });
+    const { output } = await retroalimentacionPrompt(input);
     
     if (!output) {
       throw new Error('La IA de retroalimentación no pudo generar una respuesta.');
