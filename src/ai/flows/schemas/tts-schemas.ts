@@ -1,6 +1,3 @@
-
-'use server';
-
 import { z } from 'genkit';
 
 export const TextToSpeechInputSchema = z.string();
