@@ -46,6 +46,9 @@ Esta carpeta contiene todas las páginas y la lógica de enrutamiento de la apli
 - **`/ensaya/page.tsx` (Módulo de Pruebas con IA)**
   - Permite a los usuarios generar pruebas de matemáticas personalizadas. Pueden elegir el tema, la cantidad de preguntas y el tipo (selección múltiple o respuesta corta).
 
+- **`/paes/page.tsx` (Módulo de Pruebas PAES con IA)**
+  - Permite a los usuarios generar pruebas PAES de matemáticas M1 y M2. La IA genera las preguntas en lotes para una experiencia de usuario fluida.
+
 - **`/glosario/page.tsx` (Glosario de GeoGebra)**
   - Una página de referencia que lista y explica los comandos y funciones más importantes de GeoGebra, organizados por categorías.
 
@@ -69,7 +72,9 @@ Esta carpeta contiene los componentes de React que se usan en varias partes de l
 
 - **`study-chat-assistant.tsx`**: Una variante del chat, específica para la página `/estudia-con-geogebra`. La conversación aquí es temporal (no usa Firestore) y su contexto está limitado al ejercicio que el usuario haya seleccionado.
 
-- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA.
+- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas generales. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA.
+
+- **`paes-interactivo.tsx`**: La interfaz completa para el módulo de pruebas PAES. Gestiona la selección de prueba (M1/M2) y la carga progresiva de preguntas.
 
 - **`geogebra-applet.tsx`**: El componente que carga e inicializa el applet interactivo de GeoGebra.
 
@@ -85,9 +90,13 @@ Aquí reside toda la lógica de la inteligencia artificial.
 
 - **`/flows/study-assistant.ts`**: Un flujo especializado con instrucciones diferentes para el asistente de la sección de estudio. Le indica a la IA que su conocimiento debe limitarse estrictamente al material de estudio proporcionado.
 
-- **`/flows/generador-pruebas-flow.ts`**: El flujo que genera las pruebas. Recibe un tema y una cantidad de preguntas, y le pide a la IA que cree preguntas, alternativas, respuestas correctas y justificaciones.
+- **`/flows/generador-pruebas-flow.ts`**: El flujo que genera las pruebas generales. Recibe un tema y una cantidad de preguntas, y le pide a la IA que cree preguntas, alternativas, respuestas correctas y justificaciones.
 
-- **`/flows/retroalimentacion-ia-flow.ts`**: El flujo que revisa las respuestas del usuario en el módulo de ensayos. Recibe la pregunta, la respuesta del usuario y la respuesta correcta, y le pide a la IA que evalúe si es correcta y que genere una explicación detallada en caso de error.
+- **`/flows/generador-paes-flow.ts`**: Flujo altamente especializado que genera preguntas para los ensayos PAES M1 y M2 en lotes, basándose en temarios oficiales.
+
+- **`/flows/retroalimentacion-ia-flow.ts`**: El flujo que revisa las respuestas del usuario en el módulo de ensayos. Recibe la pregunta, la respuesta del usuario y la respuesta correcta, y le pide a la IA que evalúe si es correcta y que genere una explicación detallada.
+
+- **`/flows/retroalimentacion-paes-flow.ts`**: Flujo que evalúa las respuestas del ensayo PAES y genera una explicación pedagógica detallada al estilo DEMRE.
 
 ---
 
