@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, XCircle, BookCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 
 type Fase = 'configuracion' | 'cargando' | 'realizando' | 'revisando' | 'resultados';
 type TipoPrueba = 'seleccion-multiple' | 'respuesta-corta';
+type PaesMode = 'M1' | 'M2' | null;
 
 interface RespuestaUsuario {
   preguntaIndex: number;
@@ -63,6 +64,7 @@ export function EnsayoInteractivo() {
   const [temasSeleccionados, setTemasSeleccionados] = useState<string[]>([]);
   const [cantidadPreguntas, setCantidadPreguntas] = useState<number>(5);
   const [tipoPrueba, setTipoPrueba] = useState<TipoPrueba>('seleccion-multiple');
+  const [paesMode, setPaesMode] = useState<PaesMode>(null);
 
   const [testData, setTestData] = useState<GeneradorPruebasOutput | null>(null);
   const [respuestas, setRespuestas] = useState<RespuestaUsuario[]>([]);
@@ -73,6 +75,7 @@ export function EnsayoInteractivo() {
   const { toast } = useToast();
 
   const handleToggleTema = (tema: string) => {
+    setPaesMode(null); // Deseleccionar modo PAES si se elige un tema normal
     setTemasSeleccionados(prev => {
         if (prev.includes(tema)) {
             return prev.filter(t => t !== tema);
@@ -89,23 +92,34 @@ export function EnsayoInteractivo() {
     })
   }
 
+  const handlePaesSelect = (mode: PaesMode) => {
+    setTemasSeleccionados([]); // Limpiar temas normales
+    setPaesMode(mode);
+    setCantidadPreguntas(50); // Las pruebas PAES tienen 50 preguntas
+    setTipoPrueba('seleccion-multiple'); // Son de selección múltiple
+  }
+
   const handleStart = () => {
-    if (temasSeleccionados.length === 0) {
+    if (temasSeleccionados.length === 0 && !paesMode) {
       toast({
         variant: 'destructive',
-        title: 'No hay temas seleccionados',
-        description: 'Por favor, elige al menos un tema para la prueba.',
+        title: 'No has seleccionado un modo',
+        description: 'Por favor, elige un tema o una modalidad de prueba PAES.',
       });
       return;
     }
+
+    const temaFinal = paesMode ? `PAES ${paesMode}` : temasSeleccionados.join(', ');
+    const preguntasFinal = paesMode ? 50 : cantidadPreguntas;
+    const tipoFinal = paesMode ? 'seleccion-multiple' : tipoPrueba;
+
     setFase('cargando');
     startTransition(async () => {
       try {
-        const temaCompuesto = temasSeleccionados.join(', ');
         const result: GeneradorPruebasOutput = await generarPruebaAction({
-          tema: temaCompuesto,
-          cantidadPreguntas,
-          tipoPrueba,
+          tema: temaFinal,
+          cantidadPreguntas: preguntasFinal,
+          tipoPrueba: tipoFinal,
         });
         if (result.preguntas && result.preguntas.length > 0) {
           setTestData(result);
@@ -191,6 +205,7 @@ export function EnsayoInteractivo() {
     setTemasSeleccionados([]);
     setCantidadPreguntas(5);
     setTipoPrueba('seleccion-multiple');
+    setPaesMode(null);
     setTestData(null);
     setRespuestas([]);
     setResultados([]);
@@ -199,61 +214,86 @@ export function EnsayoInteractivo() {
 
   if (fase === 'configuracion') {
     return (
-      <Card className="max-w-2xl mx-auto">
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Configura tu Ensayo</CardTitle>
-          <CardDescription>Define los parámetros para tu prueba personalizada.</CardDescription>
+          <CardDescription>Elige los temas que quieres practicar o selecciona un ensayo tipo PAES.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <Label>1. Elige hasta 3 temas que quieras practicar</Label>
-            <div className="flex flex-wrap gap-2">
-                {TEMAS_DISPONIBLES.map(tema => (
+        <CardContent className="space-y-8">
+            <div className="space-y-4 p-4 border rounded-lg">
+                <h3 className="font-semibold flex items-center gap-2"><BookCheck className="text-primary"/> Ensayo PAES 2025</h3>
+                <p className="text-sm text-muted-foreground">Selecciona un módulo. Estas pruebas contienen 50 preguntas de selección múltiple y deshabilitarán otras opciones.</p>
+                <div className="flex flex-col sm:flex-row gap-2">
                     <Button 
-                        key={tema}
-                        variant={temasSeleccionados.includes(tema) ? 'default' : 'outline'}
-                        onClick={() => handleToggleTema(tema)}
+                        variant={paesMode === 'M1' ? 'default' : 'outline'}
+                        className="flex-1"
+                        onClick={() => handlePaesSelect('M1')}
                     >
-                        {tema}
+                        PAES M1 (Obligatoria)
                     </Button>
-                ))}
+                    <Button 
+                        variant={paesMode === 'M2' ? 'default' : 'outline'}
+                        className="flex-1"
+                        onClick={() => handlePaesSelect('M2')}
+                    >
+                        PAES M2 (Electiva)
+                    </Button>
+                </div>
+            </div>
+
+          <div className={cn("space-y-6", paesMode && "opacity-50 pointer-events-none")}>
+            <div className="space-y-3">
+                <Label>O elige hasta 3 temas para un ensayo personalizado</Label>
+                <div className="flex flex-wrap gap-2">
+                    {TEMAS_DISPONIBLES.map(tema => (
+                        <Button 
+                            key={tema}
+                            variant={temasSeleccionados.includes(tema) ? 'default' : 'outline'}
+                            onClick={() => handleToggleTema(tema)}
+                            disabled={!!paesMode}
+                        >
+                            {tema}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+            <div className="space-y-3">
+                <Label>Elige la modalidad</Label>
+                <RadioGroup defaultValue="5" value={String(cantidadPreguntas)} onValueChange={(value) => setCantidadPreguntas(parseInt(value))} disabled={!!paesMode}>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="5" id="r1" />
+                    <Label htmlFor="r1">Ensayo (5 preguntas)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="15" id="r2" />
+                    <Label htmlFor="r2">Desafío (15 preguntas)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="40" id="r3" />
+                    <Label htmlFor="r3">Prueba Final (40 preguntas)</Label>
+                </div>
+                </RadioGroup>
+            </div>
+            <div className="flex items-center space-x-4">
+                <Label>Elige el tipo de pregunta</Label>
+                <div className="flex items-center space-x-2">
+                    <Label htmlFor="tipo-prueba" className={tipoPrueba === 'seleccion-multiple' ? 'text-primary' : 'text-muted-foreground'}>Selección Múltiple</Label>
+                    <Switch 
+                        id="tipo-prueba" 
+                        checked={tipoPrueba === 'respuesta-corta'}
+                        onCheckedChange={(checked) => setTipoPrueba(checked ? 'respuesta-corta' : 'seleccion-multiple')}
+                        disabled={!!paesMode}
+                    />
+                    <Label htmlFor="tipo-prueba" className={tipoPrueba === 'respuesta-corta' ? 'text-primary' : 'text-muted-foreground'}>Respuesta Escrita</Label>
+                </div>
             </div>
           </div>
-          <div className="space-y-3">
-            <Label>2. Elige la modalidad</Label>
-             <RadioGroup defaultValue="5" onValueChange={(value) => setCantidadPreguntas(parseInt(value))}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="5" id="r1" />
-                <Label htmlFor="r1">Ensayo (5 preguntas)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="15" id="r2" />
-                <Label htmlFor="r2">Desafío (15 preguntas)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="40" id="r3" />
-                <Label htmlFor="r3">Prueba Final (40 preguntas)</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Label>3. Elige el tipo de pregunta</Label>
-            <div className="flex items-center space-x-2">
-                <Label htmlFor="tipo-prueba" className={tipoPrueba === 'seleccion-multiple' ? 'text-primary' : 'text-muted-foreground'}>Selección Múltiple</Label>
-                <Switch 
-                    id="tipo-prueba" 
-                    checked={tipoPrueba === 'respuesta-corta'}
-                    onCheckedChange={(checked) => setTipoPrueba(checked ? 'respuesta-corta' : 'seleccion-multiple')}
-                />
-                <Label htmlFor="tipo-prueba" className={tipoPrueba === 'respuesta-corta' ? 'text-primary' : 'text-muted-foreground'}>Respuesta Escrita</Label>
-            </div>
-          </div>
-          {tipoPrueba === 'respuesta-corta' && (
+          {tipoPrueba === 'respuesta-corta' && !paesMode && (
               <FormatoRespuestasAlert />
           )}
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={handleStart} disabled={temasSeleccionados.length === 0 || isPending}>
+          <Button className="w-full" onClick={handleStart} disabled={temasSeleccionados.length === 0 && !paesMode || isPending}>
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Comenzar Ensayo
           </Button>
@@ -287,7 +327,7 @@ export function EnsayoInteractivo() {
                     </CardContent>
                 </Card>
             )}
-            <FormatoRespuestasAlert />
+            {tipoPrueba === 'respuesta-corta' && <FormatoRespuestasAlert />}
             <Card>
                 <CardHeader>
                     <CardTitle>Pregunta {preguntaActualIndex + 1} de {testData.preguntas.length}</CardTitle>

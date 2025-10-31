@@ -21,32 +21,59 @@ export async function generarPrueba(input: GeneradorPruebasInput): Promise<Gener
   return generadorDePruebasFlow(input);
 }
 
+const TEMARIO_M1 = `
+- Números: Conjunto de los números enteros y racionales (propiedades, operatoria, transformaciones), Porcentajes (cálculo, aplicaciones), Potencias y raíces enésimas (propiedades, operatoria).
+- Álgebra y funciones: Expresiones algebraicas (valorización, operatoria), Proporcionalidad (directa, inversa), Ecuaciones e inecuaciones de primer grado, Sistemas de ecuaciones lineales 2x2 (resolución e interpretación), Función lineal y afín (gráficos, parámetros), Función cuadrática (gráficos, parámetros, raíces).
+- Geometría: Figuras geométricas (perímetro, área), Cuerpos geométricos (área de superficie, volumen), Transformaciones isométricas (traslación, rotación, reflexión).
+- Probabilidad y estadística: Representación de datos (tablas y gráficos), Medidas de tendencia central (media, mediana, moda) y rango, Medidas de posición (cuartiles, percentiles), Reglas de la probabilidad (regla aditiva, multiplicativa).
+`;
+
+const TEMARIO_M2 = `
+- Incluye TODO el temario de M1.
+- Números: Conjunto de los números reales (propiedades, operatoria con irracionales), Logaritmos (propiedades, aplicaciones), Matemática financiera (interés simple y compuesto).
+- Álgebra y funciones: Sistemas de ecuaciones lineales 2x2 (análisis de soluciones), Función potencia.
+- Geometría: Homotecia de figuras planas (propiedades), Razones trigonométricas en triángulos rectángulos (seno, coseno, tangente).
+- Probabilidad y estadística: Medidas de dispersión (varianza, desviación estándar), Probabilidad condicional, Permutación y combinatoria.
+`;
+
+const ESTRUCTURA_EJEMPLO_PAES = `
+Pregunta 1. Por el arriendo de un juego inflable se cobra una cuota fija de $120.000 por cuatro horas, más $25.000 por cada hora adicional.
+¿Cuántas horas como máximo puede arrendar una empresa el juego inflable si tiene un presupuesto de $240.000 para este efecto?
+A) 4
+B) 8
+C) 9
+D) 10
+Respuesta: La relación entre el costo de arriendo y el número de horas es una función afín debido a que el valor inicial es diferente de 0. El cargo por hora corresponde a la pendiente de la recta y la cuota fija es el valor inicial. f(x)=25.000x+120.000. En donde f(x) es el costo y x es el número de horas. En este ejemplo, tenemos el presupuesto de la empresa por lo que se debe encontrar la cantidad de horas x. 240.000=25.000x+120.000. x = (240.000 - 120.000) / 25.000. x = 4.8 horas. La empresa únicamente puede pagar por 4 horas completas, la respuesta es A.
+`;
+
 // Definición del prompt para Genkit
 const generadorDePruebasPrompt = ai.definePrompt({
   name: 'generadorDePruebasPrompt',
   input: { schema: GeneradorPruebasInputSchema },
   output: { schema: GeneradorPruebasOutputSchema },
   prompt: `
-    Eres un experto y meticuloso creador de exámenes de matemáticas para estudiantes de enseñanza media.
+    Actúas como un experto del DEMRE, encargado de crear la PAES de Matemáticas. Eres extremadamente meticuloso.
     Tu tarea es generar una prueba sobre el tema '{{{tema}}}' que contenga exactamente {{{cantidadPreguntas}}} preguntas.
     El tipo de preguntas debe ser '{{{tipoPrueba}}}'.
 
     PASO 1: ANÁLISIS DEL TEMA
-    Analiza el '{{{tema}}}'. Si el tema se resuelve predominantemente con una fórmula matemática clave (como 'fórmula cuadrática', 'teorema de pitágoras', etc.), identifica un nombre clave para esa fórmula (ej: "formula_cuadratica", "teorema_pitagoras"). Asigna este identificador al campo 'formula' en la salida. Si no hay una única fórmula dominante, deja ese campo en blanco.
+    - Si el '{{{tema}}}' es 'PAES M1', tu base de conocimiento para crear preguntas es exclusivamente el siguiente temario: ${TEMARIO_M1}.
+    - Si el '{{{tema}}}' es 'PAES M2', tu base de conocimiento es la unión del temario M1 y el temario M2: ${TEMARIO_M1} ${TEMARIO_M2}.
+    - Si el '{{{tema}}}' es otro (ej: "Teorema de Pitágoras"), enfócate solo en ese tema.
 
     PASO 2: GENERACIÓN DE PREGUNTAS
-    Crea las {{{cantidadPreguntas}}} preguntas según el '{{{tipoPrueba}}}'.
+    Crea las {{{cantidadPreguntas}}} preguntas según el tipo solicitado.
 
-    REGLAS ESTRICTAS DE FORMATO PARA LAS RESPUESTAS CORRECTAS:
-    1.  **Decimales:** Usa siempre un punto (.) como separador decimal. Si un resultado tiene más de dos decimales, debes **redondearlo** a dos decimales. Ejemplo: 5.564 se convierte en 5.56; 5.567 se convierte en 5.57.
-    2.  **Enteros:** Los números enteros, especialmente los miles, se escriben sin separadores. Ejemplo: Escribe 1000, no 1.000.
-    3.  **Truncamiento Lógico:** Si la pregunta se refiere a contar entidades que no pueden ser fraccionarias (como personas, objetos, etc.) y el cálculo resulta en un decimal, la respuesta correcta debe ser el número entero, ignorando la parte decimal. Ejemplo: si un cálculo da 5.8 alumnos, la respuesta correcta es 5.
+    REGLAS ESTRICTAS DE GENERACIÓN (TODOS LOS TEMAS):
+    1.  **Formato de Respuesta Correcta (para tipo 'respuesta-corta'):** Usa punto (.) para decimales. Redondea a dos decimales si es necesario. No uses separadores de miles (ej: 1500, no 1.500). Para conteo de objetos/personas, trunca a entero.
+    2.  **Formato de Justificación (TODOS LOS TEMAS):**
+        - Si el tema NO es PAES, la justificación debe ser clara y directa.
+        - Si el tema ES 'PAES M1' o 'PAES M2', la justificación debe ser **extremadamente detallada y pedagógica**, como si fueras un profesor explicando la solución paso a paso. Debe definir el concepto clave, mostrar la fórmula, desarrollar el problema y concluir la respuesta. Inspírate en la estructura del siguiente ejemplo: ${ESTRUCTURA_EJEMPLO_PAES}.
 
-    - Si el tipo es 'seleccion-multiple', cada pregunta debe tener un enunciado, 5 alternativas (una correcta y cuatro distractores creíbles) y una justificación clara de la respuesta correcta. Asegúrate de que la 'respuestaCorrecta' coincida exactamente con una de las alternativas.
-    - Si el tipo es 'respuesta-corta', cada pregunta debe tener un enunciado claro y la 'respuestaCorrecta' debe seguir rigurosamente las reglas de formato anteriores.
+    PASO 3: DETECCIÓN DE FÓRMULA CLAVE (SOLO para temas NO PAES)
+    - Si el tema se resuelve con una fórmula clave (ej: 'fórmula cuadrática', 'teorema de pitágoras'), identifica un nombre clave para esa fórmula (ej: "formula_cuadratica"). Asigna este identificador al campo 'formula'. Si no, déjalo en blanco. Para temas PAES, este campo siempre irá en blanco.
 
-    Es crucial que las preguntas y los valores numéricos utilizados sean variados y únicos en cada ejecución para asegurar que cada prueba sea diferente.
-    Genera el resultado en el formato JSON especificado.
+    Es crucial que las preguntas y los valores numéricos sean variados para que cada prueba sea única. Genera el resultado en el formato JSON especificado.
   `,
 });
 
