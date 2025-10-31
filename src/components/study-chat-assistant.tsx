@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { getStudyAiResponse } from '@/app/study-actions';
+import { generateSpeech } from '@/app/tts-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, FileText, Download } from 'lucide-react';
+import { Bot, User, Send, Loader2, FileText, Download, Volume2, Waves } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -87,6 +88,10 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
   const { toast } = useToast();
   const [activeEjercicio, setActiveEjercicio] = useState<Ejercicio | null>(null);
 
+  const [audioState, setAudioState] = useState<{ id: string, src: string, isPlaying: boolean } | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
@@ -99,6 +104,19 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
     setMessages([]);
     setInput('');
   }, [ejercicios]);
+
+  useEffect(() => {
+    if (audioState && audioState.src) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.onended = () => setAudioState(null);
+      }
+      audioRef.current.src = audioState.src;
+      audioRef.current.play();
+    } else if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [audioState]);
 
 
   const sendQuery = (query: string, history: ChatMessage[], material: string) => {
@@ -187,6 +205,28 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
     setActiveEjercicio(null);
     setMessages([]);
     setInput('');
+  };
+
+  const handlePlayAudio = async (messageId: string, text: string) => {
+    if (audioState?.id === messageId && audioState.isPlaying) {
+      setAudioState(null); // Stop playing
+      return;
+    }
+
+    setIsGeneratingAudio(messageId);
+    try {
+      const { audio } = await generateSpeech(text);
+      setAudioState({ id: messageId, src: audio, isPlaying: true });
+    } catch (error) {
+      console.error("Error generating speech:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de audio",
+        description: "No se pudo generar la voz.",
+      });
+    } finally {
+      setIsGeneratingAudio(null);
+    }
   };
 
   return (
@@ -311,22 +351,43 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                                     <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
                                 </div>
                             ) : (
-                                <div className="space-y-2 leading-relaxed">
-                                    {parseResponse(message.content).map((part, index) => {
-                                        if (part.type === 'button') {
-                                        return (
-                                            <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
-                                            {part.value}
+                                <>
+                                    <div className="space-y-2 leading-relaxed">
+                                        {parseResponse(message.content).map((part, index) => {
+                                            if (part.type === 'button') {
+                                            return (
+                                                <Button key={index} variant="outline" size="sm" className="h-auto" onClick={() => handlePromptClick(part.value)}>
+                                                {part.value}
+                                                </Button>
+                                            );
+                                            } else if (part.type === 'code') {
+                                                return <code key={index} className="bg-foreground/10 text-foreground font-semibold rounded-md px-2 py-1 block whitespace-pre-wrap">{part.value}</code>
+                                            } else if (part.type === 'bold') {
+                                                return <strong key={index}>{part.value}</strong>
+                                            }
+                                            return <span key={index}>{part.value}</span>;
+                                        })}
+                                    </div>
+                                    {message.role === 'model' && message.content !== '...' && (
+                                        <div className='-mb-2 -mr-2 mt-2 flex justify-end'>
+                                            <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="h-7 w-7 text-muted-foreground"
+                                                onClick={() => handlePlayAudio(message.id, message.content)}
+                                                disabled={!!isGeneratingAudio}
+                                            >
+                                                {isGeneratingAudio === message.id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin"/>
+                                                ) : audioState?.id === message.id && audioState.isPlaying ? (
+                                                    <Waves className="h-4 w-4" />
+                                                ) : (
+                                                    <Volume2 className="h-4 w-4"/>
+                                                )}
                                             </Button>
-                                        );
-                                        } else if (part.type === 'code') {
-                                            return <code key={index} className="bg-foreground/10 text-foreground font-semibold rounded-md px-2 py-1 block whitespace-pre-wrap">{part.value}</code>
-                                        } else if (part.type === 'bold') {
-                                            return <strong key={index}>{part.value}</strong>
-                                        }
-                                        return <span key={index}>{part.value}</span>;
-                                    })}
-                                </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                             </div>
                             {message.role === 'user' && (
