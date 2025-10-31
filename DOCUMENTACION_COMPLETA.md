@@ -20,6 +20,9 @@ La aplicación fusiona tecnologías web modernas con inteligencia artificial par
 - **Backend e IA**:
   - **Firebase**: Se utiliza para la autenticación de usuarios (con Google) y como base de datos (Firestore) para guardar el historial de chats del asistente principal.
   - **Genkit**: El motor de inteligencia artificial de Google que potencia a los tutores de IA, permitiendo conversaciones contextuales y generación de contenido.
+- **Interacción por Voz**:
+  - **Texto a Voz (TTS)**: Se utiliza un modelo de IA de Google para convertir las respuestas del asistente en audio.
+  - **Voz a Texto (STT)**: Se utiliza la **Web Speech API** del navegador para transcribir la voz del usuario a texto.
 - **Contenido**:
   - **Markdown (.md)**: Los temas de estudio y ejercicios están escritos en formato Markdown, lo que facilita su creación y mantenimiento.
 
@@ -65,20 +68,24 @@ Esta carpeta contiene todas las páginas y la lógica de enrutamiento de la apli
 
 Esta carpeta contiene los componentes de React que se usan en varias partes de la aplicación.
 
-- **`header.tsx`**: La barra de navegación superior. Incluye el logo, el nombre del proyecto y los botones para abrir el chat de IA y gestionar la sesión del usuario.
+- **`header.tsx`**: La barra de navegación superior. Incluye el logo, el nombre del proyecto y los botones para abrir el chat de IA y gestionar la sesión del usuario. **Tiene lógica para ocultar el asistente principal en ciertas páginas**.
 
 - **`chat-assistant.tsx`**: **Componente Central del Asistente Principal**. Es el panel de chat del tutor de IA principal. Se encarga de:
   - Manejar la entrada del usuario.
-  - Mostrar el historial de conversación (cargado desde Firestore).
+  - **Mostrar el historial de conversación** (cargado desde Firestore).
   - Enviar las preguntas a la IA a través de `actions.ts`.
   - Permitir adjuntar archivos e imágenes para dar contexto a la IA.
   - Borrar el historial de chat.
+  - **Funcionalidad de Texto a Voz (TTS)** y **Voz a Texto (STT)**.
 
-- **`study-chat-assistant.tsx`**: Una variante del chat, específica para la página `/estudia-con-geogebra`. La conversación aquí es temporal (no usa Firestore) y su contexto está limitado al ejercicio que el usuario haya seleccionado.
+- **`study-chat-assistant.tsx`**: Una variante del chat, específica para la página `/estudia-con-geogebra`.
+  - La conversación aquí es **temporal** (no usa Firestore).
+  - Su contexto está limitado al ejercicio que el usuario haya seleccionado.
+  - **Funcionalidad de Texto a Voz (TTS)** y **Voz a Texto (STT)**.
 
-- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas generales. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. Implementa la lógica de carga progresiva para una experiencia de usuario fluida.
+- **`ensayo-interactivo.tsx`**: La interfaz completa para el módulo de pruebas generales. Gestiona la configuración de la prueba, la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. Implementa la lógica de **carga progresiva** para una experiencia de usuario fluida.
 
-- **`paes-interactivo.tsx`**: La interfaz completa para el módulo de pruebas PAES. Gestiona la selección de prueba (M1/M2), la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. También implementa la lógica de carga progresiva.
+- **`paes-interactivo.tsx`**: La interfaz completa para el módulo de pruebas PAES. Gestiona la selección de prueba (M1/M2), la presentación de las preguntas y la visualización de los resultados y la retroalimentación de la IA. También implementa la lógica de **carga progresiva**.
 
 - **`geogebra-applet.tsx`**: El componente que carga e inicializa el applet interactivo de GeoGebra.
 
@@ -99,6 +106,8 @@ Aquí reside toda la lógica de la inteligencia artificial.
 - **`/flows/generador-paes-flow.ts`**: **IA DE APOYO (GENERADOR DE PRUEBAS PAES)**. Flujo altamente especializado que genera preguntas para los ensayos PAES M1 y M2 en lotes de 5, basándose en temarios oficiales.
 
 - **`/flows/retroalimentacion-paes-flow.ts`**: **IA DE APOYO (EVALUADOR DE PRUEBAS PAES)**. Flujo que evalúa las respuestas del ensayo PAES y genera una explicación pedagógica detallada al estilo DEMRE.
+
+- **`/flows/tts-flow.ts`**: **IA DE APOYO (CONVERSOR TEXTO A VOZ)**. Recibe texto y lo convierte en audio audible usando un modelo de voz de Google.
 
 ---
 
@@ -135,13 +144,13 @@ Cada IA del proyecto tiene un "razonamiento" y una fuente de información difere
 
 #### c) El Generador y Evaluador de Pruebas (`ensayo-interactivo.tsx` y `paes-interactivo.tsx`)
 
-Estas secciones utilizan dos IAs especializadas, con una lógica de carga progresiva.
+Estas secciones utilizan dos IAs especializadas, con una lógica de **carga progresiva**.
 
 1.  **IA Generadora (`generador-pruebas-flow.ts` y `generador-paes-flow.ts`)**
     - **Fuente de Información:** Recibe un **tema** (ej. "Teorema de Pitágoras" o "PAES M1") y un **número de preguntas**.
     - **Flujo Lógico (Carga Progresiva):**
         1.  Recibe la configuración de la prueba (tema, cantidad, tipo).
-        2.  En lugar de pedir todas las preguntas de una vez, la aplicación llama a la IA en **lotes**. Por ejemplo, pide primero 5 preguntas.
+        2.  En lugar de pedir todas las preguntas de una vez, la aplicación llama a la IA en **lotes** (generalmente de 5 preguntas).
         3.  El prompt le instruye: "Actúa como un experto creador de exámenes. Genera X preguntas sobre [tema] con alternativas, respuesta correcta y justificación".
         4.  La IA devuelve el primer lote. La aplicación se lo muestra al usuario para que empiece a responder.
         5.  **En segundo plano**, la aplicación sigue pidiendo a la IA más lotes de preguntas hasta completar el total requerido.

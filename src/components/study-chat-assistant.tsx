@@ -6,7 +6,7 @@ import { generateSpeech } from '@/app/tts-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, FileText, Download, Volume2, Waves } from 'lucide-react';
+import { Bot, User, Send, Loader2, FileText, Download, Volume2, Waves, Mic } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import type { Ejercicio, EjercicioPorCurso } from '@/lib/ejercicios';
 import { Switch } from './ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 
 
 interface ChatMessage {
@@ -91,6 +92,12 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
   const [audioState, setAudioState] = useState<{ id: string, src: string, isPlaying: boolean } | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition({
+    onTranscript: (newTranscript) => {
+        setInput(prev => prev + newTranscript);
+    }
+  });
 
   useEffect(() => {
     if (viewportRef.current) {
@@ -410,9 +417,22 @@ export function StudyChatAssistant({ ejercicios }: StudyChatAssistantProps) {
                     <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Haz una pregunta sobre el ejercicio..."
+                    placeholder={activeEjercicio ? (isListening ? "Escuchando..." : "Haz una pregunta...") : "Activa un ejercicio"}
                     disabled={isPending || !activeEjercicio}
                     />
+                     {isSupported && activeEjercicio && (
+                        <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={isListening ? stopListening : startListening}
+                            disabled={isPending}
+                            title={isListening ? "Dejar de grabar" : "Grabar voz"}
+                            className={cn(isListening && 'text-red-500 hover:text-red-600')}
+                        >
+                            <Mic className="w-5 h-5" />
+                        </Button>
+                    )}
                     <Button type="submit" size="icon" disabled={isPending || !input.trim() || !activeEjercicio}>
                     {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </Button>
