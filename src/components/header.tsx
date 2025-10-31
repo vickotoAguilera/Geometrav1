@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { usePathname } from 'next/navigation';
 
 
 // SVG para el icono de Google
@@ -100,6 +101,14 @@ const AuthButton = () => {
 
 const AIChatButton = () => {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Rutas donde el asistente principal NO debe mostrarse
+  const hiddenRoutes = ['/estudia-con-geogebra', '/ensaya', '/paes'];
+
+  if (hiddenRoutes.includes(pathname)) {
+    return null; // No renderizar el botón en estas rutas
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
