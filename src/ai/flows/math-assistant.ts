@@ -12,6 +12,7 @@ import {Part} from 'genkit';
 import {z} from 'genkit';
 import mammoth from 'mammoth';
 import pdf from 'pdf-parse/lib/pdf-parse.js';
+import fetch from 'node-fetch';
 
 
 const MessageSchema = z.object({
@@ -21,7 +22,7 @@ const MessageSchema = z.object({
 
 const ContextFileSchema = z.object({
   fileName: z.string(),
-  fileDataUri: z.string(),
+  downloadURL: z.string(),
 });
 
 const MathAssistantInputSchema = z.object({
@@ -57,19 +58,20 @@ const mathAssistantFlow = ai.defineFlow(
         prompt.push({ media: { url: input.imageQueryDataUri } });
     }
 
-    // 2. Handle active context files (PDF, DOCX)
+    // 2. Handle active context files (PDF, DOCX) from Firebase Storage
     if (input.activeContextFiles && input.activeContextFiles.length > 0) {
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
         try {
-          const base64Data = file.fileDataUri.split(',')[1];
-          const buffer = Buffer.from(base64Data, 'base64');
+            const response = await fetch(file.downloadURL);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch file from ${file.downloadURL}`);
+            }
+            const buffer = await response.buffer();
           
           if (file.fileName.endsWith('.pdf')) {
-              // Process PDF page by page to include page numbers
               const data = await pdf(buffer, {
                   pagerender: (pageData) => {
-                      // Return text content for each page, prefixed with a page marker
                       return `--- PÁGINA ${pageData.pageIndex + 1} ---\n${pageData.text}\n--- FIN PÁGINA ${pageData.pageIndex + 1} ---\n\n`;
                   }
               });
@@ -80,7 +82,6 @@ const mathAssistantFlow = ai.defineFlow(
           }
         } catch (e) {
             console.error(`Error processing file ${file.fileName} in flow: `, e);
-            // Optionally notify user about the specific file that failed
         }
       }
       if (fileContents.length > 0) {

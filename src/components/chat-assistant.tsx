@@ -30,11 +30,11 @@ interface BaseMessage {
 interface TextMessage extends BaseMessage {
   type: 'text';
   content: string;
-  imageUrl?: string; // For images sent with a text message
+  imageUrl?: string; 
 }
 interface FileContextMessage extends BaseMessage {
   type: 'fileContext';
-  content: string; // This will store the data URI
+  downloadURL: string;
   fileName: string;
   isActive: boolean; 
 }
@@ -222,43 +222,58 @@ export function ChatAssistant() {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile || !user || !messagesRef) return;
   
-    if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-      toast({
-        variant: "destructive",
-        title: "Archivo demasiado grande",
-        description: "Por favor, selecciona un archivo de menos de 5MB.",
-      });
-      return;
-    }
-    
-    try {
-      const fileDataUri = await fileToDataUri(selectedFile);
-      const isImage = selectedFile.type.startsWith('image/');
+    if (selectedFile.type.startsWith('image/')) {
+        try {
+            const fileDataUri = await fileToDataUri(selectedFile);
+            setAttachedImage(fileDataUri);
+        } catch (err) {
+            console.error("Failed to process image", err);
+            toast({ variant: "destructive", title: "Error al procesar imagen", description: "No se pudo leer la imagen." });
+        }
+    } else {
+        // Handle PDF/DOCX uploads via Firebase Storage
+        startTransition(async () => {
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
 
-      if (isImage) {
-        setAttachedImage(fileDataUri);
-      } else {
-        const fileMessageData: Omit<FileContextMessage, 'id'> = {
-            role: 'user',
-            type: 'fileContext',
-            content: fileDataUri,
-            fileName: selectedFile.name,
-            isActive: true, // New documents are active by default
-            createdAt: serverTimestamp() as Timestamp,
-        };
-        await addDoc(messagesRef, fileMessageData);
-        toast({
-            title: "Archivo añadido al contexto",
-            description: `${selectedFile.name} está listo para ser usado.`,
+                // IMPORTANT: Replace with your actual Cloud Function URL
+                const functionUrl = 'https://us-central1-geogebra-476523.cloudfunctions.net/uploadFile';
+                
+                const response = await fetch(`${functionUrl}?uid=${user.uid}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+
+                const { downloadURL } = await response.json();
+                
+                const fileMessageData: Omit<FileContextMessage, 'id'> = {
+                    role: 'user',
+                    type: 'fileContext',
+                    downloadURL: downloadURL,
+                    fileName: selectedFile.name,
+                    isActive: true,
+                    createdAt: serverTimestamp() as Timestamp,
+                };
+                await addDoc(messagesRef, fileMessageData);
+                toast({
+                    title: "Archivo subido con éxito",
+                    description: `${selectedFile.name} está listo para ser usado.`,
+                });
+
+            } catch (err) {
+                console.error("Failed to upload file", err);
+                toast({
+                    variant: "destructive",
+                    title: "Error al subir archivo",
+                    description: "No se pudo subir el archivo a la nube.",
+                });
+            }
         });
-      }
-    } catch (err) {
-      console.error("Failed to process file", err);
-      toast({
-        variant: "destructive",
-        title: "Error al procesar archivo",
-        description: "No se pudo leer o guardar el archivo.",
-      });
     }
 
     if(fileInputRef.current) fileInputRef.current.value = '';
@@ -291,12 +306,8 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) {
-      if(attachedImage && !isPending && user) {
-        // Allow sending image with empty prompt
-      } else {
-        return;
-      }
+    if ((!input.trim() && !attachedImage) || isPending || !user) {
+      return;
     }
   
     const currentInput = input;
@@ -335,7 +346,7 @@ export function ChatAssistant() {
 
           const activeFiles = fileContextMessages
             .filter(f => f.isActive)
-            .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
+            .map(f => ({ fileName: f.fileName, downloadURL: f.downloadURL }));
 
           if (activeFiles.length > 0) {
              toast({
@@ -383,7 +394,6 @@ export function ChatAssistant() {
       return;
     }
 
-    // Clean the text by removing code, bold, and button tags before sending to TTS
     const cleanText = text
       .replace(/<code>(.*?)<\/code>/gs, '$1')
       .replace(/\*\*(.*?)\*\*/gs, '$1')
