@@ -38,16 +38,28 @@ interface Resultado extends RetroalimentacionOutput {
 }
 
 const TEMAS_DISPONIBLES = [
+    // Primero Medio
     "Teorema de Pitágoras",
     "Ecuaciones Lineales",
     "Factorización y Productos Notables",
+    "Medidas de Tendencia Central",
+    "Números Reales",
+    "Potencias y Raíces",
+    "Probabilidad Básica (Laplace)",
+    // Segundo Medio
     "Función Cuadrática",
-    "Función Exponencial",
-    "Función Logarítmica",
+    "Homotecia y Semejanza",
     "Logaritmos",
     "Probabilidad Condicional",
-    "Trigonometría Básica"
+    "Trigonometría Básica",
+    // Tercero Medio
+    "Ecuación de la Recta",
+    // Cuarto Medio
+    "Función Exponencial",
+    "Función Logarítmica",
+    "Distribución Normal"
 ];
+
 
 const BATCH_SIZE = 5;
 
