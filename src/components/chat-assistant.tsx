@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getAiResponse, getInitialPrompts } from '@/app/actions';
+import { getAiResponse, getInitialPrompts, uploadFileAction } from '@/app/actions';
 import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,7 @@ interface TextMessage extends BaseMessage {
 }
 interface FileContextMessage extends BaseMessage {
   type: 'fileContext';
-  content: string; // This will store the data URI
+  content: string; // This will store the download URL
   fileName: string;
   isActive: boolean; 
 }
@@ -126,7 +126,7 @@ const parseResponse = (content: string) => {
                 if (textMatch.index > lastTextIndex) {
                     textSubParts.push({type: 'text', value: part.value.substring(lastTextIndex, textMatch.index)});
                 }
-                if (textMatch[1]) { // <code> match
+                if (textMatch[1]) { // code match
                     textSubParts.push({type: 'code', value: textMatch[1]});
                 } else if (textMatch[2]) { // **bold** match
                     textSubParts.push({type: 'bold', value: textMatch[2]});
@@ -231,35 +231,44 @@ export function ChatAssistant() {
       return;
     }
     
-    try {
-      const fileDataUri = await fileToDataUri(selectedFile);
-      const isImage = selectedFile.type.startsWith('image/');
+    startTransition(async () => {
+        try {
+        const isImage = selectedFile.type.startsWith('image/');
+        const fileDataUri = await fileToDataUri(selectedFile);
 
-      if (isImage) {
-        setAttachedImage(fileDataUri);
-      } else {
-        const fileMessageData: Omit<FileContextMessage, 'id'> = {
-            role: 'user',
-            type: 'fileContext',
-            content: fileDataUri,
-            fileName: selectedFile.name,
-            isActive: true, // New documents are active by default
-            createdAt: serverTimestamp() as Timestamp,
-        };
-        await addDoc(messagesRef, fileMessageData);
-        toast({
-            title: "Archivo añadido al contexto",
-            description: `${selectedFile.name} está listo para ser usado.`,
-        });
-      }
-    } catch (err) {
-      console.error("Failed to process file", err);
-      toast({
-        variant: "destructive",
-        title: "Error al procesar archivo",
-        description: "No se pudo leer o guardar el archivo.",
-      });
-    }
+        if (isImage) {
+            setAttachedImage(fileDataUri);
+        } else {
+            toast({
+                title: "Subiendo archivo...",
+                description: "Por favor espera mientras se sube tu archivo.",
+            });
+
+            const { downloadURL } = await uploadFileAction(fileDataUri, selectedFile.name, user.uid);
+
+            const fileMessageData: Omit<FileContextMessage, 'id'> = {
+                role: 'user',
+                type: 'fileContext',
+                content: downloadURL,
+                fileName: selectedFile.name,
+                isActive: true, // New documents are active by default
+                createdAt: serverTimestamp() as Timestamp,
+            };
+            await addDoc(messagesRef, fileMessageData);
+            toast({
+                title: "Archivo añadido al contexto",
+                description: `${selectedFile.name} está listo para ser usado.`,
+            });
+        }
+        } catch (err) {
+            console.error("Failed to process file", err);
+            toast({
+                variant: "destructive",
+                title: "Error al procesar archivo",
+                description: "No se pudo leer o guardar el archivo.",
+            });
+        }
+    });
 
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -335,7 +344,7 @@ export function ChatAssistant() {
 
           const activeFiles = fileContextMessages
             .filter(f => f.isActive)
-            .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
+            .map(f => ({ fileName: f.fileName, downloadUrl: f.content }));
 
           if (activeFiles.length > 0) {
              toast({

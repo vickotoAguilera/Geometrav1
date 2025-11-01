@@ -21,7 +21,7 @@ const MessageSchema = z.object({
 
 const ContextFileSchema = z.object({
   fileName: z.string(),
-  fileDataUri: z.string(),
+  downloadUrl: z.string(),
 });
 
 const MathAssistantInputSchema = z.object({
@@ -57,18 +57,22 @@ const mathAssistantFlow = ai.defineFlow(
         prompt.push({ media: { url: input.imageQueryDataUri } });
     }
 
-    // 2. Handle active context files (PDF, DOCX)
+    // 2. Handle active context files (PDF, DOCX) from their download URLs
     if (input.activeContextFiles && input.activeContextFiles.length > 0) {
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
         try {
-          const base64Data = file.fileDataUri.split(',')[1];
-          const buffer = Buffer.from(base64Data, 'base64');
+          const response = await fetch(file.downloadUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch file ${file.fileName}: ${response.statusText}`);
+          }
+          const buffer = await response.arrayBuffer();
+          
           if (file.fileName.endsWith('.pdf')) {
-              const data = await pdf(buffer);
+              const data = await pdf(Buffer.from(buffer));
               fileContents.push(`Contenido del archivo '${file.fileName}':\n${data.text}`);
           } else if (file.fileName.endsWith('.docx')) {
-              const result = await mammoth.extractRawText({ buffer });
+              const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
               fileContents.push(`Contenido del archivo '${file.fileName}':\n${result.value}`);
           }
         } catch (e) {
@@ -161,5 +165,3 @@ Reglas estrictas de comportamiento:
     return output!;
   }
 );
-
-    
