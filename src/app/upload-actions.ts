@@ -1,13 +1,16 @@
 'use server';
 
 import admin from 'firebase-admin';
+import { firebaseConfig } from '@/firebase/config';
 
 // Initialize admin only once
 if (admin.apps.length === 0) {
   try {
+    // Use environment variables for service account credentials
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
     admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      storageBucket: 'geometrachest.appspot.com',
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: firebaseConfig.storageBucket,
     });
   } catch (error) {
     console.error('Firebase admin initialization error:', error);
@@ -39,11 +42,10 @@ export async function uploadFileAction(params: UploadFileParams): Promise<{ down
   const file = bucket.file(filePath);
 
   try {
+    const mimeType = fileDataUri.split(';')[0].split(':')[1];
     await file.save(fileBuffer, {
       metadata: {
-        // Here you could determine the mimeType from the fileDataUri if needed
-        // For simplicity, we'll let GCS auto-detect or use a generic type.
-        contentType: 'application/octet-stream', 
+        contentType: mimeType || 'application/octet-stream', 
       },
     });
 
