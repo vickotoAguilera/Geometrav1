@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut, User as UserIcon, Bot, MessageSquareHeart } from "lucide-react";
+import { LogOut, User as UserIcon, Bot, MessageSquareHeart, Menu } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
@@ -20,7 +20,7 @@ import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { usePathname } from 'next/navigation';
 import { ScreenshotGuide } from "./screenshot-guide";
-
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // SVG para el icono de Google
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -57,12 +57,12 @@ const AuthButton = () => {
     };
 
     if (isUserLoading) {
-        return <Button variant="outline" size="icon" disabled><div className="h-5 w-5 rounded-full bg-muted animate-pulse" /></Button>;
+        return <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />;
     }
 
     if (!user) {
         return (
-            <Button variant="outline" size="icon" onClick={handleSignIn}>
+            <Button variant="outline" size="icon" onClick={handleSignIn} title="Iniciar sesión con Google">
                 <GoogleIcon className="h-5 w-5" />
                  <span className="sr-only">Iniciar sesión con Google</span>
             </Button>
@@ -104,11 +104,10 @@ const AIChatButton = () => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Rutas donde el asistente principal NO debe mostrarse
   const hiddenRoutes = ['/estudia-con-geogebra', '/ensaya', '/paes'];
 
   if (hiddenRoutes.includes(pathname)) {
-    return null; // No renderizar el botón en estas rutas
+    return null;
   }
 
   return (
@@ -150,24 +149,76 @@ const ScreenshotGuideButton = () => {
   )
 }
 
+const MobileNav = () => {
+    const [open, setOpen] = useState(false);
+    return (
+        <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Abrir menú</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full max-w-xs p-4">
+                <SheetTitle className="mb-6">
+                    <Link href="/" className="flex items-center space-x-2" onClick={() => setOpen(false)}>
+                        <Logo className="h-6 w-6" />
+                        <span className="font-bold font-headline">Geometra</span>
+                    </Link>
+                </SheetTitle>
+                <nav className="flex flex-col space-y-4">
+                    <Link href="/estudia" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Estudio</Link>
+                    <Link href="/tutoriales" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Tutoriales</Link>
+                    <Link href="/glosario" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Glosario</Link>
+                    <Link href="/ensaya" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Ensayos</Link>
+                    <Link href="/paes" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>PAES</Link>
+                </nav>
+            </SheetContent>
+        </Sheet>
+    )
+}
+
 
 export default function Header() {
+  const isMobile = useIsMobile();
+  const pathname = usePathname();
+
+  // No renderizar el header en la página del applet
+  if (pathname === '/applet') {
+    return null;
+  }
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="mr-4 flex items-center">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Logo className="h-6 w-6" />
-            <span className="font-bold font-headline sm:inline-block">
-              Geometra
-            </span>
-          </Link>
-        </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <ScreenshotGuideButton />
-          <AIChatButton />
-          <AuthButton />
-        </div>
+        {isMobile ? (
+            <div className="flex w-full justify-between items-center">
+                <MobileNav />
+                 <Link href="/" className="flex items-center space-x-2">
+                    <Logo className="h-6 w-6" />
+                    <span className="font-bold font-headline sm:inline-block">Geometra</span>
+                </Link>
+                <div className="flex items-center gap-2">
+                    <AuthButton />
+                </div>
+            </div>
+        ) : (
+           <>
+            <div className="mr-4 flex items-center">
+                <Link href="/" className="mr-6 flex items-center space-x-2">
+                    <Logo className="h-6 w-6" />
+                    <span className="font-bold font-headline sm:inline-block">
+                    Geometra
+                    </span>
+                </Link>
+            </div>
+            <div className="flex flex-1 items-center justify-end space-x-2">
+                <ScreenshotGuideButton />
+                <AIChatButton />
+                <AuthButton />
+            </div>
+           </>
+        )}
       </div>
     </header>
   );
