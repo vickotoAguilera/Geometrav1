@@ -118,7 +118,7 @@ const AIChatButton = () => {
             Asistente
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+      <SheetContent className="w-full max-w-full lg:max-w-md p-0 flex flex-col h-full">
         <ChatAssistant />
       </SheetContent>
     </Sheet>
@@ -142,7 +142,7 @@ const ScreenshotGuideButton = () => {
             Guía IA
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full max-w-full sm:max-w-md p-0 flex flex-col h-full">
+      <SheetContent className="w-full max-w-full lg:max-w-md p-0 flex flex-col h-full">
         <ScreenshotGuide />
       </SheetContent>
     </Sheet>
