@@ -113,7 +113,7 @@ const AIChatButton = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button className="w-full justify-start text-base">
             <Bot className="mr-2 h-5 w-5" />
             Asistente
         </Button>
@@ -137,7 +137,7 @@ const ScreenshotGuideButton = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="w-full justify-start text-base">
             <MessageSquareHeart className="mr-2 h-5 w-5"/>
             Guía IA
         </Button>
@@ -159,20 +159,24 @@ const MobileNav = () => {
                     <span className="sr-only">Abrir menú</span>
                 </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full max-w-xs p-4">
+            <SheetContent side="left" className="w-full max-w-xs p-4 flex flex-col">
                 <SheetTitle className="mb-6">
                     <Link href="/" className="flex items-center space-x-2" onClick={() => setOpen(false)}>
                         <Logo className="h-6 w-6" />
                         <span className="font-bold font-headline">Geometra</span>
                     </Link>
                 </SheetTitle>
-                <nav className="flex flex-col space-y-4">
-                    <Link href="/estudia" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Estudio</Link>
-                    <Link href="/tutoriales" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Tutoriales</Link>
-                    <Link href="/glosario" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Glosario</Link>
-                    <Link href="/ensaya" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>Ensayos</Link>
-                    <Link href="/paes" className="text-lg hover:text-primary" onClick={() => setOpen(false)}>PAES</Link>
+                <nav className="flex flex-col space-y-2">
+                    <Link href="/estudia" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Estudio</Link>
+                    <Link href="/tutoriales" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Tutoriales</Link>
+                    <Link href="/glosario" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Glosario</Link>
+                    <Link href="/ensaya" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Ensayos</Link>
+                    <Link href="/paes" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>PAES</Link>
                 </nav>
+                <div className="mt-auto space-y-2">
+                    <ScreenshotGuideButton />
+                    <AIChatButton />
+                </div>
             </SheetContent>
         </Sheet>
     )
@@ -213,6 +217,34 @@ export default function Header() {
                 </Link>
             </div>
             <div className="flex flex-1 items-center justify-end space-x-2">
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="relative h-9 w-auto px-4 rounded-md">
+                           <Menu className="h-5 w-5 mr-2" />
+                           Menú
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <DropdownMenuLabel>Secciones</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href="/estudia">Estudio</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/tutoriales">Tutoriales</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/glosario">Glosario</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                           <Link href="/ensaya">Ensayos</Link>
+                        </DropdownMenuItem>
+                         <DropdownMenuItem asChild>
+                           <Link href="/paes">PAES</Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
                 <ScreenshotGuideButton />
                 <AIChatButton />
                 <AuthButton />
