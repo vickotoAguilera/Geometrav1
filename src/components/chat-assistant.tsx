@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getAiResponse, getInitialPrompts, uploadFileAction } from '@/app/actions';
+import { getAiResponse, getInitialPrompts } from '@/app/actions';
+import { uploadFileAction } from '@/app/upload-actions';
 import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -154,7 +155,7 @@ export function ChatAssistant() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  const [audioState, setAudioState] = useState<{ id: string, src: string, isPlaying: boolean } | null>(null);
+  const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean; } | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -244,7 +245,11 @@ export function ChatAssistant() {
                 description: "Por favor espera mientras se sube tu archivo.",
             });
 
-            const { downloadURL } = await uploadFileAction(fileDataUri, selectedFile.name, user.uid);
+            const { downloadURL } = await uploadFileAction({
+              fileDataUri, 
+              fileName: selectedFile.name, 
+              userId: user.uid
+            });
 
             const fileMessageData: Omit<FileContextMessage, 'id'> = {
                 role: 'user',
@@ -739,3 +744,5 @@ export function ChatAssistant() {
     </>
   );
 }
+
+    
