@@ -14,7 +14,7 @@ import {
 } from "./ui/dropdown-menu";
 import { LogOut, User as UserIcon, Bot, MessageSquareHeart, Menu } from "lucide-react";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
