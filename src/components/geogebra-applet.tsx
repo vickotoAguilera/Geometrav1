@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, memo, useState } from 'react';
-import { Expand, Maximize2, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -11,7 +11,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 
@@ -22,19 +21,6 @@ const isMobileDeviceClient = () => {
 
 declare global {
   interface Window { GGBApplet?: any; }
-  interface Document {
-    mozCancelFullScreen?: () => Promise<void>;
-    webkitExitFullscreen?: () => Promise<void>;
-    msExitFullscreen?: () => Promise<void>;
-    mozFullScreenElement?: Element;
-    webkitFullscreenElement?: Element;
-    msFullscreenElement?: Element;
-  }
-  interface HTMLElement {
-    mozRequestFullScreen?: () => Promise<void>;
-    webkitRequestFullscreen?: () => Promise<void>;
-    msRequestFullscreen?: () => Promise<void>;
-  }
 }
 
 // This is the free-form applet component, without contextual memory.
@@ -43,13 +29,10 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const appletRef = useRef<any>(null);
   const hasInitializedRef = useRef(false);
-  const [isSimulatedFullscreen, setIsSimulatedFullscreen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    setIsMobile(isMobileDeviceClient());
   }, []);
 
   // Add the beforeunload event listener to warn the user before leaving.
@@ -65,29 +48,6 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
-
-  const toggleFullscreen = () => {
-    if (isMobile) {
-      setIsSimulatedFullscreen(prev => !prev);
-    } else {
-      const elem = wrapperRef.current;
-      if (!elem) return;
-
-      const isNowFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-
-      if (!isNowFullscreen) {
-        if (elem.requestFullscreen) elem.requestFullscreen();
-        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-        else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
-        else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-      }
-    }
-  };
   
   useEffect(() => {
     if (typeof window === 'undefined' || !isClient) return;
@@ -127,6 +87,8 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
 
         const width = container.clientWidth || 800;
         const height = container.clientHeight || 600;
+        
+        const isMobile = isMobileDeviceClient();
         
         const parameters = {
           id: 'ggbAppletFree', // Unique ID for the free applet
@@ -179,74 +141,33 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
-
-    const handleFullscreenChange = () => {
-      setTimeout(() => {
-        const applet = appletRef.current;
-        const container = containerRef.current;
-        if (applet && container && typeof applet.setSize === 'function') {
-          const width = container.clientWidth;
-          const height = container.clientHeight;
-          if (width > 0 && height > 0) {
-            try {
-              applet.setSize(width, height);
-            } catch (err) {
-              console.warn('Resize after fullscreen change failed:', err);
-            }
-          }
-        }
-      }, 100);
-    };
     
-    if (!isMobile) {
-      document.addEventListener('fullscreenchange', handleFullscreenChange);
-      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-    }
-
     return () => {
       if (containerRef.current) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         resizeObserver.unobserve(containerRef.current);
       }
       resizeObserver.disconnect();
-      if (!isMobile) {
-        document.removeEventListener('fullscreenchange', handleFullscreenChange);
-        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
-      }
     };
-  }, [isClient, isMobile]);
+  }, [isClient]);
 
   if (!isClient) {
     return <div className="w-full h-full min-h-[500px] flex items-center justify-center">Cargando...</div>;
   }
 
   return (
-    <div
-      ref={wrapperRef}
-      className={`relative w-full bg-background ${isSimulatedFullscreen ? 'fixed inset-0 z-50' : ''}`}
-      style={{
-        height: isSimulatedFullscreen ? '100dvh' : '100%',
-        width: '100%',
-      }}
-    >
+    <div ref={wrapperRef} className="relative w-full h-full bg-background">
       <div
         ref={containerRef}
         className="w-full h-full min-h-[500px] flex items-center justify-center"
-        style={{
-          minHeight: isSimulatedFullscreen ? '100dvh' : '500px',
-        }}
       />
-      <div className="absolute top-4 right-4 z-[51] flex gap-2">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[51] flex gap-2">
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button
                     variant="destructive"
                     size="icon"
-                    className="bg-red-500/80 hover:bg-red-600/90 text-white rounded-full"
+                    className="bg-red-500/80 hover:bg-red-600/90 text-white rounded-full shadow-lg"
                     title="¡Atención! Cómo guardar tu progreso"
                 >
                     <AlertTriangle className="w-5 h-5" />
@@ -255,7 +176,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-2">
+                     <AlertDialogDescription className="space-y-2">
                         Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.
                         <br /><br />
                         <strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.
@@ -268,20 +189,6 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-background/80 hover:bg-background"
-          onClick={toggleFullscreen}
-          title={isMobile ? 'Expandir' : 'Pantalla completa'}
-        >
-          {isMobile ? (
-            <Maximize2 className="w-5 h-5" />
-          ) : (
-            <Expand className="w-5 h-5" />
-          )}
-        </Button>
       </div>
     </div>
   );
