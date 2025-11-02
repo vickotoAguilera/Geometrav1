@@ -42,26 +42,29 @@ const funcionesMatricesAssistantFlow = ai.defineFlow(
   async (input) => {
     const { history, userQuery, screenshotDataUri, initialSystemPrompt } = input;
     const prompt: Part[] = [];
+    
+    // El prompt de sistema se construye dinámicamente
+    let dynamicSystemPrompt = systemPrompt;
+    
+    // Si es el primer turno, el 'initialSystemPrompt' contiene la guía. Lo inyectamos en el prompt del sistema.
+    if (initialSystemPrompt) {
+        dynamicSystemPrompt += `\n\nCONTEXTO OBLIGATORIO (GUÍA DEL EJERCICIO):\n${initialSystemPrompt}`;
+    }
 
     // Add the screenshot to the prompt if it exists
     if (screenshotDataUri) {
       prompt.push({ media: { url: screenshotDataUri } });
     }
-
-    let fullQuery = userQuery || '';
     
-    // The initial prompt with the guide content is passed in the first turn
-    if (initialSystemPrompt) {
-        fullQuery = `${initialSystemPrompt}\n\nPregunta/Respuesta del usuario: ${userQuery || 'El usuario acaba de abrir el chat.'}`;
-    }
-
+    let fullQuery = userQuery || 'El usuario acaba de abrir el chat, preséntate y da la primera instrucción de la guía.';
+    
     if (fullQuery.trim()) {
       prompt.push({ text: fullQuery });
     }
      
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
-      system: systemPrompt,
+      system: dynamicSystemPrompt,
       history: history || undefined,
       prompt: prompt,
       output: {

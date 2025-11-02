@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -144,7 +144,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
       fetchAndStartInitialConversation();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, chatStorageKey]);
+  }, [ejercicioId]);
 
   useEffect(() => {
     try {
@@ -196,7 +196,6 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   };
 
   const handleBackNavigation = () => {
-    // No borra el historial, solo navega. La persistencia se mantiene.
     router.back();
   };
   
@@ -305,6 +304,21 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
             <RefreshCw className="w-5 h-5" />
         </Button>
       </SheetHeader>
+      
+      <div className="p-3 border-b bg-background">
+          <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+              <div className="flex items-center gap-2 overflow-hidden">
+                  <FileText className="w-4 h-4 flex-shrink-0 text-primary" />
+                  <span className="truncate font-medium text-primary" title={`${ejercicioId}.md`}>Guía activa: {ejercicioId}.md</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                  <div className="w-8 h-4 bg-primary/20 rounded-full relative">
+                      <div className="w-4 h-4 bg-primary rounded-full absolute right-0"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-6">
