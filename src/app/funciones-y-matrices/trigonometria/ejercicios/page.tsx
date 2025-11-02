@@ -1,5 +1,5 @@
 import Header from "@/components/header";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Sigma } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 
@@ -83,6 +83,9 @@ export default function EjerciciosTrigonometriaPage() {
                         <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
                     </div>
                 </CardContent>
+                 <CardFooter>
+                    <p className="text-xs text-muted-foreground">Todos los ejercicios de este módulo comparten el mismo chat y pizarra de GeoGebra.</p>
+                </CardFooter>
             </Card>
         </div>
 
