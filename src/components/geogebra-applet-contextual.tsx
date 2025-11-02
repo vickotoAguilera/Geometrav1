@@ -5,13 +5,7 @@ import { useEffect, useRef, memo, useState } from 'react';
 declare global {
   interface Window {
     GGBApplet?: any;
-    appletInstances?: { [key: string]: any };
   }
-}
-
-// Store applet instances outside the component to persist across navigations
-if (typeof window !== 'undefined' && !window.appletInstances) {
-  window.appletInstances = {};
 }
 
 interface GeoGebraAppletContextualProps {
@@ -20,6 +14,8 @@ interface GeoGebraAppletContextualProps {
 
 export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({ groupId }: GeoGebraAppletContextualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const appletRef = useRef<any>(null);
+  const hasInitialized = useRef(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -27,7 +23,7 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
   }, []);
 
   useEffect(() => {
-    if (!isClient || !containerRef.current || !groupId) {
+    if (!isClient || !containerRef.current || hasInitialized.current) {
       return;
     }
 
@@ -36,25 +32,10 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     const initializeApplet = () => {
       if (!window.GGBApplet) return;
 
-      // Clear the container before doing anything
       container.innerHTML = ''; 
 
-      // If an applet for this group already exists, re-attach it
-      if (window.appletInstances && window.appletInstances[groupId]) {
-        const applet = window.appletInstances[groupId];
-        applet.inject(container);
-        // Force a resize to ensure it fits the container
-        setTimeout(() => {
-          if (container && typeof applet.setSize === 'function') {
-            applet.setSize(container.clientWidth, container.clientHeight);
-          }
-        }, 100);
-        return;
-      }
-      
-      // If no applet exists, create a new one
       const parameters = {
-        id: `ggbApplet-${groupId}`,
+        id: `ggbApplet-${groupId}-${Date.now()}`, // Unique ID to force re-render
         appName: 'classic',
         width: container.clientWidth || 800,
         height: container.clientHeight || 600,
@@ -69,11 +50,8 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
       
       const applet = new window.GGBApplet(parameters, true);
       applet.inject(container);
-      
-      // Store the new applet instance
-      if (window.appletInstances) {
-        window.appletInstances[groupId] = applet;
-      }
+      appletRef.current = applet;
+      hasInitialized.current = true;
     };
 
     const loadGeoGebraScript = (): Promise<void> => {
@@ -102,8 +80,8 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     });
 
     const resizeObserver = new ResizeObserver(() => {
-        if (window.appletInstances && window.appletInstances[groupId] && container) {
-            const applet = window.appletInstances[groupId];
+        if (appletRef.current && container) {
+            const applet = appletRef.current;
             if (applet && typeof applet.setSize === 'function') {
                 applet.setSize(container.clientWidth, container.clientHeight);
             }
@@ -120,6 +98,7 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
             resizeObserver.unobserve(container);
         }
       resizeObserver.disconnect();
+      hasInitialized.current = false;
     };
   }, [isClient, groupId]);
 
