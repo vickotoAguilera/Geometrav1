@@ -14,60 +14,38 @@ interface EjercicioInteractivoProps {
 
 export function EjercicioInteractivo({ ejercicioId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
-  const [ayuda, setAyuda] = useState<'teoria' | 'geogebra' | null>(null);
+  
+  const storageKey = `respuesta-${ejercicioId}`;
 
-  // --- INICIO DE LA LÓGICA DE PERSISTENCIA ---
-
-  // Efecto para cargar la respuesta guardada desde localStorage al montar el componente.
+  // Cargar la respuesta guardada al montar el componente.
   useEffect(() => {
-    const savedRespuesta = localStorage.getItem(`respuesta-${ejercicioId}`);
+    const savedRespuesta = localStorage.getItem(storageKey);
     if (savedRespuesta) {
       setRespuesta(savedRespuesta);
     }
-  }, [ejercicioId]);
+  }, [storageKey]);
 
-  // Efecto para guardar la respuesta en localStorage cada vez que cambia.
-  useEffect(() => {
-    if (respuesta) {
-      localStorage.setItem(`respuesta-${ejercicioId}`, respuesta);
-    } else {
-      // Si la respuesta está vacía, la eliminamos del storage.
-      localStorage.removeItem(`respuesta-${ejercicioId}`);
-    }
-  }, [respuesta, ejercicioId]);
+  // Guardar la respuesta en localStorage cada vez que cambia.
+  const handleRespuestaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRespuesta = e.target.value;
+    setRespuesta(newRespuesta);
+    localStorage.setItem(storageKey, newRespuesta);
+  };
   
-  // --- FIN DE LA LÓGICA DE PERSISTENCIA ---
-
-
-  // En fases futuras, el contenido de la ayuda se cargará dinámicamente.
-  const contenidoTeorico = "Aquí irá la explicación teórica paso a paso, sin dar el resultado final.";
-  const contenidoGeoGebra = "Aquí irá la guía paso a paso para resolver el ejercicio usando GeoGebra.";
-
-
   return (
     <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <Button variant={ayuda === 'teoria' ? 'default' : 'outline'} onClick={() => setAyuda(ayuda === 'teoria' ? null : 'teoria')}>
+        <Button variant={'outline'}>
           <BookText className="mr-2 h-4 w-4" />
-          Explicación Teórica
+          Explicación Teórica (Próximamente)
         </Button>
         <Link href={`/applet?ejercicio=${ejercicioId}`} passHref>
-            <Button variant={ayuda === 'geogebra' ? 'default' : 'outline'}>
+            <Button>
                 <CirclePlay className="mr-2 h-4 w-4" />
-                Resolver con GeoGebra
+                Resolver con Tutor IA en GeoGebra
             </Button>
         </Link>
       </div>
-
-      {ayuda && (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">
-              {ayuda === 'teoria' ? contenidoTeorico : contenidoGeoGebra}
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       <div className="space-y-2">
         <Label htmlFor={`respuesta-${ejercicioId}`} className="font-semibold">
@@ -76,7 +54,7 @@ export function EjercicioInteractivo({ ejercicioId }: EjercicioInteractivoProps)
         <Input
           id={`respuesta-${ejercicioId}`}
           value={respuesta}
-          onChange={(e) => setRespuesta(e.target.value)}
+          onChange={handleRespuestaChange}
           placeholder="Ingresa aquí tu resultado..."
         />
       </div>

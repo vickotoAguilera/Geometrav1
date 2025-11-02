@@ -144,14 +144,12 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
       fetchAndStartInitialConversation();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId]);
+  }, [ejercicioId, chatStorageKey]);
 
   useEffect(() => {
     try {
       if (messages.length > 0) {
         localStorage.setItem(chatStorageKey, JSON.stringify(messages));
-      } else {
-        localStorage.removeItem(chatStorageKey);
       }
     } catch (error) {
       console.error("Failed to save to localStorage", error);
@@ -198,7 +196,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   };
 
   const handleBackNavigation = () => {
-    // No borramos el historial, solo navegamos hacia atrás.
+    // No borra el historial, solo navega. La persistencia se mantiene.
     router.back();
   };
   
@@ -230,6 +228,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     let screenshotDataUri: string | null = null;
     if (sendScreenshot) {
       screenshotDataUri = await takeScreenshot();
+      setSendScreenshot(false); // Desactivar después de enviar
       if (!screenshotDataUri) return;
     }
 
