@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -101,49 +101,51 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
 
   const chatStorageKey = `funciones-chat-${ejercicioId}`;
 
-  // Cargar mensajes y enviar guía inicial si es necesario
+  const fetchAndStartInitialConversation = () => {
+    const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
+    setMessages([assistantPlaceholder]);
+    
+    fetch(`/content/guias-geogebra/${ejercicioId}.md`)
+      .then(res => {
+        if (!res.ok) throw new Error('Guía no encontrada');
+        return res.text();
+      })
+      .then(guideContent => {
+        startTransition(() => {
+          getFuncionesMatricesAiResponse({ 
+            initialSystemPrompt: guideContent 
+          })
+            .then(({ response }) => {
+              const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
+              setMessages([finalMessage]);
+            })
+            .catch(error => {
+               console.error("Error in initial chat:", error);
+               setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
+            });
+        });
+      })
+      .catch(err => {
+         console.error("Failed to fetch guide:", err);
+         setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
+      });
+  };
+
   useEffect(() => {
     try {
       const savedMessages = localStorage.getItem(chatStorageKey);
       if (savedMessages) {
         setMessages(JSON.parse(savedMessages));
       } else {
-        // Nueva conversación: buscar guía y enviar
-        const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
-        setMessages([assistantPlaceholder]);
-        
-        fetch(`/content/guias-geogebra/${ejercicioId}.md`)
-          .then(res => {
-            if (!res.ok) throw new Error('Guía no encontrada');
-            return res.text();
-          })
-          .then(guideContent => {
-            startTransition(() => {
-              getFuncionesMatricesAiResponse({ 
-                initialSystemPrompt: guideContent 
-              })
-                .then(({ response }) => {
-                  const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
-                  setMessages([finalMessage]);
-                })
-                .catch(error => {
-                   console.error("Error in initial chat:", error);
-                   setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
-                });
-            });
-          })
-          .catch(err => {
-             console.error("Failed to fetch guide:", err);
-             setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
-          });
+        fetchAndStartInitialConversation();
       }
     } catch (error) {
       console.error("Failed to load from localStorage", error);
+      fetchAndStartInitialConversation();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ejercicioId]);
 
-  // Guardar mensajes en localStorage
   useEffect(() => {
     try {
       if (messages.length > 0) {
@@ -193,11 +195,20 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     }
   };
 
+  const handleBackNavigation = () => {
+    localStorage.removeItem(chatStorageKey);
+    router.back();
+  };
+  
+  const handleResetConversation = () => {
+    localStorage.removeItem(chatStorageKey);
+    setMessages([]);
+    fetchAndStartInitialConversation();
+  };
 
   const handleButtonClick = (value: string) => {
     if (value === 'Volver al Ejercicio') {
-      localStorage.removeItem(chatStorageKey);
-      router.back();
+      handleBackNavigation();
     } else {
       setInput(value);
       const form = document.getElementById("funciones-chat-form") as HTMLFormElement;
@@ -257,14 +268,14 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
 
    const handlePlayAudio = async (messageId: string, text: string) => {
     if (audioState?.id === messageId && audioState.isPlaying) {
-      setAudioState(null); // Stop playing
+      setAudioState(null);
       return;
     }
 
     const cleanText = text.replace(/<code>(.*?)<\/code>/gs, '$1').replace(/\*\*(.*?)\*\*/gs, '$1').replace(/\[button:(.*?)\]/g, '');
     setIsGeneratingAudio(messageId);
     try {
-      const { audio } = await generateFuncionesMatricesSpeech(cleanText);
+      const { audio } = await generateFuncionesMatricesSpeech(text);
       setAudioState({ id: messageId, src: audio, isPlaying: true });
     } catch (error) {
       console.error("Error generating speech:", error);
@@ -280,8 +291,11 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
       <SheetHeader className="p-4 border-b">
         <SheetTitle className="flex items-center gap-2"><Bot /> Tutor de GeoGebra</SheetTitle>
         <SheetDescription>Sigue los pasos para resolver el ejercicio en la pizarra.</SheetDescription>
-         <Button variant="ghost" size="icon" className="absolute top-3 right-12" onClick={() => router.back()} title="Volver al ejercicio">
+         <Button variant="ghost" size="icon" className="absolute top-3 right-12" onClick={handleBackNavigation} title="Volver al ejercicio">
             <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <Button variant="ghost" size="icon" className="absolute top-3 right-20" onClick={handleResetConversation} title="Reiniciar conversación">
+            <RefreshCw className="w-5 h-5" />
         </Button>
       </SheetHeader>
 
