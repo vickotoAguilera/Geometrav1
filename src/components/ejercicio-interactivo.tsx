@@ -40,8 +40,8 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
           <BookText className="mr-2 h-4 w-4" />
           Explicación Teórica (Próximamente)
         </Button>
-        {/* Se pasa tanto el ID del ejercicio como el ID del grupo al applet */}
-        <Link href={`/applet?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
+        {/* Se pasa tanto el ID del ejercicio como el ID del grupo al applet contextual */}
+        <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
             <Button>
                 <CirclePlay className="mr-2 h-4 w-4" />
                 Resolver con Tutor IA en GeoGebra
