@@ -60,7 +60,9 @@ interface GenkitMessage {
 
 type TutorMode = 'math' | 'geogebra';
 
-const CHUNK_SIZE = 1048487; // Approx 1MB, Firestore's limit for a document
+// Firestore's document size limit is 1 MiB (1,048,576 bytes).
+// We set a chunk size just below this to account for other fields in the document.
+const CHUNK_SIZE = 1000000; // 1,000,000 bytes
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
@@ -168,7 +170,7 @@ export function ChatAssistant() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  const [audioState, setAudioState] = useState<{ id: string, src: string, isPlaying: boolean } | null>(null);
+  const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -594,14 +596,14 @@ export function ChatAssistant() {
   return (
     <>
       <SheetHeader className="p-4 border-b">
-        <div className="flex justify-between items-center">
-            <SheetTitle className="font-headline flex items-center gap-2">
-                <Bot /> Asistente Geometra
-            </SheetTitle>
-            {user && (
+        <SheetTitle>Asistente Geometra</SheetTitle>
+        <SheetDescription>
+            {user ? (isListening ? 'Escuchando... Di tu pregunta.' : 'Adjunta un archivo para añadir contexto o haz una pregunta.') : 'Inicia sesión para usar el asistente y guardar tu historial.'}
+        </SheetDescription>
+         {user && (
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" title="Borrar chat">
+                        <Button variant="ghost" size="icon" title="Borrar chat" className="absolute top-3 right-12">
                             <Trash2 className="w-5 h-5" />
                         </Button>
                     </AlertDialogTrigger>
@@ -619,10 +621,6 @@ export function ChatAssistant() {
                     </AlertDialogContent>
                 </AlertDialog>
             )}
-        </div>
-        <SheetDescription>
-            {user ? (isListening ? 'Escuchando... Di tu pregunta.' : 'Adjunta un archivo para añadir contexto o haz una pregunta.') : 'Inicia sesión para usar el asistente y guardar tu historial.'}
-        </SheetDescription>
       </SheetHeader>
 
       {user && groupedFiles.length > 0 && (
