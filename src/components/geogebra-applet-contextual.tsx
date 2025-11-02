@@ -81,9 +81,15 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     }
 
     const initializeOrAttachApplet = () => {
-      if (window.appletInstances?.[groupId]) {
+      if (window.appletInstances?.[groupId] && container) {
         container.innerHTML = ''; // Limpiar el contenedor
-        window.appletInstances[groupId].inject(container.id);
+        try {
+            window.appletInstances[groupId].inject(container.id);
+        } catch (e) {
+            console.error("Failed to re-inject applet, creating new one.", e);
+            delete window.appletInstances[groupId];
+            initializeApplet();
+        }
         return;
       }
 
@@ -145,10 +151,14 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
         }
     });
     
-    resizeObserver.observe(container);
+    if(container) {
+      resizeObserver.observe(container);
+    }
 
     return () => {
-      resizeObserver.unobserve(container);
+      if(container) {
+        resizeObserver.unobserve(container);
+      }
       resizeObserver.disconnect();
     };
   }, [isClient, groupId]);
@@ -164,21 +174,6 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
         id={`geogebra-container-${groupId}`}
         className="w-full h-full min-h-[500px] flex items-center justify-center"
       />
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-            <Button variant="outline" size="icon" onClick={handleSaveGGB} title="Guardar Pizarra">
-                <FileDown className="w-5 h-5" />
-            </Button>
-            <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Abrir Pizarra">
-                <FileUp className="w-5 h-5" />
-            </Button>
-             <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept=".ggb"
-                onChange={handleOpenGGB}
-             />
-      </div>
     </div>
   );
 });
