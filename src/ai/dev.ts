@@ -22,3 +22,5 @@ import '@/ai/flows/schemas/tts-schemas.ts';
 import '@/ai/flows/screenshot-assistant.ts';
 import '@/ai/flows/funciones-matrices-assistant.ts';
 import '@/ai/flows/schemas/funciones-matrices-schemas.ts';
+import '@/ai/flows/teoria-calculadora-assistant.ts';
+import '@/ai/flows/schemas/teoria-calculadora-schemas.ts';
