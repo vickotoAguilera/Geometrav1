@@ -1,5 +1,6 @@
 import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sigma } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 
@@ -52,41 +53,49 @@ export default function EjerciciosTrigonometriaPage() {
         </div>
         
         <div className="max-w-4xl mx-auto space-y-8">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Módulo 1: La Plaza de Skate</CardTitle>
-                    <CardDescription>
-                        Los siguientes ejercicios se basan en la misma situación. Resuélvelos usando la ayuda del tutor de GeoGebra si lo necesitas.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 divide-y">
-                    <div className="pt-6">
-                        <CentralAngleTheoremVisual/>
-                        <div className="p-4 border rounded-lg bg-background">
-                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
-                            <p className="mt-2 text-muted-foreground">
-                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
-                            </p>
-                        </div>
-                        
-                        <EjercicioInteractivo ejercicioId="plaza-skate" groupId={groupId} />
-                    </div>
+            <Accordion type="single" collapsible defaultValue="item-1">
+                <AccordionItem value="item-1">
+                    <Card>
+                        <AccordionTrigger className="p-6">
+                            <div className="flex flex-col items-start text-left">
+                                <CardTitle>Módulo 1: La Plaza de Skate</CardTitle>
+                                <CardDescription className="mt-2">
+                                    Los siguientes ejercicios se basan en la misma situación. Resuélvelos usando la ayuda del tutor de GeoGebra si lo necesitas.
+                                </CardDescription>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                             <CardContent className="space-y-6 divide-y">
+                                <div className="pt-6">
+                                    <CentralAngleTheoremVisual/>
+                                    <div className="p-4 border rounded-lg bg-background">
+                                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
+                                        <p className="mt-2 text-muted-foreground">
+                                            La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
+                                        </p>
+                                    </div>
+                                    
+                                    <EjercicioInteractivo ejercicioId="plaza-skate" groupId={groupId} />
+                                </div>
 
-                     <div className="pt-6">
-                        <div className="p-4 border rounded-lg bg-background">
-                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
-                            <p className="mt-2 text-muted-foreground">
-                                Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
-                            </p>
-                        </div>
+                                <div className="pt-6">
+                                    <div className="p-4 border rounded-lg bg-background">
+                                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
+                                        <p className="mt-2 text-muted-foreground">
+                                            Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
+                                        </p>
+                                    </div>
 
-                        <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
-                    </div>
-                </CardContent>
-                 <CardFooter>
-                    <p className="text-xs text-muted-foreground">Todos los ejercicios de este módulo comparten el mismo chat y pizarra de GeoGebra.</p>
-                </CardFooter>
-            </Card>
+                                    <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <p className="text-xs text-muted-foreground">Todos los ejercicios de este módulo comparten el mismo chat y pizarra de GeoGebra.</p>
+                            </CardFooter>
+                        </AccordionContent>
+                    </Card>
+                </AccordionItem>
+            </Accordion>
         </div>
 
       </main>
