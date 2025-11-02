@@ -172,6 +172,7 @@ const MobileNav = () => {
                     <Link href="/glosario" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Glosario</Link>
                     <Link href="/ensaya" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Ensayos</Link>
                     <Link href="/paes" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>PAES</Link>
+                    <Link href="/funciones-y-matrices" className="text-lg hover:text-primary py-2" onClick={() => setOpen(false)}>Funciones y Matrices</Link>
                 </nav>
                 <div className="mt-auto space-y-2">
                     <ScreenshotGuideButton />
@@ -241,6 +242,9 @@ export default function Header() {
                         </DropdownMenuItem>
                          <DropdownMenuItem asChild>
                            <Link href="/paes">PAES</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                           <Link href="/funciones-y-matrices">Funciones y Matrices</Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
