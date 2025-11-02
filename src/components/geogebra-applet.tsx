@@ -109,9 +109,15 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
         }
     });
     
-    resizeObserver.observe(container);
+    if (container) {
+      resizeObserver.observe(container);
+    }
 
     return () => {
+        if (container) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            resizeObserver.unobserve(container);
+        }
       resizeObserver.disconnect();
     };
   }, [isClient, currentGroupId]);
