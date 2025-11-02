@@ -6,6 +6,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { Part } from 'genkit';
 import { 
     TeoriaCalculadoraAssistantInputSchema,
     TeoriaCalculadoraAssistantOutputSchema,
@@ -49,11 +50,16 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     
     // El prompt de sistema se enriquece con el contexto del ejercicio actual.
     const dynamicSystemPrompt = `${systemPrompt}\n\nCONTEXTO DEL EJERCICIO ACTUAL:\n${contextoEjercicio}`;
+
+    // Extraer el mensaje más reciente para el prompt principal
+    const lastUserMessage = history?.[history.length - 1]?.content[0]?.text || '';
+    const prompt: Part[] = [{ text: lastUserMessage }];
      
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
-      history: history || undefined,
+      history: history?.slice(0, -1) || [], // El historial no debe incluir el último mensaje
+      prompt: prompt, // El prompt principal es el último mensaje del usuario
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
