@@ -1,11 +1,20 @@
 'use client';
 
 import { useEffect, useRef, memo, useState } from 'react';
-import { Expand, Maximize2 } from 'lucide-react';
+import { Expand, Maximize2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-// Se mueve la función de detección dentro del componente o se usa en useEffect.
-// Para este caso, la dejaremos fuera pero su uso se controlará con estado.
+
 const isMobileDeviceClient = () => {
   if (typeof window === 'undefined') return false;
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -39,9 +48,22 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Esto se ejecuta solo en el cliente, después de la hidratación.
     setIsClient(true);
     setIsMobile(isMobileDeviceClient());
+  }, []);
+
+  // Add the beforeunload event listener to warn the user before leaving.
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = ''; // Required for most browsers
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   const toggleFullscreen = () => {
@@ -68,7 +90,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   };
   
   useEffect(() => {
-    if (typeof window === 'undefined' || !isClient) return; // Espera a que el cliente esté listo
+    if (typeof window === 'undefined' || !isClient) return;
 
     const loadGeoGebraScript = (): Promise<void> => {
       return new Promise((resolve, reject) => {
@@ -113,7 +135,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
           height,
           showToolBar: true,
           showAlgebraInput: true,
-          showMenuBar: !isMobile,
+          showMenuBar: true, // Menu bar must be visible for saving/loading
           enableLabelDrags: true,
           enableShiftDragZoom: true,
           enableRightClick: !isMobile,
@@ -199,7 +221,6 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   }, [isClient, isMobile]);
 
   if (!isClient) {
-    // Renderiza un placeholder o nada durante el SSR y la hidratación inicial.
     return <div className="w-full h-full min-h-[500px] flex items-center justify-center">Cargando...</div>;
   }
 
@@ -219,19 +240,55 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
           minHeight: isSimulatedFullscreen ? '100dvh' : '500px',
         }}
       />
-      <Button
-        variant="outline"
-        size="icon"
-        className="absolute top-4 right-4 z-[51] bg-background/80 hover:bg-background"
-        onClick={toggleFullscreen}
-        title={isMobile ? 'Expandir' : 'Pantalla completa'}
-      >
-        {isMobile ? (
-          <Maximize2 className="w-5 h-5" />
-        ) : (
-          <Expand className="w-5 h-5" />
-        )}
-      </Button>
+      <div className="absolute top-4 right-4 z-[51] flex gap-2">
+        <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button
+                    variant="destructive"
+                    size="icon"
+                    className="bg-red-500/80 hover:bg-red-600/90 text-white rounded-full"
+                    title="¡Atención! Cómo guardar tu progreso"
+                >
+                    <AlertTriangle className="w-5 h-5" />
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-2">
+                        <p>
+                            Esta pizarra es un lienzo libre y **no guarda tu trabajo automáticamente** si sales o recargas la página.
+                        </p>
+                        <p>
+                            <strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.
+                        </p>
+                        <p>
+                            <strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.
+                        </p>
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogAction>Entendido</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-background/80 hover:bg-background"
+          onClick={toggleFullscreen}
+          title={isMobile ? 'Expandir' : 'Pantalla completa'}
+        >
+          {isMobile ? (
+            <Maximize2 className="w-5 h-5" />
+          ) : (
+            <Expand className="w-5 h-5" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 });
+
+    
