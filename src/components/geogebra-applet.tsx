@@ -7,13 +7,10 @@ declare global {
   interface Window { GGBApplet?: any; }
 }
 
-// Almacenamos la instancia del applet fuera del componente para que persista entre renders.
-// La clave será el ID del grupo de ejercicios.
-const appletInstances: { [key: string]: any } = {};
-
 export const GeoGebraApplet = memo(function GeoGebraApplet() {
   const searchParams = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
+  const appletRef = useRef<any>(null); // Usaremos useRef para la instancia del applet
   const [isClient, setIsClient] = useState(false);
   const currentGroupId = searchParams.get('grupo');
 
@@ -22,14 +19,17 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   }, []);
   
   useEffect(() => {
-    if (typeof window === 'undefined' || !isClient || !containerRef.current || !currentGroupId) return;
+    if (typeof window === 'undefined' || !isClient || !containerRef.current) return;
 
     const container = containerRef.current;
     
-    // Función para inicializar un nuevo applet de GeoGebra
-    const initializeNewApplet = (groupId: string) => {
+    const initializeApplet = () => {
+        if (!window.GGBApplet) return;
+        
+        container.innerHTML = ''; // Limpiar el contenedor antes de inyectar
+
         const parameters = {
-            id: `ggbApplet-${groupId}`,
+            id: `ggbApplet-${currentGroupId || 'default'}`,
             appName: 'classic',
             width: container.clientWidth || 800,
             height: container.clientHeight || 600,
@@ -43,36 +43,38 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
         };
         const applet = new window.GGBApplet(parameters, true);
         applet.inject(container);
-        appletInstances[groupId] = applet; // Guardar la nueva instancia
+        appletRef.current = applet; // Guardar la instancia en el ref
     };
 
     const loadGeoGebraScript = (): Promise<void> => {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         if (window.GGBApplet) return resolve();
+        
+        const existingScript = document.getElementById('ggb-script');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => resolve());
+            existingScript.addEventListener('error', (e) => reject(e));
+            return;
+        }
+
         const script = document.createElement('script');
         script.id = 'ggb-script';
         script.src = 'https://www.geogebra.org/apps/deployggb.js';
         script.async = true;
         script.onload = () => resolve();
+        script.onerror = (e) => reject(e);
         document.head.appendChild(script);
       });
     };
 
-    loadGeoGebraScript().then(() => {
-        container.innerHTML = ''; // Limpiar el contenedor
-        
-        // Si ya existe una instancia para este grupo, la re-inyecta.
-        if (appletInstances[currentGroupId]) {
-            appletInstances[currentGroupId].inject(container);
-        } else {
-            // Si no, crea una nueva.
-            initializeNewApplet(currentGroupId);
-        }
+    loadGeoGebraScript().then(initializeApplet).catch(error => {
+        console.error("Error loading or initializing GeoGebra applet:", error);
     });
 
     const resizeObserver = new ResizeObserver(() => {
-      if (appletInstances[currentGroupId] && container) {
-        appletInstances[currentGroupId].setSize(container.clientWidth, container.clientHeight);
+      const applet = appletRef.current;
+      if (applet && container && typeof applet.setSize === 'function') {
+        applet.setSize(container.clientWidth, container.clientHeight);
       }
     });
     
@@ -80,6 +82,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
 
     return () => {
       resizeObserver.disconnect();
+      appletRef.current = null; // Limpiar la referencia al desmontar
     };
   }, [isClient, currentGroupId]);
 
