@@ -5,8 +5,9 @@ import { Sigma } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 
 const CentralAngleTheoremVisual = () => (
-    <div className="flex justify-center items-center my-4">
-        <svg viewBox="0 0 100 100" className="w-full h-auto max-w-[250px] mx-auto">
+    <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-background/50 h-full">
+        <h4 className="text-sm font-semibold text-center mb-2">Teorema del Ángulo Central</h4>
+        <svg viewBox="0 0 100 100" className="w-full h-auto max-w-[200px] mx-auto">
             {/* Circle */}
             <circle cx="50" cy="50" r="45" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth="1" />
             
@@ -34,6 +35,9 @@ const CentralAngleTheoremVisual = () => (
              <path d="M 50 95 Q 50 88, 57 86" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" transform="translate(-8, -8) rotate(20, 50, 95)" />
             <text x="48" y="82" fontSize="8" fill="hsl(var(--foreground))">α</text>
         </svg>
+        <p className="text-xs text-center text-muted-foreground mt-2">
+            El ángulo del centro (2α) es siempre el doble que el ángulo inscrito (α) que abarca el mismo arco.
+        </p>
     </div>
 );
 
@@ -67,12 +71,14 @@ export default function EjerciciosTrigonometriaPage() {
                         <AccordionContent>
                              <CardContent className="space-y-6 divide-y">
                                 <div className="pt-6">
-                                    <CentralAngleTheoremVisual/>
-                                    <div className="p-4 border rounded-lg bg-background">
-                                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
-                                        <p className="mt-2 text-muted-foreground">
-                                            La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
-                                        </p>
+                                    <div className="flex flex-col md:flex-row gap-4">
+                                        <div className="flex-1 p-4 border rounded-lg bg-background">
+                                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
+                                            <p className="mt-2 text-muted-foreground">
+                                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
+                                            </p>
+                                        </div>
+                                        <CentralAngleTheoremVisual/>
                                     </div>
                                     
                                     <EjercicioInteractivo ejercicioId="plaza-skate" groupId={groupId} />
