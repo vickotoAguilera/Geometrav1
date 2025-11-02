@@ -7,12 +7,12 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic } from 'lucide-react';
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic, Files } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -30,16 +30,28 @@ interface BaseMessage {
 interface TextMessage extends BaseMessage {
   type: 'text';
   content: string;
-  imageUrl?: string; // For images sent with a text message
+  imageUrl?: string; 
 }
 interface FileContextMessage extends BaseMessage {
   type: 'fileContext';
-  content: string; // This will store the data URI
+  content: string; 
   fileName: string;
-  isActive: boolean; 
+  isActive: boolean;
+  groupId?: string;
+  partNumber?: number;
+  totalParts?: number;
 }
 
 type Message = TextMessage | FileContextMessage;
+
+interface GroupedFile {
+    id: string;
+    fileName: string;
+    isActive: boolean;
+    groupId: string;
+    totalParts: number;
+    messages: FileContextMessage[];
+}
 
 interface GenkitMessage {
   role: 'user' | 'model';
@@ -47,6 +59,8 @@ interface GenkitMessage {
 }
 
 type TutorMode = 'math' | 'geogebra';
+
+const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
@@ -185,6 +199,40 @@ export function ChatAssistant() {
 
   const textMessages = allMessages.filter(m => m.type === 'text') as TextMessage[];
   const fileContextMessages = allMessages.filter(m => m.type === 'fileContext') as FileContextMessage[];
+  
+  const groupedFiles: GroupedFile[] = useMemoFirebase(() => {
+    const groups: { [key: string]: GroupedFile } = {};
+    fileContextMessages.forEach(msg => {
+        if (msg.groupId) {
+            if (!groups[msg.groupId]) {
+                groups[msg.groupId] = {
+                    id: msg.groupId,
+                    fileName: msg.fileName.replace(/ - Parte \d+\/\d+$/, ''),
+                    isActive: msg.isActive,
+                    groupId: msg.groupId,
+                    totalParts: msg.totalParts || 1,
+                    messages: []
+                };
+            }
+            groups[msg.groupId].messages.push(msg);
+            if(msg.isActive) {
+                groups[msg.groupId].isActive = true;
+            }
+        } else {
+             const individualGroupId = `individual-${msg.id}`;
+             groups[individualGroupId] = {
+                id: msg.id,
+                fileName: msg.fileName,
+                isActive: msg.isActive,
+                groupId: individualGroupId,
+                totalParts: 1,
+                messages: [msg]
+            };
+        }
+    });
+    return Object.values(groups);
+  }, [fileContextMessages]);
+
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -207,6 +255,74 @@ export function ChatAssistant() {
       audioRef.current.pause();
     }
   }, [audioState]);
+  
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile || !user || !messagesRef || !firestore) return;
+
+    try {
+        const fileDataUri = await fileToDataUri(selectedFile);
+
+        if (selectedFile.type.startsWith('image/')) {
+            setAttachedImage(fileDataUri);
+        } else {
+            // Document handling (PDF, DOCX)
+            if (fileDataUri.length > CHUNK_SIZE) {
+                // Chunking logic
+                const totalParts = Math.ceil(fileDataUri.length / CHUNK_SIZE);
+                const groupId = `group-${Date.now()}`;
+                const batch = writeBatch(firestore);
+
+                for (let i = 0; i < totalParts; i++) {
+                    const chunkContent = fileDataUri.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                    const docRef = doc(collection(firestore, 'users', user.uid, 'messages'));
+                    const fileMessageData: Omit<FileContextMessage, 'id'> = {
+                        role: 'user',
+                        type: 'fileContext',
+                        content: chunkContent,
+                        fileName: `${selectedFile.name} - Parte ${i + 1}/${totalParts}`,
+                        isActive: true,
+                        createdAt: serverTimestamp() as Timestamp,
+                        groupId,
+                        partNumber: i + 1,
+                        totalParts,
+                    };
+                    batch.set(docRef, fileMessageData);
+                }
+                await batch.commit();
+                toast({
+                    title: "Archivo grande añadido",
+                    description: `${selectedFile.name} se dividió en ${totalParts} partes y se añadió al contexto.`,
+                });
+
+            } else {
+                // Single file logic
+                const fileMessageData: Omit<FileContextMessage, 'id'> = {
+                    role: 'user',
+                    type: 'fileContext',
+                    content: fileDataUri,
+                    fileName: selectedFile.name,
+                    isActive: true,
+                    createdAt: serverTimestamp() as Timestamp,
+                };
+                await addDoc(messagesRef, fileMessageData);
+                toast({
+                    title: "Archivo añadido al contexto",
+                    description: `${selectedFile.name} está listo para ser usado.`,
+                });
+            }
+        }
+    } catch (err) {
+        console.error("Failed to process file", err);
+        toast({
+            variant: "destructive",
+            title: "Error al procesar archivo",
+            description: "No se pudo leer o guardar el archivo.",
+        });
+    }
+    
+    if(fileInputRef.current) fileInputRef.current.value = '';
+  };
 
 
   const fileToDataUri = (file: File): Promise<string> => {
@@ -217,53 +333,6 @@ export function ChatAssistant() {
       reader.readAsDataURL(file);
     });
   }
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile || !user || !messagesRef) return;
-  
-    if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-      toast({
-        variant: "destructive",
-        title: "Archivo demasiado grande",
-        description: "Por favor, selecciona un archivo de menos de 5MB.",
-      });
-      return;
-    }
-    
-    try {
-      const fileDataUri = await fileToDataUri(selectedFile);
-      const isImage = selectedFile.type.startsWith('image/');
-
-      if (isImage) {
-        setAttachedImage(fileDataUri);
-      } else {
-        const fileMessageData: Omit<FileContextMessage, 'id'> = {
-            role: 'user',
-            type: 'fileContext',
-            content: fileDataUri,
-            fileName: selectedFile.name,
-            isActive: true, // New documents are active by default
-            createdAt: serverTimestamp() as Timestamp,
-        };
-        await addDoc(messagesRef, fileMessageData);
-        toast({
-            title: "Archivo añadido al contexto",
-            description: `${selectedFile.name} está listo para ser usado.`,
-        });
-      }
-    } catch (err) {
-      console.error("Failed to process file", err);
-      toast({
-        variant: "destructive",
-        title: "Error al procesar archivo",
-        description: "No se pudo leer o guardar el archivo.",
-      });
-    }
-
-    if(fileInputRef.current) fileInputRef.current.value = '';
-  };
-
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
@@ -291,12 +360,8 @@ export function ChatAssistant() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || !user) {
-      if(attachedImage && !isPending && user) {
-        // Allow sending image with empty prompt
-      } else {
+    if ((!input.trim() && !attachedImage) || isPending || !user) {
         return;
-      }
     }
   
     const currentInput = input;
@@ -335,12 +400,31 @@ export function ChatAssistant() {
 
           const activeFiles = fileContextMessages
             .filter(f => f.isActive)
+            .sort((a,b) => (a.partNumber || 0) - (b.partNumber || 0))
             .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
-
+            
+          const concatenatedFiles: {fileName: string, fileDataUri: string}[] = [];
           if (activeFiles.length > 0) {
+            const fileGroups: {[key: string]: {fileName: string, content: string[]}} = {};
+
+            activeFiles.forEach(f => {
+                const baseName = f.fileName.replace(/ - Parte \d+\/\d+$/, '');
+                if (!fileGroups[baseName]) {
+                    fileGroups[baseName] = { fileName: baseName, content: [] };
+                }
+                fileGroups[baseName].content.push(f.fileDataUri);
+            });
+
+            for (const groupName in fileGroups) {
+                concatenatedFiles.push({
+                    fileName: fileGroups[groupName].fileName,
+                    fileDataUri: fileGroups[groupName].content.join('')
+                });
+            }
+
              toast({
               title: "Usando contexto",
-              description: `La IA está usando ${activeFiles.length} archivo(s) como contexto.`,
+              description: `La IA está usando ${concatenatedFiles.length} archivo(s) como contexto.`,
             });
           }
           
@@ -351,7 +435,7 @@ export function ChatAssistant() {
               content: [{ text: (m as TextMessage).content }],
             }));
             
-          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, activeFiles);
+          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, concatenatedFiles);
           
           await saveMessage({
             role: 'assistant',
@@ -383,7 +467,6 @@ export function ChatAssistant() {
       return;
     }
 
-    // Clean the text by removing code, bold, and button tags before sending to TTS
     const cleanText = text
       .replace(/<code>(.*?)<\/code>/gs, '$1')
       .replace(/\*\*(.*?)\*\*/gs, '$1')
@@ -430,13 +513,47 @@ export function ChatAssistant() {
     }
   };
   
-  const toggleFileActive = async (fileId: string, isActive: boolean) => {
+  const toggleFileGroupActive = async (groupId: string, isActive: boolean) => {
+    if (!messagesRef || !firestore) return;
+    
+    const querySnapshot = await getDocs(query(messagesRef, where('groupId', '==', groupId)));
+    const batch = writeBatch(firestore);
+    querySnapshot.forEach(doc => {
+        batch.update(doc.ref, { isActive });
+    });
+    await batch.commit();
+  };
+  
+  const toggleIndividualFileActive = async (fileId: string, isActive: boolean) => {
     if (!messagesRef) return;
     const docRef = doc(messagesRef, fileId);
     await updateDoc(docRef, { isActive });
+  }
+
+  const deleteFileGroup = async (groupId: string) => {
+    if (!messagesRef || !firestore) return;
+    try {
+      const querySnapshot = await getDocs(query(messagesRef, where('groupId', '==', groupId)));
+      const batch = writeBatch(firestore);
+      querySnapshot.forEach(doc => {
+          batch.delete(doc.ref);
+      });
+      await batch.commit();
+
+      toast({
+        title: "Archivo eliminado",
+        description: "El archivo y todas sus partes han sido eliminados del contexto.",
+      });
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error al eliminar",
+        description: "No se pudo eliminar el grupo de archivos.",
+      });
+    }
   };
 
-  const deleteFile = async (fileId: string) => {
+  const deleteIndividualFile = async (fileId: string) => {
     if (!messagesRef) return;
     try {
       await deleteDoc(doc(messagesRef, fileId));
@@ -506,26 +623,26 @@ export function ChatAssistant() {
         </SheetDescription>
       </SheetHeader>
 
-      {user && fileContextMessages.length > 0 && (
+      {user && groupedFiles.length > 0 && (
         <div className="p-3 border-b bg-background">
           <h3 className="text-sm font-medium mb-2 text-muted-foreground flex items-center gap-2">
             <Info className="w-4 h-4"/>
             Contexto de Archivos
           </h3>
           <div className="space-y-2">
-            {fileContextMessages.map(file => (
-              <div key={file.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
+            {groupedFiles.map(group => (
+              <div key={group.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
                 <div className="flex items-center gap-2 overflow-hidden">
-                  <FileText className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate" title={file.fileName}>{file.fileName}</span>
+                  {group.totalParts > 1 ? <Files className="w-4 h-4 flex-shrink-0" /> : <FileText className="w-4 h-4 flex-shrink-0" />}
+                  <span className="truncate" title={group.fileName}>{group.fileName} {group.totalParts > 1 ? `(${group.totalParts} partes)` : ''}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <Switch
-                    checked={file.isActive}
-                    onCheckedChange={(checked) => toggleFileActive(file.id, checked)}
-                    aria-label={`Activar contexto para ${file.fileName}`}
+                    checked={group.isActive}
+                    onCheckedChange={(checked) => group.totalParts > 1 ? toggleFileGroupActive(group.groupId, checked) : toggleIndividualFileActive(group.id, checked)}
+                    aria-label={`Activar contexto para ${group.fileName}`}
                   />
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteFile(file.id)} title="Quitar archivo">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => group.totalParts > 1 ? deleteFileGroup(group.groupId) : deleteIndividualFile(group.id)} title="Quitar archivo">
                       <X className="w-4 h-4" />
                   </Button>
                 </div>
