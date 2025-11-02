@@ -50,14 +50,19 @@ export async function funcionesMatricesAssistant(input: FuncionesMatricesAssista
   return funcionesMatricesAssistantFlow(input);
 }
 
-const systemPrompt = `Eres un tutor de GeoGebra experto, paciente y amigable. Tu única misión es guiar al usuario, paso a paso, para que resuelva un ejercicio específico **dentro de la herramienta GeoGebra**.
+const systemPrompt = `Eres un tutor de GeoGebra experto, paciente y amigable. Tu única misión es guiar al usuario, paso a paso, para que resuelva un ejercicio específico **dentro de la herramienta GeoGebra**. También puedes analizar capturas de pantalla de la pizarra de GeoGebra para darle feedback.
 
 REGLAS DE COMPORTAMIENTO ESTRICTAS:
 1.  **NO DES LA RESPUESTA FINAL:** Tu objetivo es que el alumno descubra la solución, no que tú se la des.
 2.  **GUÍA PASO A PASO:** Da solo una instrucción o haz una pregunta a la vez. Espera la respuesta del alumno antes de continuar.
 3.  **PIDE CONFIRMACIÓN VISUAL:** Haz preguntas como "**¿Qué ves ahora en la Vista Gráfica?**", "**¿Qué punto se acaba de crear?**" o "**Inténtalo y dime qué resultado te aparece**".
-4.  **USA EL MATERIAL DEL EJERCICIO:** A continuación se te proporcionará el contexto y los pasos para un ejercicio específico, identificado por un 'ejercicioId'. Basa toda tu guía en ese material.
-5.  **BOTÓN DE REGRESO:** Cuando el ejercicio esté completamente resuelto y el alumno haya llegado a la respuesta final, tu último mensaje DEBE ser una felicitación y terminar con el botón de acción: \`[button:Volver al Ejercicio]\`.`;
+4.  **USA EL MATERIAL DEL EJERCICIO:** Si el usuario te envía una consulta inicial, se te proporcionará el contexto y los pasos para un ejercicio específico, identificado por un 'ejercicioId'. Basa toda tu guía inicial en ese material.
+5.  **BOTÓN DE REGRESO:** Cuando el ejercicio esté completamente resuelto y el alumno haya llegado a la respuesta final, tu último mensaje DEBE ser una felicitación y terminar con el botón de acción: \`[button:Volver al Ejercicio]\`.
+6.  **ANÁLISIS DE CAPTURA DE PANTALLA:** Si el usuario te envía una imagen, tu rol es ser un supervisor.
+    - Analiza la construcción en GeoGebra que se ve en la imagen.
+    - Compárala con los pasos del ejercicio que están resolviendo.
+    - Dale una retroalimentación constructiva. Ejemplo: "**Veo que ya dibujaste la circunferencia, ¡muy bien! Ahora, según el paso 2, necesitas crear los puntos A, B y C. ¿Necesitas ayuda con eso?**".
+    - Finaliza siempre tu análisis con una pregunta para seguir guiándolo.`;
 
 const funcionesMatricesAssistantFlow = ai.defineFlow(
   {
@@ -66,33 +71,38 @@ const funcionesMatricesAssistantFlow = ai.defineFlow(
     outputSchema: FuncionesMatricesAssistantOutputSchema,
   },
   async (input) => {
-    const { ejercicioId, history, userQuery } = input;
+    const { ejercicioId, history, userQuery, screenshotDataUri } = input;
+    const prompt: Part[] = [];
 
-    const guiaEjercicio = guiasEjercicios[ejercicioId] || "No tengo instrucciones para este ejercicio. ¿Puedes describirme el problema?";
+    // 1. Add the screenshot to the prompt if it exists
+    if (screenshotDataUri) {
+      prompt.push({ media: { url: screenshotDataUri } });
+    }
 
-    const fullQuery = `
-      --- INICIO GUÍA DEL EJERCICIO ---
-      ejercicioId: ${ejercicioId}
-      ${guiaEjercicio}
-      --- FIN GUÍA DEL EJERCICIO ---
+    let fullQuery = userQuery || '';
+    
+    // 2. If it's the start of the conversation, add the exercise guide
+    if (ejercicioId && (!history || history.length === 0)) {
+        const guiaEjercicio = guiasEjercicios[ejercicioId] || "No tengo instrucciones para este ejercicio. ¿Puedes describirme el problema?";
+        fullQuery = `
+          --- INICIO GUÍA DEL EJERCICIO ---
+          ejercicioId: ${ejercicioId}
+          ${guiaEjercicio}
+          --- FIN GUÍA DEL EJERCICIO ---
 
-      Pregunta/Respuesta del usuario: ${userQuery || (history && history.length > 0 ? '' : 'El usuario acaba de abrir el chat.')}
-    `;
+          Pregunta/Respuesta del usuario: ${userQuery || 'El usuario acaba de abrir el chat.'}
+        `;
+    }
 
-    const newHistory: Part[] = (history || []).map(m => ({
-        role: m.role,
-        content: m.content.map(c => ({ text: c.text }))
-    }));
-
-    if (userQuery) {
-        newHistory.push({ role: 'user', content: [{ text: userQuery }]});
+    if (fullQuery.trim()) {
+      prompt.push({ text: fullQuery });
     }
      
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: systemPrompt,
-      prompt: [{ text: fullQuery }],
-      history: newHistory.length > 0 ? newHistory : undefined,
+      history: history || undefined,
+      prompt: prompt,
       output: {
         schema: FuncionesMatricesAssistantOutputSchema,
       },

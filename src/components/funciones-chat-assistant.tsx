@@ -1,22 +1,25 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getFuncionesMatricesAiResponse } from '@/app/funciones-matrices-actions';
+import { getFuncionesMatricesAiResponse, generateFuncionesMatricesSpeech } from '@/app/funciones-matrices-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2 } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
+import html2canvas from 'html2canvas';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   content: string;
+  screenshot?: string;
 }
 
 interface GenkitMessage {
@@ -85,6 +88,60 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   const { toast } = useToast();
   const router = useRouter();
 
+  const [sendScreenshot, setSendScreenshot] = useState(false);
+  const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const { isListening, startListening, stopListening, isSupported } = useSpeechRecognition({
+    onTranscript: (newTranscript) => {
+        setInput(prev => (prev.endsWith(' ') ? prev : prev + ' ') + newTranscript);
+    }
+  });
+
+  const chatStorageKey = `funciones-chat-${ejercicioId}`;
+
+  // Cargar mensajes desde localStorage
+  useEffect(() => {
+    try {
+      const savedMessages = localStorage.getItem(chatStorageKey);
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      } else {
+        // Enviar consulta inicial solo si no hay historial guardado
+        const initialAssistantMessage: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
+        setMessages([initialAssistantMessage]);
+
+        startTransition(() => {
+          getFuncionesMatricesAiResponse({ ejercicioId: ejercicioId, history: [] })
+            .then(({ response }) => {
+              const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
+              setMessages([finalMessage]);
+              localStorage.setItem(chatStorageKey, JSON.stringify([finalMessage]));
+            })
+            .catch(error => {
+              console.error("Error in initial chat:", error);
+              setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
+            });
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load messages from localStorage", error);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ejercicioId]);
+
+  // Guardar mensajes en localStorage
+  useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem(chatStorageKey, JSON.stringify(messages));
+      }
+    } catch (error) {
+      console.error("Failed to save messages to localStorage", error);
+    }
+  }, [messages, chatStorageKey]);
+
   useEffect(() => {
     const viewport = viewportRef.current;
     if (viewport) {
@@ -94,35 +151,40 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     }
   }, [messages, isPending]);
 
-  useEffect(() => {
-    // Enviar consulta inicial al montar el componente
-    const initialAssistantMessage: ChatMessage = {
-      id: `assistant-intro-${Date.now()}`,
-      role: 'model',
-      content: '...',
-    };
-    setMessages([initialAssistantMessage]);
+   useEffect(() => {
+    if (audioState && audioState.src) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.onended = () => setAudioState(null);
+      }
+      audioRef.current.src = audioState.src;
+      audioRef.current.play().catch(e => console.error("Audio playback error", e));
+    } else if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [audioState]);
 
-    startTransition(() => {
-      const processAndRespond = async () => {
-        try {
-          const { response: aiResponse } = await getFuncionesMatricesAiResponse({
-            ejercicioId: ejercicioId,
-            history: [],
-          });
-          setMessages([{ id: `assistant-intro-final-${Date.now()}`, role: 'model', content: aiResponse }]);
-        } catch (error: any) {
-          console.error("Error in initial chat:", error);
-          setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
-        }
-      };
-      processAndRespond();
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId]);
+
+  const takeScreenshot = async (): Promise<string | null> => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) {
+        toast({ variant: 'destructive', title: 'Error', description: 'No se pudo encontrar el contenido principal para capturar.' });
+        return null;
+    }
+    try {
+        const canvas = await html2canvas(mainElement, { useCORS: true, logging: false, scale: window.devicePixelRatio });
+        return canvas.toDataURL('image/png');
+    } catch (error) {
+        console.error('Error taking screenshot:', error);
+        toast({ variant: 'destructive', title: 'Error de Captura', description: 'No se pudo tomar la captura de pantalla.' });
+        return null;
+    }
+  };
+
 
   const handleButtonClick = (value: string) => {
     if (value === 'Volver al Ejercicio') {
+      localStorage.removeItem(chatStorageKey);
       router.back();
     } else {
       setInput(value);
@@ -133,18 +195,23 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isPending) return;
 
     const currentInput = input;
     setInput('');
+    
+    let screenshotDataUri: string | null = null;
+    if (sendScreenshot) {
+      screenshotDataUri = await takeScreenshot();
+      if (!screenshotDataUri) return;
+    }
 
-    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput };
+    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput, ...(screenshotDataUri && { screenshot: screenshotDataUri }) };
     const assistantPlaceholder: ChatMessage = { id: `assistant-${Date.now()}`, role: 'model', content: '...' };
 
-    const newMessages = [...messages, userMessage, assistantPlaceholder];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
 
     startTransition(() => {
       const processAndRespond = async () => {
@@ -155,9 +222,9 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
           }));
 
           const { response: aiResponse } = await getFuncionesMatricesAiResponse({
-            ejercicioId: ejercicioId,
             history: genkitHistory,
             userQuery: currentInput,
+            screenshotDataUri: screenshotDataUri ?? undefined
           });
 
           setMessages(prev => prev.slice(0, -1).concat({
@@ -176,11 +243,34 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     });
   };
 
+   const handlePlayAudio = async (messageId: string, text: string) => {
+    if (audioState?.id === messageId && audioState.isPlaying) {
+      setAudioState(null); // Stop playing
+      return;
+    }
+
+    const cleanText = text.replace(/<code>(.*?)<\/code>/gs, '$1').replace(/\*\*(.*?)\*\*/gs, '$1').replace(/\[button:(.*?)\]/g, '');
+    setIsGeneratingAudio(messageId);
+    try {
+      const { audio } = await generateFuncionesMatricesSpeech(cleanText);
+      setAudioState({ id: messageId, src: audio, isPlaying: true });
+    } catch (error) {
+      console.error("Error generating speech:", error);
+      toast({ variant: "destructive", title: "Error de audio", description: "No se pudo generar la voz." });
+    } finally {
+      setIsGeneratingAudio(null);
+    }
+  };
+
+
   return (
     <>
       <SheetHeader className="p-4 border-b">
         <SheetTitle className="flex items-center gap-2"><Bot /> Tutor de GeoGebra</SheetTitle>
         <SheetDescription>Sigue los pasos para resolver el ejercicio en la pizarra.</SheetDescription>
+         <Button variant="ghost" size="icon" className="absolute top-3 right-12" onClick={() => router.back()} title="Volver al ejercicio">
+            <ArrowLeft className="w-5 h-5" />
+        </Button>
       </SheetHeader>
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
@@ -191,6 +281,11 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
                 <Avatar className="w-8 h-8 border"><AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback></Avatar>
               )}
               <div className={cn('p-3 rounded-lg max-w-[85%] text-sm', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
+                {message.screenshot && (
+                    <div className="mb-2">
+                        <img src={message.screenshot} alt="Captura de pantalla" className="rounded-md object-cover max-h-40"/>
+                    </div>
+                )}
                 {message.content === '...' ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
@@ -198,6 +293,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
                     <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
                   </div>
                 ) : (
+                 <>
                   <div className="space-y-2 leading-relaxed">
                     {parseResponse(message.content).map((part, index) => {
                       if (part.type === 'button') {
@@ -210,6 +306,26 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
                       return <span key={index}>{part.value}</span>;
                     })}
                   </div>
+                   {message.role === 'model' && message.content !== '...' && (
+                        <div className='-mb-2 -mr-2 mt-2 flex justify-end'>
+                             <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-7 w-7 text-muted-foreground"
+                                onClick={() => handlePlayAudio(message.id, message.content)}
+                                disabled={!!isGeneratingAudio}
+                            >
+                                {isGeneratingAudio === message.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin"/>
+                                ) : audioState?.id === message.id && audioState.isPlaying ? (
+                                    <Waves className="h-4 w-4" />
+                                ) : (
+                                    <Volume2 className="h-4 w-4"/>
+                                )}
+                            </Button>
+                        </div>
+                    )}
+                  </>
                 )}
               </div>
               {message.role === 'user' && (
@@ -222,12 +338,35 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
 
       <SheetFooter className="p-4 border-t bg-background">
         <form id="funciones-chat-form" onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
+            <Button
+                type="button"
+                variant={sendScreenshot ? 'default' : 'ghost'}
+                size="icon"
+                onClick={() => setSendScreenshot(prev => !prev)}
+                disabled={isPending}
+                title={sendScreenshot ? "Desactivar captura" : "Activar captura"}
+            >
+                <Camera className="w-5 h-5" />
+            </Button>
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Responde al tutor..."
+            placeholder={isListening ? "Escuchando..." : "Responde al tutor..."}
             disabled={isPending}
           />
+           {isSupported && (
+                 <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={isPending}
+                    title={isListening ? "Dejar de grabar" : "Grabar voz"}
+                    className={cn(isListening && 'text-red-500 hover:text-red-600')}
+                 >
+                    <Mic className="w-5 h-5" />
+                 </Button>
+              )}
           <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
