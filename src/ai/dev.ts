@@ -20,3 +20,4 @@ import '@/ai/flows/retroalimentacion-paes-flow.ts';
 import '@/ai/flows/tts-flow.ts';
 import '@/ai/flows/schemas/tts-schemas.ts';
 import '@/ai/flows/screenshot-assistant.ts';
+import '@/ai/flows/funciones-matrices-assistant.ts';
