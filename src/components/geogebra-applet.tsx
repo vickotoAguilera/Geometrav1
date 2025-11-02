@@ -11,6 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 
@@ -177,11 +178,11 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
                 <AlertDialogHeader>
                     <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
                      <AlertDialogDescription className="space-y-2">
-                        Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.
+                        <span>Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.</span>
                         <br /><br />
-                        <strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.
+                        <span><strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.</span>
                         <br /><br />
-                        <strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.
+                        <span><strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.</span>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
