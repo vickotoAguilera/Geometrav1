@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef, useTransition, useMemo } from 'react';
 import { getAiResponse, getInitialPrompts } from '@/app/actions';
 import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
@@ -60,7 +60,7 @@ interface GenkitMessage {
 
 type TutorMode = 'math' | 'geogebra';
 
-const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB
+const CHUNK_SIZE = 1048487; // Approx 1MB, Firestore's limit for a document
 
 const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
   const [prompts, setPrompts] = useState<string[]>([]);
@@ -200,7 +200,7 @@ export function ChatAssistant() {
   const textMessages = allMessages.filter(m => m.type === 'text') as TextMessage[];
   const fileContextMessages = allMessages.filter(m => m.type === 'fileContext') as FileContextMessage[];
   
-  const groupedFiles: GroupedFile[] = useMemoFirebase(() => {
+  const groupedFiles: GroupedFile[] = useMemo(() => {
     const groups: { [key: string]: GroupedFile } = {};
     fileContextMessages.forEach(msg => {
         if (msg.groupId) {
@@ -215,10 +215,11 @@ export function ChatAssistant() {
                 };
             }
             groups[msg.groupId].messages.push(msg);
-            if(msg.isActive) {
+            if(msg.isActive) { // If any part is active, the whole group is considered active for UI
                 groups[msg.groupId].isActive = true;
             }
         } else {
+             // Handle files uploaded before the grouping logic
              const individualGroupId = `individual-${msg.id}`;
              groups[individualGroupId] = {
                 id: msg.id,
@@ -412,6 +413,7 @@ export function ChatAssistant() {
                 if (!fileGroups[baseName]) {
                     fileGroups[baseName] = { fileName: baseName, content: [] };
                 }
+                // The content from Data URI is already a string, no need for Buffer
                 fileGroups[baseName].content.push(f.fileDataUri);
             });
 

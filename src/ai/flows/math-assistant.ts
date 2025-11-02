@@ -62,7 +62,8 @@ const mathAssistantFlow = ai.defineFlow(
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
         try {
-          const base64Data = file.fileDataUri.split(',')[1];
+          // The Data URI is now the full, concatenated content if it was chunked
+          const base64Data = file.fileDataUri.substring(file.fileDataUri.indexOf(',') + 1);
           const buffer = Buffer.from(base64Data, 'base64');
           let textContent = '';
           if (file.fileName.endsWith('.pdf')) {
