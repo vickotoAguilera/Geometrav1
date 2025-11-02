@@ -15,7 +15,8 @@ import { useRouter } from 'next/navigation';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import html2canvas from 'html2canvas';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
 interface ChatMessage {
@@ -339,9 +340,25 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
             <Button variant="ghost" size="icon" onClick={handleResetConversation} title="Reiniciar conversación">
                 <RefreshCw className="w-5 h-5" />
             </Button>
-             <Button variant="ghost" size="icon" onClick={handleBackNavigation} title="Volver al ejercicio">
-                <ArrowLeft className="w-5 h-5" />
-            </Button>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" title="Volver al ejercicio">
+                        <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Seguro que quieres salir?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                           Si vuelves, tu progreso no guardado en la pizarra de GeoGebra se perderá. Asegúrate de haberlo guardado si quieres conservarlo.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleBackNavigation}>Salir de todas formas</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
       </SheetHeader>
       
