@@ -11,7 +11,7 @@ const MessageSchema = z.object({
 // Esquema para la entrada del flujo
 export const FuncionesMatricesAssistantInputSchema = z.object({
   history: z.array(MessageSchema).optional().describe('El historial de la conversación.'),
-  ejercicioId: z.string().optional().describe('El identificador único del ejercicio que se está resolviendo. Se usa solo en el primer turno.'),
+  initialSystemPrompt: z.string().optional().describe('La guía completa del ejercicio en formato de texto. Se usa solo en el primer turno para dar contexto a la IA.'),
   userQuery: z.string().optional().describe('La respuesta o pregunta del usuario.'),
   screenshotDataUri: z.string().optional().describe("Una captura de pantalla de la pizarra de GeoGebra, como un data URI. Formato: 'data:<mimetype>;base64,<encoded_data>'."),
 });

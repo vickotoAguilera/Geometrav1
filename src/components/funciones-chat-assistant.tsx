@@ -101,34 +101,46 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
 
   const chatStorageKey = `funciones-chat-${ejercicioId}`;
 
-  // Cargar mensajes desde localStorage
+  // Cargar mensajes y enviar guía inicial si es necesario
   useEffect(() => {
     try {
       const savedMessages = localStorage.getItem(chatStorageKey);
       if (savedMessages) {
         setMessages(JSON.parse(savedMessages));
       } else {
-        // Enviar consulta inicial solo si no hay historial guardado
-        const initialAssistantMessage: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
-        setMessages([initialAssistantMessage]);
-
-        startTransition(() => {
-          getFuncionesMatricesAiResponse({ ejercicioId: ejercicioId, history: [] })
-            .then(({ response }) => {
-              const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
-              setMessages([finalMessage]);
-              localStorage.setItem(chatStorageKey, JSON.stringify([finalMessage]));
-            })
-            .catch(error => {
-              console.error("Error in initial chat:", error);
-              setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
+        // Nueva conversación: buscar guía y enviar
+        const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
+        setMessages([assistantPlaceholder]);
+        
+        fetch(`/content/guias-geogebra/${ejercicioId}.md`)
+          .then(res => {
+            if (!res.ok) throw new Error('Guía no encontrada');
+            return res.text();
+          })
+          .then(guideContent => {
+            startTransition(() => {
+              getFuncionesMatricesAiResponse({ 
+                initialSystemPrompt: guideContent 
+              })
+                .then(({ response }) => {
+                  const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
+                  setMessages([finalMessage]);
+                })
+                .catch(error => {
+                   console.error("Error in initial chat:", error);
+                   setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
+                });
             });
-        });
+          })
+          .catch(err => {
+             console.error("Failed to fetch guide:", err);
+             setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
+          });
       }
     } catch (error) {
-      console.error("Failed to load messages from localStorage", error);
+      console.error("Failed to load from localStorage", error);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ejercicioId]);
 
   // Guardar mensajes en localStorage
@@ -138,7 +150,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
         localStorage.setItem(chatStorageKey, JSON.stringify(messages));
       }
     } catch (error) {
-      console.error("Failed to save messages to localStorage", error);
+      console.error("Failed to save to localStorage", error);
     }
   }, [messages, chatStorageKey]);
 
