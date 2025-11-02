@@ -198,7 +198,7 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   };
 
   const handleBackNavigation = () => {
-    localStorage.removeItem(chatStorageKey);
+    // No borramos el historial, solo navegamos hacia atrás.
     router.back();
   };
   
