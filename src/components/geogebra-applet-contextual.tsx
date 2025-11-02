@@ -5,6 +5,7 @@ import { useEffect, useRef, memo, useState } from 'react';
 declare global {
   interface Window {
     GGBApplet?: any;
+    appletInstances?: { [key: string]: any };
   }
 }
 
@@ -14,8 +15,6 @@ interface GeoGebraAppletContextualProps {
 
 export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({ groupId }: GeoGebraAppletContextualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const appletRef = useRef<any>(null);
-  const hasInitialized = useRef(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -23,36 +22,49 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
   }, []);
 
   useEffect(() => {
-    if (!isClient || !containerRef.current || hasInitialized.current) {
+    if (!isClient || !containerRef.current) {
       return;
     }
-
+    
     const container = containerRef.current;
     
-    const initializeApplet = () => {
-      if (!window.GGBApplet) return;
+    // Initialize global instance store if it doesn't exist
+    if (!window.appletInstances) {
+      window.appletInstances = {};
+    }
 
-      container.innerHTML = ''; 
+    const initializeOrAttachApplet = () => {
+      const existingApplet = window.appletInstances?.[groupId];
 
-      const parameters = {
-        id: `ggbApplet-${groupId}-${Date.now()}`, // Unique ID to force re-render
-        appName: 'classic',
-        width: container.clientWidth || 800,
-        height: container.clientHeight || 600,
-        showToolBar: true,
-        showAlgebraInput: true,
-        showMenuBar: true,
-        enableLabelDrags: true,
-        enableShiftDragZoom: true,
-        enableRightClick: true,
-        language: 'es',
-      };
-      
-      const applet = new window.GGBApplet(parameters, true);
-      applet.inject(container);
-      appletRef.current = applet;
-      hasInitialized.current = true;
+      if (existingApplet && typeof existingApplet.inject === 'function') {
+        // If an applet for this group already exists, re-inject it
+        container.innerHTML = ''; // Clear container before injecting
+        existingApplet.inject(container);
+      } else {
+        // If no applet exists, create a new one
+        if (!window.GGBApplet) return; // Wait for script to load
+        container.innerHTML = '';
+        
+        const parameters = {
+          id: `ggbApplet-${groupId}`, // Use a consistent ID for the group
+          appName: 'classic',
+          width: container.clientWidth || 800,
+          height: container.clientHeight || 600,
+          showToolBar: true,
+          showAlgebraInput: true,
+          showMenuBar: true,
+          enableLabelDrags: true,
+          enableShiftDragZoom: true,
+          enableRightClick: true,
+          language: 'es',
+        };
+        
+        const newApplet = new window.GGBApplet(parameters, true);
+        newApplet.inject(container);
+        window.appletInstances[groupId] = newApplet; // Store the new instance
+      }
     };
+
 
     const loadGeoGebraScript = (): Promise<void> => {
       return new Promise((resolve, reject) => {
@@ -75,30 +87,22 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
       });
     };
 
-    loadGeoGebraScript().then(initializeApplet).catch(error => {
+    loadGeoGebraScript().then(initializeOrAttachApplet).catch(error => {
       console.error("Error loading or initializing GeoGebra applet:", error);
     });
 
     const resizeObserver = new ResizeObserver(() => {
-        if (appletRef.current && container) {
-            const applet = appletRef.current;
-            if (applet && typeof applet.setSize === 'function') {
-                applet.setSize(container.clientWidth, container.clientHeight);
-            }
+        const applet = window.appletInstances?.[groupId];
+        if (applet && container && typeof applet.setSize === 'function') {
+            applet.setSize(container.clientWidth, container.clientHeight);
         }
     });
     
-    if (container) {
-      resizeObserver.observe(container);
-    }
+    resizeObserver.observe(container);
 
     return () => {
-        if (container) {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            resizeObserver.unobserve(container);
-        }
+      resizeObserver.unobserve(container);
       resizeObserver.disconnect();
-      hasInitialized.current = false;
     };
   }, [isClient, groupId]);
 
