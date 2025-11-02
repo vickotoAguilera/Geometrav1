@@ -256,15 +256,15 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
                 <AlertDialogHeader>
                     <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
                     <AlertDialogDescription className="space-y-2">
-                        <p>
-                            Esta pizarra es un lienzo libre y **no guarda tu trabajo automáticamente** si sales o recargas la página.
-                        </p>
-                        <p>
+                        <div>
+                            Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.
+                        </div>
+                        <div>
                             <strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.
-                        </p>
-                        <p>
+                        </div>
+                        <div>
                             <strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.
-                        </p>
+                        </div>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -290,5 +290,3 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
     </div>
   );
 });
-
-    
