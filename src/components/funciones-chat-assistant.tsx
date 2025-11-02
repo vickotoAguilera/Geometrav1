@@ -20,7 +20,7 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   screenshot?: string;
-  contextFile?: string;
+  contextFile?: string; // El ID del ejercicio que originó este mensaje
 }
 
 interface GenkitMessage {
@@ -95,7 +95,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Clave única para el historial de chat basada en el grupo de ejercicios.
   const chatStorageKey = `chat-history-${grupoId}`;
 
   const { isListening, startListening, stopListening, isSupported } = useSpeechRecognition({
@@ -103,61 +102,51 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         setInput(prev => (prev.endsWith(' ') ? prev : prev + ' ') + newTranscript);
     }
   });
-
-
-  const fetchAndStartInitialConversation = async (guideContent: string) => {
-    const autoPrompt = `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`;
-    const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
-    setMessages([assistantPlaceholder]);
+  
+  const getActiveGuideContext = async (history: ChatMessage[]): Promise<{ guideContent: string, activeGuides: string[] }> => {
+    const activeGuideIds = [...new Set(history.map(m => m.contextFile).filter(Boolean))] as string[];
     
-    startTransition(() => {
-        getFuncionesMatricesAiResponse({ 
-          initialSystemPrompt: guideContent,
-          userQuery: autoPrompt
-        })
-          .then(({ response }) => {
-            const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response, contextFile: ejercicioId };
-            setMessages([finalMessage]);
-          })
-          .catch(error => {
-             console.error("Error in initial chat:", error);
-             setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
-          });
-      });
-  };
+    let combinedContent = '';
+    const loadedGuides: string[] = [];
 
+    for (const guideId of activeGuideIds) {
+        try {
+            const result = await getGuiaEjercicio(guideId);
+            if (!('error' in result)) {
+                combinedContent += `--- INICIO GUÍA: ${guideId}.md ---\n${result.content}\n--- FIN GUÍA: ${guideId}.md ---\n\n`;
+                loadedGuides.push(`${guideId}.md`);
+            }
+        } catch (e) {
+            console.error(`Failed to load guide ${guideId}`, e);
+        }
+    }
+    return { guideContent: combinedContent, activeGuides: loadedGuides };
+  };
+  
+  // Efecto para cargar y manejar la conversación
   useEffect(() => {
     const loadConversation = async () => {
-      try {
-        const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-        const currentHistory = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
+      const savedMessagesRaw = localStorage.getItem(chatStorageKey);
+      const currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
+      
+      const isNewExercise = !currentHistory.some(msg => msg.contextFile === ejercicioId);
 
-        // Comprueba si el ejercicio actual ya está en el contexto del historial cargado
-        const isExerciseInHistory = currentHistory.some((msg: ChatMessage) => msg.contextFile === ejercicioId);
+      if (currentHistory.length === 0 || isNewExercise) {
+        const autoPrompt = currentHistory.length === 0
+          ? `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`
+          : `Ahora también he activado la guía '${ejercicioId}'. Por favor, continúa la conversación considerando este nuevo contexto.`;
+
+        const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
+        const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
         
-        const result = await getGuiaEjercicio(ejercicioId);
-        if ('error' in result) throw new Error(result.error);
-        const guideContent = result.content;
+        const updatedHistory = [...currentHistory, userMessage];
+        setMessages([...updatedHistory, assistantPlaceholder]);
+        
+        const { guideContent } = await getActiveGuideContext(updatedHistory);
 
-        if (currentHistory.length === 0 || !isExerciseInHistory) {
-          // Si no hay historial, o el ejercicio es nuevo para este grupo, empieza una conversación o la continúa.
-          const autoPrompt = currentHistory.length === 0
-            ? `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`
-            : `Ahora también he activado la guía '${ejercicioId}'. Por favor, continúa la conversación considerando este nuevo contexto.`;
-            
-          const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
-          const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
-
-          const newMessages = [...currentHistory, userMessage, assistantPlaceholder];
-          setMessages(newMessages);
-
-          const genkitHistory: GenkitMessage[] = currentHistory.map((m: ChatMessage) => ({
-            role: m.role,
-            content: [{ text: m.content }],
-          }));
-          
-          getFuncionesMatricesAiResponse({ 
-            history: genkitHistory,
+        startTransition(() => {
+          getFuncionesMatricesAiResponse({
+            history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
             initialSystemPrompt: guideContent,
             userQuery: autoPrompt
           })
@@ -166,23 +155,18 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
             setMessages(prev => [...prev.slice(0, -1), finalMessage]);
           })
           .catch(error => {
-             console.error("Error continuing chat:", error);
-             setMessages(currentHistory); // Revert to old history on error
+            console.error("Error starting/continuing chat:", error);
+            setMessages(currentHistory); // Revertir en caso de error
           });
-        } else {
-          // Si el ejercicio ya estaba en el contexto, simplemente cargamos el historial
-          setMessages(currentHistory);
-        }
-      } catch (error) {
-        console.error("Failed to load conversation:", error);
-        setMessages([{ id: 'error-load', role: 'model', content: "No se pudo cargar la guía para este ejercicio." }]);
+        });
+      } else {
+        setMessages(currentHistory);
       }
     };
 
     loadConversation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ejercicioId, grupoId]);
-
 
   useEffect(() => {
     try {
@@ -240,13 +224,32 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const handleResetConversation = () => {
     localStorage.removeItem(chatStorageKey);
     setMessages([]);
-    // Iniciar de nuevo la conversación para el ejercicio actual
-     getGuiaEjercicio(ejercicioId).then(result => {
-        if (!('error' in result)) {
-            fetchAndStartInitialConversation(result.content);
-        }
-     });
+    // Vuelve a iniciar la conversación solo para el ejercicio actual
+    loadConversationForCurrentExercise();
   };
+
+  const loadConversationForCurrentExercise = async () => {
+      const autoPrompt = `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`;
+      const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
+      setMessages([assistantPlaceholder]);
+      
+      const { guideContent } = await getActiveGuideContext([{ id: 'temp', role: 'user', content: '', contextFile: ejercicioId }]);
+
+      startTransition(() => {
+          getFuncionesMatricesAiResponse({ 
+            initialSystemPrompt: guideContent,
+            userQuery: autoPrompt
+          })
+            .then(({ response }) => {
+              const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-intro-final-${Date.now()}`, content: response };
+              setMessages([finalMessage]);
+            })
+            .catch(error => {
+               console.error("Error in initial chat:", error);
+               setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente.", contextFile: ejercicioId }]);
+            });
+        });
+  }
 
   const handleButtonClick = (value: string) => {
     if (value === 'Volver al Ejercicio') {
@@ -277,41 +280,37 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
     const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput, ...(screenshotDataUri && { screenshot: screenshotDataUri }), contextFile: ejercicioId };
     const assistantPlaceholder: ChatMessage = { id: `assistant-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
 
-    setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
+    const newHistory = [...messages, userMessage];
+    setMessages([...newHistory, assistantPlaceholder]);
 
-    startTransition(() => {
-      const processAndRespond = async () => {
+    startTransition(async () => {
         try {
-          const genkitHistory: GenkitMessage[] = messages.map(m => ({
-            role: m.role,
-            content: [{ text: m.content }],
-          }));
-          
-          const guideContentResult = await getGuiaEjercicio(ejercicioId);
-          if ('error' in guideContentResult) throw new Error(guideContentResult.error);
-          
+            const { guideContent } = await getActiveGuideContext(newHistory);
+            
+            const genkitHistory: GenkitMessage[] = newHistory.map(m => ({
+              role: m.role,
+              content: [{ text: m.content }],
+            }));
+            
+            const { response: aiResponse } = await getFuncionesMatricesAiResponse({
+              history: genkitHistory,
+              userQuery: currentInput,
+              screenshotDataUri: screenshotDataUri ?? undefined,
+              initialSystemPrompt: guideContent,
+            });
 
-          const { response: aiResponse } = await getFuncionesMatricesAiResponse({
-            history: genkitHistory,
-            userQuery: currentInput,
-            screenshotDataUri: screenshotDataUri ?? undefined,
-            initialSystemPrompt: guideContentResult.content,
-          });
-
-          setMessages(prev => prev.slice(0, -1).concat({
-            id: `assistant-final-${Date.now()}`,
-            role: 'model',
-            content: aiResponse,
-            contextFile: ejercicioId
-          }));
+            setMessages(prev => prev.slice(0, -1).concat({
+              id: `assistant-final-${Date.now()}`,
+              role: 'model',
+              content: aiResponse,
+              contextFile: ejercicioId
+            }));
 
         } catch (error: any) {
-          console.error("Error in chat:", error);
-          toast({ variant: "destructive", title: "Error del asistente", description: "No se pudo obtener una respuesta." });
-          setMessages(prev => prev.slice(0, -1));
+            console.error("Error in chat:", error);
+            toast({ variant: "destructive", title: "Error del asistente", description: "No se pudo obtener una respuesta." });
+            setMessages(prev => prev.slice(0, -1));
         }
-      };
-      processAndRespond();
     });
   };
 
@@ -334,6 +333,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
     }
   };
 
+  const activeGuides = [...new Set(messages.map(m => m.contextFile).filter(Boolean))];
 
   return (
     <>
@@ -348,14 +348,19 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         </Button>
       </SheetHeader>
       
-      <div className="p-3 border-b bg-background">
-          <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
-              <div className="flex items-center gap-2 overflow-hidden">
-                  <FileText className="w-4 h-4 flex-shrink-0 text-primary" />
-                  <span className="truncate font-medium text-primary" title={`${ejercicioId}.md`}>Guía activa: {ejercicioId}.md</span>
+      {activeGuides.length > 0 && (
+        <div className="p-3 border-b bg-background">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">Guías Activas:</h3>
+          <div className="space-y-1">
+            {activeGuides.map(guide => (
+              <div key={guide} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
+                <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
+                <span className="truncate font-medium text-primary">{guide}.md</span>
               </div>
+            ))}
           </div>
       </div>
+      )}
 
 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
