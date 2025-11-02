@@ -96,7 +96,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Clave única para el historial de chat basada en el grupo de ejercicios.
-  const chatStorageKey = `funciones-chat-${grupoId}`;
+  const chatStorageKey = `chat-history-${grupoId}`;
 
   const { isListening, startListening, stopListening, isSupported } = useSpeechRecognition({
     onTranscript: (newTranscript) => {
@@ -128,34 +128,61 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
 
   useEffect(() => {
     const loadConversation = async () => {
-        try {
-            const savedMessages = localStorage.getItem(chatStorageKey);
-            const currentHistory = savedMessages ? JSON.parse(savedMessages) : [];
+      try {
+        const savedMessagesRaw = localStorage.getItem(chatStorageKey);
+        const currentHistory = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
 
-            const result = await getGuiaEjercicio(ejercicioId);
-            if ('error' in result) throw new Error(result.error);
-            const guideContent = result.content;
+        // Comprueba si el ejercicio actual ya está en el contexto del historial cargado
+        const isExerciseInHistory = currentHistory.some((msg: ChatMessage) => msg.contextFile === ejercicioId);
+        
+        const result = await getGuiaEjercicio(ejercicioId);
+        if ('error' in result) throw new Error(result.error);
+        const guideContent = result.content;
 
-            // Si no hay historial o el último archivo de contexto es diferente, empezar de nuevo.
-            const lastContextFile = currentHistory[currentHistory.length - 1]?.contextFile;
-            if (currentHistory.length === 0 || lastContextFile !== ejercicioId) {
-                // Borra el historial anterior si estamos cambiando de ejercicio dentro del mismo grupo
-                if (currentHistory.length > 0) {
-                  localStorage.removeItem(chatStorageKey);
-                }
-                fetchAndStartInitialConversation(guideContent);
-            } else {
-                setMessages(currentHistory);
-            }
-        } catch (error) {
-            console.error("Failed to load conversation:", error);
-            setMessages([{ id: 'error-load', role: 'model', content: "No se pudo cargar la guía para este ejercicio." }]);
+        if (currentHistory.length === 0 || !isExerciseInHistory) {
+          // Si no hay historial, o el ejercicio es nuevo para este grupo, empieza una conversación o la continúa.
+          const autoPrompt = currentHistory.length === 0
+            ? `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`
+            : `Ahora también he activado la guía '${ejercicioId}'. Por favor, continúa la conversación considerando este nuevo contexto.`;
+            
+          const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
+          const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
+
+          const newMessages = [...currentHistory, userMessage, assistantPlaceholder];
+          setMessages(newMessages);
+
+          const genkitHistory: GenkitMessage[] = currentHistory.map((m: ChatMessage) => ({
+            role: m.role,
+            content: [{ text: m.content }],
+          }));
+          
+          getFuncionesMatricesAiResponse({ 
+            history: genkitHistory,
+            initialSystemPrompt: guideContent,
+            userQuery: autoPrompt
+          })
+          .then(({ response }) => {
+            const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
+            setMessages(prev => [...prev.slice(0, -1), finalMessage]);
+          })
+          .catch(error => {
+             console.error("Error continuing chat:", error);
+             setMessages(currentHistory); // Revert to old history on error
+          });
+        } else {
+          // Si el ejercicio ya estaba en el contexto, simplemente cargamos el historial
+          setMessages(currentHistory);
         }
+      } catch (error) {
+        console.error("Failed to load conversation:", error);
+        setMessages([{ id: 'error-load', role: 'model', content: "No se pudo cargar la guía para este ejercicio." }]);
+      }
     };
-    
+
     loadConversation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ejercicioId, grupoId]);
+
 
   useEffect(() => {
     try {
@@ -313,10 +340,10 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
       <SheetHeader className="p-4 border-b">
         <SheetTitle className="flex items-center gap-2"><Bot /> Tutor de GeoGebra</SheetTitle>
         <SheetDescription>Sigue los pasos para resolver el ejercicio en la pizarra.</SheetDescription>
-         <Button variant="ghost" size="icon" className="absolute top-3 right-12" onClick={handleBackNavigation} title="Volver al ejercicio">
+         <Button variant="ghost" size="icon" className="absolute top-3 right-3" onClick={handleBackNavigation} title="Volver al ejercicio">
             <ArrowLeft className="w-5 h-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="absolute top-3 right-20" onClick={handleResetConversation} title="Reiniciar conversación">
+        <Button variant="ghost" size="icon" className="absolute top-3 right-12" onClick={handleResetConversation} title="Reiniciar conversación">
             <RefreshCw className="w-5 h-5" />
         </Button>
       </SheetHeader>
