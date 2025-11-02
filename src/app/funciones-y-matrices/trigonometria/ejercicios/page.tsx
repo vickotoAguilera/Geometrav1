@@ -32,7 +32,7 @@ const CentralAngleTheoremVisual = () => (
             
             {/* Inscribed Angle */}
             <path d="M 10 30 L 50 95 L 90 30" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
-             <path d="M 50 95 Q 50 88, 57 86" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" transform="translate(-8, -8) rotate(20, 50, 95)" />
+            <path d="M 40 85 A 15 15 0 0 1 60 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" />
             <text x="48" y="82" fontSize="8" fill="hsl(var(--foreground))">α</text>
         </svg>
         <p className="text-xs text-center text-muted-foreground mt-2">
