@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,29 @@ interface EjercicioInteractivoProps {
 export function EjercicioInteractivo({ ejercicioId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
   const [ayuda, setAyuda] = useState<'teoria' | 'geogebra' | null>(null);
+
+  // --- INICIO DE LA LÓGICA DE PERSISTENCIA ---
+
+  // Efecto para cargar la respuesta guardada desde localStorage al montar el componente.
+  useEffect(() => {
+    const savedRespuesta = localStorage.getItem(`respuesta-${ejercicioId}`);
+    if (savedRespuesta) {
+      setRespuesta(savedRespuesta);
+    }
+  }, [ejercicioId]);
+
+  // Efecto para guardar la respuesta en localStorage cada vez que cambia.
+  useEffect(() => {
+    if (respuesta) {
+      localStorage.setItem(`respuesta-${ejercicioId}`, respuesta);
+    } else {
+      // Si la respuesta está vacía, la eliminamos del storage.
+      localStorage.removeItem(`respuesta-${ejercicioId}`);
+    }
+  }, [respuesta, ejercicioId]);
+  
+  // --- FIN DE LA LÓGICA DE PERSISTENCIA ---
+
 
   // En fases futuras, el contenido de la ayuda se cargará dinámicamente.
   const contenidoTeorico = "Aquí irá la explicación teórica paso a paso, sin dar el resultado final.";
