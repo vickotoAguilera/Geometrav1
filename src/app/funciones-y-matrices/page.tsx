@@ -1,4 +1,7 @@
 import Header from '@/components/header';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 export default function FuncionesYMatricesPage() {
   return (
@@ -11,7 +14,16 @@ export default function FuncionesYMatricesPage() {
                 Bienvenido al nuevo módulo de Funciones y Matrices. Aquí podrás explorar conceptos y herramientas interactivas.
             </p>
         </div>
-        {/* Aquí se podrán añadir más componentes en el futuro */}
+        
+        <div className="max-w-md mx-auto">
+          <Link href="/funciones-y-matrices/trigonometria" passHref>
+            <Button variant="outline" className="w-full justify-between h-16 text-lg">
+              Trigonometría
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+
       </main>
     </div>
   );
