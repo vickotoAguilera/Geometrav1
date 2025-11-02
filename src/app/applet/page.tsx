@@ -21,7 +21,7 @@ function AppletContent() {
           <>
             <Button 
               onClick={() => setIsChatOpen(true)}
-              className="absolute bottom-6 right-6 rounded-full w-16 h-16 shadow-lg animate-bounce"
+              className="absolute bottom-6 left-6 rounded-full w-16 h-16 shadow-lg animate-bounce"
               title="Ayuda con el ejercicio"
             >
               <Bot className="w-8 h-8" />
