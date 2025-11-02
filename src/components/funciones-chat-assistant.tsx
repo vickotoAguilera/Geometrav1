@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
-import { getFuncionesMatricesAiResponse, generateFuncionesMatricesSpeech } from '@/app/funciones-matrices-actions';
+import { getFuncionesMatricesAiResponse, generateFuncionesMatricesSpeech, getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,40 +101,40 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
 
   const chatStorageKey = `funciones-chat-${ejercicioId}`;
 
-  const fetchAndStartInitialConversation = () => {
+  const fetchAndStartInitialConversation = async () => {
     const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
     setMessages([assistantPlaceholder]);
     
-    fetch(`/content/guias-geogebra/${ejercicioId}.md`)
-      .then(res => {
-        if (!res.ok) throw new Error('Guía no encontrada');
-        return res.text();
-      })
-      .then(guideContent => {
-        startTransition(() => {
-          getFuncionesMatricesAiResponse({ 
-            initialSystemPrompt: guideContent 
+    try {
+      const result = await getGuiaEjercicio(ejercicioId);
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      const guideContent = result.content;
+      
+      startTransition(() => {
+        getFuncionesMatricesAiResponse({ 
+          initialSystemPrompt: guideContent 
+        })
+          .then(({ response }) => {
+            const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
+            setMessages([finalMessage]);
           })
-            .then(({ response }) => {
-              const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
-              setMessages([finalMessage]);
-            })
-            .catch(error => {
-               console.error("Error in initial chat:", error);
-               setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
-            });
-        });
-      })
-      .catch(err => {
-         console.error("Failed to fetch guide:", err);
-         setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
+          .catch(error => {
+             console.error("Error in initial chat:", error);
+             setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
+          });
       });
+    } catch (err) {
+       console.error("Failed to fetch guide:", err);
+       setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
+    }
   };
 
   useEffect(() => {
     try {
       const savedMessages = localStorage.getItem(chatStorageKey);
-      if (savedMessages) {
+      if (savedMessages && savedMessages !== '[]') {
         setMessages(JSON.parse(savedMessages));
       } else {
         fetchAndStartInitialConversation();
@@ -150,6 +150,8 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     try {
       if (messages.length > 0) {
         localStorage.setItem(chatStorageKey, JSON.stringify(messages));
+      } else {
+        localStorage.removeItem(chatStorageKey);
       }
     } catch (error) {
       console.error("Failed to save to localStorage", error);
@@ -243,11 +245,17 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
             role: m.role,
             content: [{ text: m.content }],
           }));
+          
+          const guideContent = await getGuiaEjercicio(ejercicioId);
+          if ('error' in guideContent) {
+            throw new Error(guideContent.error);
+          }
 
           const { response: aiResponse } = await getFuncionesMatricesAiResponse({
             history: genkitHistory,
             userQuery: currentInput,
-            screenshotDataUri: screenshotDataUri ?? undefined
+            screenshotDataUri: screenshotDataUri ?? undefined,
+            initialSystemPrompt: guideContent.content
           });
 
           setMessages(prev => prev.slice(0, -1).concat({
