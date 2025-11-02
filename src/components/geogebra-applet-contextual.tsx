@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useRef, memo, useState } from 'react';
+import { Button } from './ui/button';
+import { FileDown, FileUp } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 declare global {
   interface Window {
@@ -15,16 +18,62 @@ interface GeoGebraAppletContextualProps {
 
 export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({ groupId }: GeoGebraAppletContextualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (!isClient || !containerRef.current) {
-      return;
+  const getApplet = () => {
+    if (typeof window !== 'undefined' && window.appletInstances) {
+      return window.appletInstances[groupId];
     }
+    return null;
+  }
+
+  const handleSaveGGB = () => {
+    const applet = getApplet();
+    if (applet && typeof applet.getGGBBase64 === 'function') {
+      const ggbData = applet.getGGBBase64();
+      const link = document.createElement('a');
+      link.href = `data:application/vnd.geogebra.file;base64,${ggbData}`;
+      link.download = `geometra-sesion-${groupId}.ggb`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({ title: 'Guardado', description: 'Tu trabajo en la pizarra ha sido descargado.' });
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo guardar el estado de la pizarra.' });
+    }
+  };
+
+  const handleOpenGGB = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const applet = getApplet();
+    if (applet && typeof applet.setBase64 === 'function') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileContent = e.target?.result as string;
+        if (fileContent) {
+          const base64Content = fileContent.split(',')[1];
+          applet.setBase64(base64Content);
+          toast({ title: 'Cargado', description: 'Se ha restaurado tu trabajo en la pizarra.' });
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el archivo en la pizarra.' });
+    }
+    if(fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+
+  useEffect(() => {
+    if (!isClient || !containerRef.current) return;
     
     const container = containerRef.current;
     if (!window.appletInstances) {
@@ -32,16 +81,12 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     }
 
     const initializeOrAttachApplet = () => {
-      // Check if an instance for this group ID already exists and is stored
-      if (window.appletInstances && window.appletInstances[groupId]) {
-        const existingApplet = window.appletInstances[groupId];
-        // Ensure the container is clean before re-injecting
-        container.innerHTML = '';
-        existingApplet.inject(container.id);
+      if (window.appletInstances?.[groupId]) {
+        container.innerHTML = ''; // Limpiar el contenedor
+        window.appletInstances[groupId].inject(container.id);
         return;
       }
 
-      // If no instance exists, create a new one
       if (!window.GGBApplet) {
         console.warn('GeoGebra script not loaded yet.');
         return;
@@ -64,9 +109,7 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
       };
       
       const newApplet = new window.GGBApplet(parameters, true);
-      // Store the new instance in the global object
       window.appletInstances[groupId] = newApplet;
-      // Inject it into the specifically ID'd container
       newApplet.inject(container.id);
     };
 
@@ -107,8 +150,6 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     return () => {
       resizeObserver.unobserve(container);
       resizeObserver.disconnect();
-      // Important: Do not destroy the applet instance on unmount
-      // It needs to persist in `window.appletInstances`
     };
   }, [isClient, groupId]);
 
@@ -116,7 +157,6 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
     return <div className="w-full h-full min-h-[500px] flex items-center justify-center bg-muted">Cargando pizarra...</div>;
   }
 
-  // Assign a unique and stable ID to the container
   return (
     <div className="relative w-full h-full bg-background">
       <div
@@ -124,6 +164,21 @@ export const GeoGebraAppletContextual = memo(function GeoGebraAppletContextual({
         id={`geogebra-container-${groupId}`}
         className="w-full h-full min-h-[500px] flex items-center justify-center"
       />
+      <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+            <Button variant="outline" size="icon" onClick={handleSaveGGB} title="Guardar Pizarra">
+                <FileDown className="w-5 h-5" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Abrir Pizarra">
+                <FileUp className="w-5 h-5" />
+            </Button>
+             <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".ggb"
+                onChange={handleOpenGGB}
+             />
+      </div>
     </div>
   );
 });

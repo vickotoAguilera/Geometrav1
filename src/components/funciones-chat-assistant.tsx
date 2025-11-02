@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText, FileDown, FileUp } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -87,7 +87,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -243,53 +242,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
     }
   };
 
-  const getApplet = () => {
-    if (typeof window !== 'undefined' && (window as any).appletInstances) {
-      return (window as any).appletInstances[grupoId];
-    }
-    return null;
-  }
-
-  const handleSaveGGB = () => {
-    const applet = getApplet();
-    if (applet && typeof applet.getGGBBase64 === 'function') {
-      const ggbData = applet.getGGBBase64();
-      const link = document.createElement('a');
-      link.href = `data:application/vnd.geogebra.file;base64,${ggbData}`;
-      link.download = `geometra-${grupoId}.ggb`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast({ title: 'Guardado', description: 'Tu trabajo en la pizarra ha sido descargado.' });
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo guardar el estado de la pizarra.' });
-    }
-  };
-
-  const handleOpenGGB = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const applet = getApplet();
-    if (applet && typeof applet.setBase64 === 'function') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const fileContent = e.target?.result as string;
-        if (fileContent) {
-          const base64Content = fileContent.split(',')[1];
-          applet.setBase64(base64Content);
-          toast({ title: 'Cargado', description: 'Se ha restaurado tu trabajo en la pizarra.' });
-        }
-      };
-      reader.readAsDataURL(file);
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el archivo en la pizarra.' });
-    }
-    // Reset file input
-    if(fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isPending) return;
@@ -368,19 +320,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         <SheetTitle className="flex items-center gap-2"><Bot /> Tutor de GeoGebra</SheetTitle>
         <SheetDescription>Sigue los pasos para resolver el ejercicio en la pizarra.</SheetDescription>
          <div className="absolute top-3 right-3 flex gap-1">
-            <Button variant="ghost" size="icon" onClick={handleSaveGGB} title="Guardar Pizarra">
-                <FileDown className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} title="Abrir Pizarra">
-                <FileUp className="w-5 h-5" />
-            </Button>
-             <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept=".ggb"
-                onChange={handleOpenGGB}
-             />
             <Button variant="ghost" size="icon" onClick={handleResetConversation} title="Reiniciar conversación">
                 <RefreshCw className="w-5 h-5" />
             </Button>
