@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookText, CirclePlay } from 'lucide-react';
@@ -10,12 +9,14 @@ import Link from 'next/link';
 
 interface EjercicioInteractivoProps {
   ejercicioId: string;
+  groupId: string;
 }
 
-export function EjercicioInteractivo({ ejercicioId }: EjercicioInteractivoProps) {
+export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
   
-  const storageKey = `respuesta-${ejercicioId}`;
+  // La clave de almacenamiento ahora depende del grupo del ejercicio.
+  const storageKey = `respuesta-${groupId}-${ejercicioId}`;
 
   // Cargar la respuesta guardada al montar el componente.
   useEffect(() => {
@@ -39,7 +40,8 @@ export function EjercicioInteractivo({ ejercicioId }: EjercicioInteractivoProps)
           <BookText className="mr-2 h-4 w-4" />
           Explicación Teórica (Próximamente)
         </Button>
-        <Link href={`/applet?ejercicio=${ejercicioId}`} passHref>
+        {/* Se pasa tanto el ID del ejercicio como el ID del grupo al applet */}
+        <Link href={`/applet?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
             <Button>
                 <CirclePlay className="mr-2 h-4 w-4" />
                 Resolver con Tutor IA en GeoGebra

@@ -11,13 +11,14 @@ import { FuncionesChatAssistant } from '@/components/funciones-chat-assistant';
 function AppletContent() {
   const searchParams = useSearchParams();
   const ejercicioId = searchParams.get('ejercicio');
+  const grupoId = searchParams.get('grupo'); // Obtener el ID del grupo
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
     <div className="flex flex-col h-screen">
       <main className="flex-1 relative w-full overflow-hidden">
         <GeoGebraApplet />
-        {ejercicioId && (
+        {ejercicioId && grupoId && ( // Solo mostrar si tenemos ambos IDs
           <>
             <Button 
               onClick={() => setIsChatOpen(true)}
@@ -28,7 +29,7 @@ function AppletContent() {
             </Button>
             <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
               <SheetContent className="w-full max-w-full lg:max-w-md p-0 flex flex-col h-full">
-                {isChatOpen && <FuncionesChatAssistant ejercicioId={ejercicioId} />}
+                {isChatOpen && <FuncionesChatAssistant ejercicioId={ejercicioId} grupoId={grupoId} />}
               </SheetContent>
             </Sheet>
           </>
@@ -41,7 +42,7 @@ function AppletContent() {
 
 export default function AppletPage() {
     return (
-        <Suspense fallback={<div>Cargando...</div>}>
+        <Suspense fallback={<div className="flex h-screen w-screen items-center justify-center">Cargando Pizarra Interactiva...</div>}>
             <AppletContent/>
         </Suspense>
     )

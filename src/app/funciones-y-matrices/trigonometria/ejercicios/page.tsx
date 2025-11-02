@@ -38,6 +38,8 @@ const CentralAngleTheoremVisual = () => (
 
 
 export default function EjerciciosTrigonometriaPage() {
+  const groupId = "trigonometria-basica";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -52,41 +54,34 @@ export default function EjerciciosTrigonometriaPage() {
         <div className="max-w-4xl mx-auto space-y-8">
             <Card>
                 <CardHeader>
-                    <CardTitle>Problema 1: La Plaza de Skate</CardTitle>
+                    <CardTitle>Módulo 1: La Plaza de Skate</CardTitle>
                     <CardDescription>
-                        Se ha construido una gran plaza de skate en una ciudad, con una forma circular, que contará con
-                        una notable cantidad de árboles. Como símbolo de este nuevo pulmón verde, se ha colocado un gran árbol en el centro
-                        de la plaza (Punto O). En la imagen, se observa que en el punto B hay una cámara de seguridad, y en el árbol central también.
+                        Los siguientes ejercicios se basan en la misma situación. Resuélvelos usando la ayuda del tutor de GeoGebra si lo necesitas.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <CentralAngleTheoremVisual/>
-                    <div className="p-4 border rounded-lg">
-                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A</h4>
-                        <p className="mt-2 text-muted-foreground">
-                            La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
-                        </p>
-                    </div>
-                    
-                    <EjercicioInteractivo ejercicioId="plaza-skate" />
-
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Problema 2: Conversión a Radianes</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="p-4 border rounded-lg">
-                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B</h4>
-                        <p className="mt-2 text-muted-foreground">
-                            Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
-                        </p>
+                <CardContent className="space-y-6 divide-y">
+                    <div className="pt-6">
+                        <CentralAngleTheoremVisual/>
+                        <div className="p-4 border rounded-lg bg-background">
+                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
+                            <p className="mt-2 text-muted-foreground">
+                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
+                            </p>
+                        </div>
+                        
+                        <EjercicioInteractivo ejercicioId="plaza-skate" groupId={groupId} />
                     </div>
 
-                    <EjercicioInteractivo ejercicioId="conversion-radianes" />
+                     <div className="pt-6">
+                        <div className="p-4 border rounded-lg bg-background">
+                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
+                            <p className="mt-2 text-muted-foreground">
+                                Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
+                            </p>
+                        </div>
 
+                        <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
+                    </div>
                 </CardContent>
             </Card>
         </div>

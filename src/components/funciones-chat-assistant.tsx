@@ -20,6 +20,7 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   screenshot?: string;
+  contextFile?: string;
 }
 
 interface GenkitMessage {
@@ -29,6 +30,7 @@ interface GenkitMessage {
 
 interface FuncionesChatAssistantProps {
   ejercicioId: string;
+  grupoId: string;
 }
 
 const parseResponse = (content: string) => {
@@ -80,7 +82,7 @@ const parseResponse = (content: string) => {
     return finalParts;
 };
 
-export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantProps) {
+export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAssistantProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -92,6 +94,9 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Clave única para el historial de chat basada en el grupo de ejercicios.
+  const chatStorageKey = `funciones-chat-${grupoId}`;
 
   const { isListening, startListening, stopListening, isSupported } = useSpeechRecognition({
     onTranscript: (newTranscript) => {
@@ -99,25 +104,19 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     }
   });
 
-  const chatStorageKey = `funciones-chat-${ejercicioId}`;
 
-  const fetchAndStartInitialConversation = async () => {
-    const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...' };
+  const fetchAndStartInitialConversation = async (guideContent: string) => {
+    const autoPrompt = `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`;
+    const assistantPlaceholder: ChatMessage = { id: `assistant-intro-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
     setMessages([assistantPlaceholder]);
     
-    try {
-      const result = await getGuiaEjercicio(ejercicioId);
-      if ('error' in result) {
-        throw new Error(result.error);
-      }
-      const guideContent = result.content;
-      
-      startTransition(() => {
+    startTransition(() => {
         getFuncionesMatricesAiResponse({ 
-          initialSystemPrompt: guideContent 
+          initialSystemPrompt: guideContent,
+          userQuery: autoPrompt
         })
           .then(({ response }) => {
-            const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response };
+            const finalMessage: ChatMessage = { id: `assistant-intro-final-${Date.now()}`, role: 'model', content: response, contextFile: ejercicioId };
             setMessages([finalMessage]);
           })
           .catch(error => {
@@ -125,26 +124,38 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
              setMessages([{ id: 'error-initial', role: 'model', content: "Error al iniciar el asistente." }]);
           });
       });
-    } catch (err) {
-       console.error("Failed to fetch guide:", err);
-       setMessages([{ id: 'error-fetch-guide', role: 'model', content: "No pude encontrar la guía para este ejercicio." }]);
-    }
   };
 
   useEffect(() => {
-    try {
-      const savedMessages = localStorage.getItem(chatStorageKey);
-      if (savedMessages && savedMessages !== '[]') {
-        setMessages(JSON.parse(savedMessages));
-      } else {
-        fetchAndStartInitialConversation();
-      }
-    } catch (error) {
-      console.error("Failed to load from localStorage", error);
-      fetchAndStartInitialConversation();
-    }
+    const loadConversation = async () => {
+        try {
+            const savedMessages = localStorage.getItem(chatStorageKey);
+            const currentHistory = savedMessages ? JSON.parse(savedMessages) : [];
+
+            const result = await getGuiaEjercicio(ejercicioId);
+            if ('error' in result) throw new Error(result.error);
+            const guideContent = result.content;
+
+            // Si no hay historial o el último archivo de contexto es diferente, empezar de nuevo.
+            const lastContextFile = currentHistory[currentHistory.length - 1]?.contextFile;
+            if (currentHistory.length === 0 || lastContextFile !== ejercicioId) {
+                // Borra el historial anterior si estamos cambiando de ejercicio dentro del mismo grupo
+                if (currentHistory.length > 0) {
+                  localStorage.removeItem(chatStorageKey);
+                }
+                fetchAndStartInitialConversation(guideContent);
+            } else {
+                setMessages(currentHistory);
+            }
+        } catch (error) {
+            console.error("Failed to load conversation:", error);
+            setMessages([{ id: 'error-load', role: 'model', content: "No se pudo cargar la guía para este ejercicio." }]);
+        }
+    };
+    
+    loadConversation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId]);
+  }, [ejercicioId, grupoId]);
 
   useEffect(() => {
     try {
@@ -202,7 +213,12 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
   const handleResetConversation = () => {
     localStorage.removeItem(chatStorageKey);
     setMessages([]);
-    fetchAndStartInitialConversation();
+    // Iniciar de nuevo la conversación para el ejercicio actual
+     getGuiaEjercicio(ejercicioId).then(result => {
+        if (!('error' in result)) {
+            fetchAndStartInitialConversation(result.content);
+        }
+     });
   };
 
   const handleButtonClick = (value: string) => {
@@ -227,12 +243,12 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
     let screenshotDataUri: string | null = null;
     if (sendScreenshot) {
       screenshotDataUri = await takeScreenshot();
-      setSendScreenshot(false); // Desactivar después de enviar
+      setSendScreenshot(false);
       if (!screenshotDataUri) return;
     }
 
-    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput, ...(screenshotDataUri && { screenshot: screenshotDataUri }) };
-    const assistantPlaceholder: ChatMessage = { id: `assistant-${Date.now()}`, role: 'model', content: '...' };
+    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput, ...(screenshotDataUri && { screenshot: screenshotDataUri }), contextFile: ejercicioId };
+    const assistantPlaceholder: ChatMessage = { id: `assistant-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
 
     setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
 
@@ -244,22 +260,22 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
             content: [{ text: m.content }],
           }));
           
-          const guideContent = await getGuiaEjercicio(ejercicioId);
-          if ('error' in guideContent) {
-            throw new Error(guideContent.error);
-          }
+          const guideContentResult = await getGuiaEjercicio(ejercicioId);
+          if ('error' in guideContentResult) throw new Error(guideContentResult.error);
+          
 
           const { response: aiResponse } = await getFuncionesMatricesAiResponse({
             history: genkitHistory,
             userQuery: currentInput,
             screenshotDataUri: screenshotDataUri ?? undefined,
-            initialSystemPrompt: guideContent.content
+            initialSystemPrompt: guideContentResult.content,
           });
 
           setMessages(prev => prev.slice(0, -1).concat({
             id: `assistant-final-${Date.now()}`,
             role: 'model',
-            content: aiResponse
+            content: aiResponse,
+            contextFile: ejercicioId
           }));
 
         } catch (error: any) {
@@ -310,11 +326,6 @@ export function FuncionesChatAssistant({ ejercicioId }: FuncionesChatAssistantPr
               <div className="flex items-center gap-2 overflow-hidden">
                   <FileText className="w-4 h-4 flex-shrink-0 text-primary" />
                   <span className="truncate font-medium text-primary" title={`${ejercicioId}.md`}>Guía activa: {ejercicioId}.md</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                  <div className="w-8 h-4 bg-primary/20 rounded-full relative">
-                      <div className="w-4 h-4 bg-primary rounded-full absolute right-0"></div>
-                  </div>
               </div>
           </div>
       </div>
