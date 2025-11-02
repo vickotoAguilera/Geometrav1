@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText, AlertTriangle } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText, AlertTriangle, ChevronDown } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import html2canvas from 'html2canvas';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 
 interface ChatMessage {
@@ -91,6 +92,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const [isAttentionCollapsed, setAttentionCollapsed] = useState(false);
 
   const [sendScreenshot, setSendScreenshot] = useState(false);
   const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
@@ -208,7 +210,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      // El navegador mostrará un mensaje genérico. No podemos personalizarlo.
       e.returnValue = ''; 
     };
 
@@ -345,27 +346,45 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
       </SheetHeader>
       
       <div className="p-3 border-b">
-        <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>¡Atención!</AlertTitle>
-            <AlertDescription className="text-xs">
-                Para guardar tu progreso en la pizarra, usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)'. Para recuperarlo, usa la opción 'Abrir' del mismo menú.
-            </AlertDescription>
-        </Alert>
+         <Accordion type="single" collapsible defaultValue='item-1' onValueChange={(value) => setAttentionCollapsed(!value)}>
+            <AccordionItem value="item-1" className="border-b-0">
+                <AccordionTrigger className={cn("py-2 px-3 rounded-md text-sm hover:no-underline", !isAttentionCollapsed ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-red-500 text-white')}>
+                     <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span className="font-semibold">{isAttentionCollapsed ? 'Atención (Haz clic para expandir)' : 'Atención'}</span>
+                     </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2">
+                    <Alert variant="destructive" className="bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 [&>svg]:text-yellow-500 dark:[&>svg]:text-yellow-400">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>¡No pierdas tu progreso!</AlertTitle>
+                        <AlertDescription className="text-xs">
+                           Para guardar tu trabajo en la pizarra, usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)'. Para recuperarlo más tarde, usa la opción 'Abrir' del mismo menú.
+                        </AlertDescription>
+                    </Alert>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
       </div>
 
       {activeGuides.length > 0 && (
-        <div className="p-3 border-b bg-background">
-          <h3 className="text-sm font-medium mb-2 text-muted-foreground">Guías Activas en esta Sesión:</h3>
-          <div className="space-y-1">
-            {activeGuides.map(guide => (
-              <div key={guide} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
-                <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
-                <span className="truncate font-medium text-primary">{guide}.md</span>
-              </div>
-            ))}
-          </div>
-      </div>
+         <div className="p-3 border-b bg-background">
+            <Accordion type="single" collapsible defaultValue="item-1">
+                <AccordionItem value="item-1" className="border-b-0">
+                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
+                        Guías Activas en esta Sesión ({activeGuides.length})
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 space-y-1">
+                         {activeGuides.map(guide => (
+                            <div key={guide} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
+                                <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
+                                <span className="truncate font-medium text-primary">{guide}.md</span>
+                            </div>
+                        ))}
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
       )}
 
 
