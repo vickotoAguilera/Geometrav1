@@ -26,12 +26,12 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !isClient || !containerRef.current || !currentGroupId) {
+    if (!isClient || !containerRef.current || !currentGroupId) {
       return;
     }
 
     const container = containerRef.current;
-    
+
     const initializeApplet = () => {
       if (!window.GGBApplet) return;
 
@@ -44,9 +44,9 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
         applet.inject(container);
         // Force a resize to ensure it fits the container
         setTimeout(() => {
-            if (container && typeof applet.setSize === 'function') {
-                applet.setSize(container.clientWidth, container.clientHeight);
-            }
+          if (container && typeof applet.setSize === 'function') {
+            applet.setSize(container.clientWidth, container.clientHeight);
+          }
         }, 100);
         return;
       }
@@ -103,7 +103,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
     const resizeObserver = new ResizeObserver(() => {
         if (window.appletInstances && window.appletInstances[currentGroupId] && container) {
             const applet = window.appletInstances[currentGroupId];
-            if (typeof applet.setSize === 'function') {
+            if (applet && typeof applet.setSize === 'function') {
                 applet.setSize(container.clientWidth, container.clientHeight);
             }
         }
@@ -130,6 +130,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
     <div className="relative w-full h-full bg-background">
       <div
         ref={containerRef}
+        id={`geogebra-container-${currentGroupId}`}
         className="w-full h-full min-h-[500px] flex items-center justify-center"
       />
     </div>
