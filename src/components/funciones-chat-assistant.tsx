@@ -6,7 +6,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/compon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText } from 'lucide-react';
+import { Bot, User, Send, Loader2, Mic, Volume2, Waves, ArrowLeft, Camera, RefreshCw, FileText, AlertTriangle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import html2canvas from 'html2canvas';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 interface ChatMessage {
   id: string;
@@ -202,6 +204,19 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
       audioRef.current.pause();
     }
   }, [audioState]);
+  
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // El navegador mostrará un mensaje genérico. No podemos personalizarlo.
+      e.returnValue = ''; 
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
 
   const takeScreenshot = async (): Promise<string | null> => {
@@ -329,6 +344,16 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         </div>
       </SheetHeader>
       
+      <div className="p-3 border-b">
+        <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>¡Atención!</AlertTitle>
+            <AlertDescription className="text-xs">
+                Para guardar tu progreso en la pizarra, usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)'. Para recuperarlo, usa la opción 'Abrir' del mismo menú.
+            </AlertDescription>
+        </Alert>
+      </div>
+
       {activeGuides.length > 0 && (
         <div className="p-3 border-b bg-background">
           <h3 className="text-sm font-medium mb-2 text-muted-foreground">Guías Activas en esta Sesión:</h3>
