@@ -27,8 +27,6 @@ const CentralAngleTheoremVisual = () => (
 
             {/* Central Angle */}
             <path d="M 10 30 L 50 50 L 90 30" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
-            <path d="M 50 50 L 50 20" fill="none" /> 
-            <path d="M 50 50 m -15 -10 a 15 15 0 0 1 30 0" fill="none" /> 
             <path d="M 60 38 A 15 15 0 0 0 40 38" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
             <text x="46" y="35" fontSize="8" fill="hsl(var(--primary))">2α</text>
             
@@ -66,7 +64,6 @@ const RadianConversionVisual = () => (
 
 
 export default function EjerciciosTrigonometriaPage() {
-  const groupId = "trigonometria-basica";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -104,7 +101,7 @@ export default function EjerciciosTrigonometriaPage() {
                                         <CentralAngleTheoremVisual/>
                                     </div>
                                     
-                                    <EjercicioInteractivo ejercicioId="plaza-skate" groupId={groupId} />
+                                    <EjercicioInteractivo ejercicioId="plaza-skate" groupId="trigonometria-basica" />
                                 </div>
 
                                 <div className="pt-6">
@@ -118,7 +115,7 @@ export default function EjerciciosTrigonometriaPage() {
                                         <RadianConversionVisual />
                                     </div>
 
-                                    <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
+                                    <EjercicioInteractivo ejercicioId="conversion-radianes" groupId="trigonometria-basica" />
                                 </div>
                             </CardContent>
                             <CardFooter>
@@ -146,7 +143,7 @@ export default function EjerciciosTrigonometriaPage() {
                                             Aprende a construir triángulos, transformar ángulos y calcular razones trigonométricas usando los comandos de GeoGebra.
                                         </p>
                                     </div>
-                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-geogebra" groupId={groupId} />
+                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-geogebra" groupId="actividad-tecnologica" />
                                 </div>
 
                                 <div className="pt-6">
@@ -156,7 +153,7 @@ export default function EjerciciosTrigonometriaPage() {
                                             Aprende a configurar tu calculadora en modo Grados (DEG), Radianes (RAD) y Gradianes (GRA) para resolver problemas trigonométricos.
                                         </p>
                                     </div>
-                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-calculadora" groupId={groupId} />
+                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-calculadora" groupId="actividad-tecnologica" />
                                 </div>
                             </CardContent>
                             <CardFooter>
