@@ -196,7 +196,7 @@ export function ModuloEjercicios() {
                                         <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa."/>
                                         
                                         <h3 className="font-semibold text-lg">Actividad 1: Pendiente y Diferencia de Nivel</h3>
-                                        {/* <TablaActividad1 onVerify={() => {}} /> */}
+                                        <TablaActividad1 onVerify={() => {}} />
 
                                         <Separator className="my-8" />
                                         
@@ -219,7 +219,7 @@ export function ModuloEjercicios() {
                                         <Separator className="my-8" />
 
                                         <h3 className="font-semibold text-lg">Actividad 4: Razones Trigonométricas</h3>
-                                        {/* <TablaActividad4 onVerify={() => {}}/> */}
+                                        <TablaActividad4 onVerify={() => {}}/>
 
                                         <Separator className="my-8" />
                                         

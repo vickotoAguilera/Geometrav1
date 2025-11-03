@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, Check, Bot, Calculator, FileText, Info } from 'lucide-react';
+import { Loader2, Check, Bot, Calculator, X } from 'lucide-react';
 import Link from 'next/link';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
@@ -18,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
+import { Label } from '@/components/ui/label';
 
 
 // Este componente contendrá los dos botones de ayuda
@@ -174,6 +174,22 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
             toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla 4.' });
         }).finally(() => setIsPending(false));
     };
+
+    const renderInputCell = (index: number) => (
+      <TableCell key={index}>
+        <Input
+          type="text"
+          placeholder="..."
+          value={respuestas[index]}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          className={cn(
+            'w-24 text-center',
+            resultados[index] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+            resultados[index] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+          )}
+        />
+      </TableCell>
+    );
     
     return (
         <div className="space-y-4">
@@ -195,57 +211,15 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
                     <TableBody>
                         <TableRow>
                             <TableCell className="font-semibold">12%</TableCell>
-                            {Array.from({ length: 7 }).map((_, i) => (
-                                <TableCell key={i}>
-                                    <Input
-                                        type="text"
-                                        placeholder="..."
-                                        value={respuestas[i]}
-                                        onChange={(e) => handleInputChange(i, e.target.value)}
-                                        className={cn(
-                                            'w-24 text-center',
-                                            resultados[i] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
-                                            resultados[i] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
-                                        )}
-                                    />
-                                </TableCell>
-                            ))}
+                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i))}
                         </TableRow>
                          <TableRow>
                             <TableCell className="font-semibold">8%</TableCell>
-                            {Array.from({ length: 7 }).map((_, i) => (
-                                <TableCell key={i + 7}>
-                                    <Input
-                                        type="text"
-                                        placeholder="..."
-                                        value={respuestas[i + 7]}
-                                        onChange={(e) => handleInputChange(i + 7, e.target.value)}
-                                        className={cn(
-                                            'w-24 text-center',
-                                            resultados[i + 7] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
-                                            resultados[i + 7] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
-                                        )}
-                                    />
-                                </TableCell>
-                            ))}
+                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i + 7))}
                         </TableRow>
                         <TableRow>
                             <TableCell className="font-semibold">6%</TableCell>
-                             {Array.from({ length: 7 }).map((_, i) => (
-                                <TableCell key={i + 14}>
-                                    <Input
-                                        type="text"
-                                        placeholder="..."
-                                        value={respuestas[i + 14]}
-                                        onChange={(e) => handleInputChange(i + 14, e.target.value)}
-                                        className={cn(
-                                            'w-24 text-center',
-                                            resultados[i + 14] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
-                                            resultados[i + 14] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
-                                        )}
-                                    />
-                                </TableCell>
-                            ))}
+                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i + 14))}
                         </TableRow>
                     </TableBody>
                 </Table>
