@@ -3,109 +3,90 @@
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { BookOpen, Bot, Calculator } from 'lucide-react';
 import { useState } from 'react';
-// import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { ButtonVerificarConceptual, AyudaContextual, EjercicioInteractivo, TeoremaAnguloCentralSVG } from '@/components/modulo-ejercicios';
 
-// Componente para un solo ejercicio
-const EjercicioRespuesta = ({ pregunta, placeholder }: { pregunta: React.ReactNode, placeholder: string }) => {
+const ejerciciosPlazaSkate = [
+    { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40' },
+    { id: 'conversion-radianes', pregunta: '**Ejercicio 2:** Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? Explica cómo se calcula y recuerda que `180° = π radianes`.', respuestaCorrecta: '2*pi/9' },
+];
+
+
+export default function EjerciciosTrigonometriaPage() {
+    const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
+
+    const handleTeoricoToggle = (groupId: string) => {
+        setActiveTeorico(prev => ({
+            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+            groupId: groupId,
+        }));
+    };
+
     return (
-        <div className="space-y-2 p-4 border rounded-lg bg-card/50">
-            <div className="text-sm font-medium">{pregunta}</div>
-            <div className="flex items-center gap-2">
-                <Input placeholder={placeholder} disabled />
-                <Button variant="outline" size="icon" className="flex-shrink-0" disabled>
-                    <BookOpen className="w-4 h-4" />
-                </Button>
-            </div>
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1 container mx-auto py-8 px-4">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
+                    <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+                        Resuelve los siguientes ejercicios. Puedes verificar tus respuestas con la IA.
+                    </p>
+                </div>
+
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
+                            <AccordionContent>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Descripción del Problema</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="pt-2">
+                                        <div className="space-y-6">
+                                            <div className="prose prose-invert max-w-none">
+                                                <p>En el parque de una ciudad hay instaladas cámaras de vigilancia. La ubicada en el punto B, con un ángulo de 20°, detectó un objeto sospechoso en C. Para enfocar la cámara del centro O, se necesita saber el valor del ángulo central `2α`.</p>
+                                                <TeoremaAnguloCentralSVG className="w-full max-w-xs mx-auto my-4" />
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                {ejerciciosPlazaSkate.map(ej => (
+                                                    <ButtonVerificarConceptual 
+                                                        key={ej.id} 
+                                                        ejercicio={ej}
+                                                    />
+                                                ))}
+                                            </div>
+
+                                            {/* <div className="flex justify-end pt-4">
+                                                <AyudaContextual
+                                                    ejercicioId="plaza-skate"
+                                                    groupId="trigonometria-basica"
+                                                    onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
+                                                    isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
+                                                />
+                                            </div> */}
+
+                                            {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                            <EjercicioInteractivo 
+                                                    key="trigonometria-basica"
+                                                    groupId="trigonometria-basica"
+                                                    contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
+                                            />
+                                            )} */}
+
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </AccordionContent>
+                        </AccordionItem>
+                        
+                        {/* Aquí se agregarán los futuros módulos */}
+
+                    </Accordion>
+                </div>
+
+            </main>
         </div>
     );
-};
-
-export default function NuevaEjerciciosPage() {
-  const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
-
-  const handleTeoricoToggle = (groupId: string) => {
-      setActiveTeorico(prev => ({
-          isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-          groupId: groupId,
-      }));
-  };
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                Resuelve los siguientes ejercicios. Próximamente podrás interactuar con nuestros tutores de IA.
-            </p>
-        </div>
-        
-        <div className="max-w-4xl mx-auto space-y-8">
-            <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
-                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
-                    <AccordionContent>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Descripción del Problema</CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-2">
-                                <div className="space-y-6">
-                                    <div className="prose prose-invert max-w-none">
-                                        <p>En el parque de una ciudad hay instaladas cámaras de vigilancia. La ubicada en el punto B, con un ángulo de 20°, detectó un objeto sospechoso en C. Para enfocar la cámara del centro O, se necesita saber el valor del ángulo central `2α`.</p>
-                                        <TeoremaAnguloCentralSVG className="w-full max-w-xs mx-auto my-4" />
-                                    </div>
-                                    
-                                    <div className="space-y-4">
-                                       <EjercicioRespuesta 
-                                            pregunta={<><b>Ejercicio 1:</b> El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?</>}
-                                            placeholder="Respuesta en grados..."
-                                       />
-                                       <EjercicioRespuesta 
-                                            pregunta={<><b>Ejercicio 2:</b> Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? (Recuerda que `180° = π radianes`).</>}
-                                            placeholder="Respuesta en radianes..."
-                                       />
-                                    </div>
-
-                                    <div className="flex justify-end pt-4">
-                                        {/* <AyudaContextual
-                                            ejercicioId="plaza-skate"
-                                            groupId="trigonometria-basica"
-                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
-                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
-                                        /> */}
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="icon" className="h-9 w-9" disabled><Calculator className="h-5 w-5"/></Button>
-                                            <Button variant="outline" size="icon" className="h-9 w-9" disabled><Bot className="h-5 w-5"/></Button>
-                                        </div>
-                                    </div>
-
-                                    {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
-                                       <EjercicioInteractivo 
-                                            key="trigonometria-basica"
-                                            groupId="trigonometria-basica"
-                                            contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
-                                       />
-                                    )} */}
-
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </AccordionContent>
-                </AccordionItem>
-                
-                {/* Aquí se agregarán los futuros módulos */}
-
-            </Accordion>
-        </div>
-
-      </main>
-    </div>
-  );
 }
