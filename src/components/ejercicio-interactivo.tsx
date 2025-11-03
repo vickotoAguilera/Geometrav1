@@ -242,22 +242,7 @@ export function EjercicioInteractivo({ groupId, activeContextFiles }: EjercicioI
 
   return (
     <div className="border-t pt-4 mt-4">
-        <div className="p-2 border rounded-md mb-4 bg-background">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Info className="h-4 w-4 text-primary" />
-                <p>Archivos de contexto activos para la IA: <span className="font-bold text-primary">{activeContextFiles.length}</span></p>
-            </div>
-             {activeContextFiles.length > 0 && (
-                <div className="text-xs text-muted-foreground mt-2 pl-7 space-y-1">
-                    {activeContextFiles.map(file => (
-                        <div key={file} className="flex items-center gap-2">
-                             <FileText className="w-3 h-3 flex-shrink-0" />
-                             <span>{file.split('/').pop()}.md</span>
-                        </div>
-                    ))}
-                </div>
-             )}
-        </div>
+        {/* The info box for active files is removed to simplify the UI as requested */}
         <TutorTeoricoChat 
             activeContextFiles={activeContextFiles}
             groupId={groupId} 
