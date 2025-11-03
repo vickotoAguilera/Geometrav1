@@ -124,7 +124,7 @@ const TablaActividad4 = () => {
     };
 
     const crearCeldaInput = (index: number) => (
-        <TableCell>
+        <TableCell key={index}>
             <Input
                 type="text"
                 placeholder="..."
