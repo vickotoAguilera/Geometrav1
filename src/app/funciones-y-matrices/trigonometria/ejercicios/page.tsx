@@ -1,7 +1,7 @@
 import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Sigma, Calculator, MonitorPlay } from "lucide-react";
+import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 
 const CentralAngleTheoremVisual = () => (
@@ -162,6 +162,32 @@ export default function EjerciciosTrigonometriaPage() {
                         </AccordionContent>
                     </Card>
                 </AccordionItem>
+                <AccordionItem value="item-1.2">
+                    <Card>
+                        <AccordionTrigger className="p-6">
+                            <div className="flex flex-col items-start text-left">
+                                <CardTitle>Módulo 1.2: Situación de Modelación - La Rampa</CardTitle>
+                                <CardDescription className="mt-2">
+                                    Aplica conceptos de trigonometría en un contexto real de accesibilidad y diseño.
+                                </CardDescription>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                             <CardContent>
+                                <div className="p-4 border rounded-lg bg-background flex flex-col">
+                                    <h4 className="font-semibold flex items-center gap-2"><Accessibility />Guía de la Rampa</h4>
+                                    <p className="mt-2 text-muted-foreground flex-1">
+                                        Analiza la normativa de construcción de rampas de acceso, calcula pendientes, ángulos y utiliza las razones trigonométricas para resolver problemas de diseño.
+                                    </p>
+                                </div>
+                                <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
+                            </CardContent>
+                            <CardFooter>
+                                <p className="text-xs text-muted-foreground">Este módulo utiliza un tutor especializado para guiarte en el problema.</p>
+                            </CardFooter>
+                        </AccordionContent>
+                    </Card>
+                </AccordionItem>
             </Accordion>
         </div>
 
@@ -169,3 +195,4 @@ export default function EjerciciosTrigonometriaPage() {
     </div>
   );
 }
+
