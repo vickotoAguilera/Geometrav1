@@ -27,16 +27,37 @@ const CentralAngleTheoremVisual = () => (
 
             {/* Central Angle */}
             <path d="M 10 30 L 50 50 L 90 30" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
-            <path d="M 60 42 A 10 10 0 0 0 40 42" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
-            <text x="47" y="38" fontSize="8" fill="hsl(var(--primary))">2α</text>
+            <path d="M 50 50 A 15 15 0 0 1 64 39" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
+            <text x="58" y="35" fontSize="8" fill="hsl(var(--primary))">2α</text>
             
             {/* Inscribed Angle */}
             <path d="M 10 30 L 50 95 L 90 30" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
-            <path d="M 45 85 A 15 15 0 0 1 55 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" />
-            <text x="48" y="80" fontSize="8" fill="hsl(var(--foreground))">α</text>
+            <path d="M 45 85 A 15 15 0 0 1 55 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" transform="translate(1, -5)"/>
+            <text x="48" y="82" fontSize="8" fill="hsl(var(--foreground))">α</text>
         </svg>
         <p className="text-xs text-center text-muted-foreground mt-2 px-2">
            El ángulo del centro (`2α`) es siempre el doble que el ángulo inscrito (`α`) que abarca el mismo arco.
+        </p>
+    </div>
+);
+
+const RadianConversionVisual = () => (
+    <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-background/50 h-full">
+        <h4 className="text-sm font-semibold text-center mb-2">Conversión de Grados a Radianes</h4>
+        <svg viewBox="0 0 100 100" className="w-full h-auto max-w-[200px] mx-auto">
+            {/* Semicircle */}
+            <path d="M 5,50 A 45,45 0 0,1 95,50" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
+            <line x1="5" y1="50" x2="95" y2="50" stroke="hsl(var(--foreground))" strokeWidth="1" />
+            
+            {/* Center Point */}
+            <circle cx="50" cy="50" r="1.5" fill="hsl(var(--foreground))" />
+
+            {/* Labels */}
+            <text x="45" y="30" fontSize="8" fill="hsl(var(--primary))" className="font-semibold">π rad</text>
+            <text x="45" y="65" fontSize="8" fill="hsl(var(--foreground))">180°</text>
+        </svg>
+        <p className="text-xs text-center text-muted-foreground mt-2 px-2">
+            La equivalencia fundamental es: <strong>π radianes = 180 grados</strong>. Se usa para convertir cualquier ángulo entre estas dos unidades.
         </p>
     </div>
 );
@@ -85,11 +106,14 @@ export default function EjerciciosTrigonometriaPage() {
                                 </div>
 
                                 <div className="pt-6">
-                                    <div className="p-4 border rounded-lg bg-background">
-                                        <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
-                                        <p className="mt-2 text-muted-foreground">
-                                            Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
-                                        </p>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="p-4 border rounded-lg bg-background flex flex-col">
+                                            <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
+                                            <p className="mt-2 text-muted-foreground flex-1">
+                                                Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
+                                            </p>
+                                        </div>
+                                        <RadianConversionVisual />
                                     </div>
 
                                     <EjercicioInteractivo ejercicioId="conversion-radianes" groupId={groupId} />
@@ -108,3 +132,4 @@ export default function EjerciciosTrigonometriaPage() {
     </div>
   );
 }
+
