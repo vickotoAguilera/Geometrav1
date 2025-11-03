@@ -129,7 +129,6 @@ export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
     
-    // Estado unificado para los archivos de contexto
     const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
 
     const handleContextToggle = (file: string, isActive: boolean) => {
@@ -148,7 +147,6 @@ export function ModuloEjercicios() {
         setActiveTeorico(prev => {
             const isOpeningForFirstTime = prev.groupId !== groupId;
             if (isOpeningForFirstTime) {
-                // Al abrir un nuevo tutor, se resetea el contexto a los archivos iniciales de ese módulo
                 setActiveContextFiles(initialFiles);
             }
             return {
@@ -220,11 +218,33 @@ export function ModuloEjercicios() {
                                         <TablaActividad1 onVerify={() => {}} />
 
                                         <Separator className="my-8" />
+                                        
+                                        <h3 className="font-semibold text-lg">Actividad 2: Representación en GeoGebra</h3>
+                                        <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior con el comando `Polígono`. ¿Qué tipo de triángulo representan? ¿Qué semejanzas y diferencias observas entre ellas?</p>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Representación de una rampa en GeoGebra."/>
+                                        <ButtonVerificarConceptual 
+                                            ejercicio={{ id: 'la-rampa-act-2', pregunta: 'Describe tus conclusiones sobre los triángulos que representan las rampas (tipo, semejanzas, diferencias).', respuestaCorrecta: 'Son triángulos rectángulos. Los que tienen misma pendiente son semejantes entre sí. Se diferencian en el tamaño de sus lados.', contextFile: 'la-rampa-actividad-2' }}
+                                            onContextToggle={handleContextToggle}
+                                            isContextActive={activeContextFiles.includes('la-rampa-actividad-2')}
+                                        />
+
+                                        <Separator className="my-8" />
+
+                                        <h3 className="font-semibold text-lg">Actividad 3: Medición de Ángulos</h3>
+                                        <p>Usa la herramienta `Ángulo` en GeoGebra para medir la inclinación de las rampas que dibujaste.</p>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra."/>
+                                         <ButtonVerificarConceptual 
+                                            ejercicio={{ id: 'la-rampa-act-3', pregunta: '¿Cuál es el ángulo para la pendiente del 12% y para la del 8%? (aprox. a dos decimales)', respuestaCorrecta: '6.84, 4.57', contextFile: 'la-rampa-actividad-3' }}
+                                            onContextToggle={handleContextToggle}
+                                            isContextActive={activeContextFiles.includes('la-rampa-actividad-3')}
+                                        />
+
+                                        <Separator className="my-8" />
 
                                         <h3 className="font-semibold text-lg">Actividad 4: Razones Trigonométricas</h3>
                                         <TablaActividad4 onVerify={() => {}}/>
 
-                                         <Separator className="my-8" />
+                                        <Separator className="my-8" />
                                         
                                         <h3 className="font-semibold text-lg">Actividad 5: Conclusiones</h3>
                                         <div className="space-y-4">
@@ -291,8 +311,9 @@ export function ModuloEjercicios() {
                                     
                                     <div className="prose prose-invert max-w-none">
                                         <h3 className="font-semibold text-lg">Actividades con Calculadora (10-27)</h3>
-                                        <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/Video.png" alt="Guía de uso de la calculadora científica para trigonometría."/>
-                                        <div className="space-y-4">
+                                        <p className="text-muted-foreground">Revisa el siguiente video para aprender a configurar tu calculadora en modo DEG, RAD o GRA.</p>
+                                        <div style={{position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', maxWidth: '100%', background: '#000', borderRadius: '0.5rem'}}><iframe style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} src="https://www.youtube.com/embed/eFROC2qbNFI" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe></div>
+                                        <div className="space-y-4 mt-4">
                                              {ejerciciosModulo1_2.slice(4).map(ej => (
                                                 <ButtonVerificarConceptual 
                                                     key={ej.id} 
