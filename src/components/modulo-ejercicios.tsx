@@ -25,6 +25,24 @@ interface EjercicioConceptual {
     contextFile: string;
 }
 
+const ejerciciosPlazaSkate: EjercicioConceptual[] = [
+    { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40', contextFile: 'plaza-skate/tutor-geogebra/actividad' },
+    { id: 'conversion-radianes', pregunta: '**Ejercicio 2:** Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? Expresa el resultado en función de π (pi).', respuestaCorrecta: '2*pi/9', contextFile: 'conversion-radianes/tutor-geogebra/actividad' },
+];
+
+const ejerciciosModulo1_2: EjercicioConceptual[] = [
+    { id: 'act-tec-2', pregunta: '**Actividad 2:** Construye un triángulo con vértices A=(0,0), B=(4,0) y C=(4,3) usando `Polígono(A,B,C)`. Luego, usa `ÁngulosInteriores(t1)`. Escribe los tres ángulos (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '36.87, 53.13, 90', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
+    { id: 'act-tec-3', pregunta: '**Actividad 3:** Usando `Ángulo()`, convierte `3pi/2`, `pi/3` y `1` rad a grados. Escribe los resultados (aprox. a un decimal) separados por comas.', respuestaCorrecta: '270, 60, 57.3', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
+    { id: 'act-tec-4', pregunta: '**Actividad 4:** Calcula `sin(30°)`, `cos(30°)` y `tan(30°)`. Escribe los resultados (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '0.5, 0.87, 0.58', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
+    { id: 'act-tec-7', pregunta: '**Actividad 7:** Usando `asind(0.5)`, `acosd(0.5)` y `atand(0.5)`, ¿qué ángulos en grados obtienes? (aprox. a dos decimales)', respuestaCorrecta: '30, 60, 26.57', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
+    { id: 'act-tec-10', pregunta: '**Actividad 10 (Calculadora - DEG):** ¿Cuál es el valor de `sin(30°)`?', respuestaCorrecta: '0.5', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+    { id: 'act-tec-13', pregunta: '**Actividad 13 (Calculadora - DEG):** ¿Cuál es el ángulo (en grados) cuyo seno es 0.5?', respuestaCorrecta: '30', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+    { id: 'act-tec-16', pregunta: '**Actividad 16 (Calculadora - RAD):** ¿Cuál es el valor de `sin(30 rad)`? (Aprox. a dos decimales).', respuestaCorrecta: '-0.99', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+    { id: 'act-tec-19', pregunta: '**Actividad 19 (Calculadora - RAD):** ¿Cuál es el ángulo (en radianes) cuyo seno es 0.5? (Aprox. a dos decimales).', respuestaCorrecta: '0.52', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+    { id: 'act-tec-22', pregunta: '**Actividad 22 (Calculadora - GRA):** ¿Cuál es el valor de `sin(50g)`? (Aprox. a cuatro decimales).', respuestaCorrecta: '0.7071', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+];
+
+
 const ButtonVerificarConceptual = ({
   ejercicio,
   onContextToggle,
@@ -107,20 +125,6 @@ const ButtonVerificarConceptual = ({
 };
 
 
-const ejerciciosModulo1_2: EjercicioConceptual[] = [
-    { id: 'act-tec-2', pregunta: '**Actividad 2:** Construye un triángulo con vértices A=(0,0), B=(4,0) y C=(4,3) usando `Polígono(A,B,C)`. Luego, usa `ÁngulosInteriores(t1)`. Escribe los tres ángulos (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '36.87, 53.13, 90', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-3', pregunta: '**Actividad 3:** Usando `Ángulo()`, convierte `3pi/2`, `pi/3` y `1` rad a grados. Escribe los resultados (aprox. a un decimal) separados por comas.', respuestaCorrecta: '270, 60, 57.3', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-4', pregunta: '**Actividad 4:** Calcula `sin(30°)`, `cos(30°)` y `tan(30°)`. Escribe los resultados (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '0.5, 0.87, 0.58', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-7', pregunta: '**Actividad 7:** Usando `asind(0.5)`, `acosd(0.5)` y `atand(0.5)`, ¿qué ángulos en grados obtienes? (aprox. a dos decimales)', respuestaCorrecta: '30, 60, 26.57', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-10', pregunta: '**Actividad 10 (Calculadora - DEG):** ¿Cuál es el valor de `sin(30°)`?', respuestaCorrecta: '0.5', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-13', pregunta: '**Actividad 13 (Calculadora - DEG):** ¿Cuál es el ángulo (en grados) cuyo seno es 0.5?', respuestaCorrecta: '30', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-16', pregunta: '**Actividad 16 (Calculadora - RAD):** ¿Cuál es el valor de `sin(30 rad)`? (Aprox. a dos decimales).', respuestaCorrecta: '-0.99', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-19', pregunta: '**Actividad 19 (Calculadora - RAD):** ¿Cuál es el ángulo (en radianes) cuyo seno es 0.5? (Aprox. a dos decimales).', respuestaCorrecta: '0.52', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-22', pregunta: '**Actividad 22 (Calculadora - GRA):** ¿Cuál es el valor de `sin(50g)`? (Aprox. a cuatro decimales).', respuestaCorrecta: '0.7071', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-];
-
-
-
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
@@ -162,7 +166,41 @@ export function ModuloEjercicios() {
                     <AccordionContent>
                         <Card>
                             <CardContent className="pt-6">
-                                {/* Contenido del Módulo 1.0 */}
+                                <div className="space-y-6">
+                                    <div className="prose prose-invert max-w-none">
+                                        <p>En el parque de una ciudad hay instaladas cámaras de vigilancia. La ubicada en el punto B, con un ángulo de 20°, detectó un objeto sospechoso en C. Para enfocar la cámara del centro O, se necesita saber el valor del ángulo central `2α`.</p>
+                                        <TeoremaAnguloCentralSVG className="w-full max-w-xs mx-auto my-4" />
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        {ejerciciosPlazaSkate.map(ej => (
+                                             <ButtonVerificarConceptual 
+                                                key={ej.id} 
+                                                ejercicio={ej}
+                                                onContextToggle={handleContextToggle}
+                                                isContextActive={activeContextFiles.includes(ej.contextFile)}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex justify-end pt-4">
+                                        <AyudaContextual
+                                            ejercicioId="plaza-skate"
+                                            groupId="trigonometria-basica"
+                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica', ['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad'])}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
+                                        />
+                                    </div>
+
+                                    {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                       <EjercicioInteractivo 
+                                            key="trigonometria-basica"
+                                            groupId="trigonometria-basica"
+                                            activeContextFiles={activeContextFiles}
+                                       />
+                                    )}
+
+                                </div>
                             </CardContent>
                         </Card>
                     </AccordionContent>
@@ -173,7 +211,56 @@ export function ModuloEjercicios() {
                     <AccordionContent>
                          <Card>
                             <CardContent className="pt-6">
-                                {/* Contenido del Módulo 1.1 */}
+                                <div className="space-y-6">
+                                    <div className="prose prose-invert max-w-none">
+                                        <p>Las rampas son esenciales para la accesibilidad. La norma chilena establece una pendiente máxima del 12% para tramos de hasta 150 cm y del 8% para tramos más largos. Vamos a analizarlo.</p>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa."/>
+                                        
+                                        <h3 className="font-semibold text-lg">Actividad 1: Pendiente y Diferencia de Nivel</h3>
+                                        <TablaActividad1 onVerify={() => {}} />
+
+                                        <Separator className="my-8" />
+
+                                        <h3 className="font-semibold text-lg">Actividad 4: Razones Trigonométricas</h3>
+                                        <TablaActividad4 onVerify={() => {}}/>
+
+                                         <Separator className="my-8" />
+                                        
+                                        <h3 className="font-semibold text-lg">Actividad 5: Conclusiones</h3>
+                                        <div className="space-y-4">
+                                            <ButtonVerificarConceptual 
+                                                ejercicio={{ id: 'la-rampa-act-5a', pregunta: '**a.** ¿Qué comandos de GeoGebra y funciones de tu calculadora te permiten encontrar el ángulo conociendo los lados?', respuestaCorrecta: 'atand', contextFile: 'la-rampa-actividad-5' }}
+                                                onContextToggle={handleContextToggle}
+                                                isContextActive={activeContextFiles.includes('la-rampa-actividad-5')}
+                                            />
+                                            <ButtonVerificarConceptual 
+                                                ejercicio={{ id: 'la-rampa-act-5b', pregunta: '**b.** Para un ángulo de 4°, ¿cuál debe ser la pendiente porcentual aproximada?', respuestaCorrecta: '7%', contextFile: 'la-rampa-actividad-5' }}
+                                                onContextToggle={handleContextToggle}
+                                                isContextActive={activeContextFiles.includes('la-rampa-actividad-5')}
+                                            />
+                                            <ButtonVerificarConceptual 
+                                                ejercicio={{ id: 'la-rampa-act-5c', pregunta: '**c.** Si la diferencia de nivel es de 25 cm con un ángulo de 4°, ¿cuál es la distancia horizontal (aprox. a un decimal)?', respuestaCorrecta: '357.5', contextFile: 'la-rampa-actividad-5' }}
+                                                onContextToggle={handleContextToggle}
+                                                isContextActive={activeContextFiles.includes('la-rampa-actividad-5')}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end pt-4">
+                                        <AyudaContextual
+                                            ejercicioId="la-rampa"
+                                            groupId="la-rampa"
+                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa', ['la-rampa/tutor-geogebra/actividad', 'la-rampa/tutor-calculadora/actividad-1', 'la-rampa-actividad-4', 'la-rampa-actividad-5'])}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa'}
+                                        />
+                                    </div>
+                                     {activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa' && (
+                                       <EjercicioInteractivo 
+                                            key="la-rampa"
+                                            groupId="la-rampa"
+                                            activeContextFiles={activeContextFiles}
+                                       />
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </AccordionContent>
@@ -204,9 +291,7 @@ export function ModuloEjercicios() {
                                     
                                     <div className="prose prose-invert max-w-none">
                                         <h3 className="font-semibold text-lg">Actividades con Calculadora (10-27)</h3>
-                                        <div style={{position: 'relative', paddingBottom: '56.25%', height: '0', overflow: 'hidden', maxWidth: '100%', borderRadius: '0.5rem', marginBottom: '1rem'}}>
-                                            <iframe style={{position: 'absolute', top: '0', left: '0', width: '100%', height: '100%'}} src="https://www.youtube.com/embed/eFROC2qbNFI" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-                                        </div>
+                                        <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/Video.png" alt="Guía de uso de la calculadora científica para trigonometría."/>
                                         <div className="space-y-4">
                                              {ejerciciosModulo1_2.slice(4).map(ej => (
                                                 <ButtonVerificarConceptual 
