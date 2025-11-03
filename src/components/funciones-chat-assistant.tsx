@@ -133,10 +133,9 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   
   const loadConversation = async () => {
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-    const currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
+    let currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
     
     const isNewExercise = !currentHistory.some(msg => msg.contextFile === ejercicioId);
-    let updatedHistory = [...currentHistory];
 
     if (currentHistory.length === 0 || isNewExercise) {
       const autoPrompt = currentHistory.length === 0
@@ -146,7 +145,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
       const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
       const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
       
-      updatedHistory = [...currentHistory, userMessage];
+      const updatedHistory = [...currentHistory, userMessage];
       setMessages([...updatedHistory, assistantPlaceholder]);
       
       const { guideContent } = await getActiveGuideContext(updatedHistory);
@@ -163,7 +162,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         })
         .catch(error => {
           console.error("Error starting/continuing chat:", error);
-          setMessages(currentHistory); // Revertir en caso de error
+          setMessages(currentHistory); // Revert on error
         });
       });
     } else {
@@ -180,6 +179,8 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
     try {
       if (messages.length > 0) {
         localStorage.setItem(chatStorageKey, JSON.stringify(messages));
+      } else {
+        localStorage.removeItem(chatStorageKey);
       }
     } catch (error) {
       console.error("Failed to save to localStorage", error);
@@ -376,7 +377,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>¡No pierdas tu progreso!</AlertTitle>
                         <AlertDescription className="text-xs">
-                           Para guardar tu trabajo en la pizarra, usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)'. Para recuperarlo más tarde, usa la opción 'Abrir' del mismo menú.
+                           Para guardar tu trabajo en la pizarra, usa el menú de GeoGebra (☰) -> 'Descargar como' -> 'Archivo GGB (.ggb)'. Para recuperarlo más tarde, usa la opción 'Abrir' del mismo menú.
                         </AlertDescription>
                     </Alert>
                 </AccordionContent>
