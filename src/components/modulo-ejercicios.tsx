@@ -14,55 +14,63 @@ import { cn } from '@/lib/utils';
 import { AyudaContextual, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
 import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
 import { Textarea } from './ui/textarea';
+import { MarkdownImage } from './markdown-image';
 
-const ButtonVerificarConceptual = ({ respuesta, preguntaId, respuestaCorrecta, onResult, children, }: { respuesta: string; preguntaId: string; respuestaCorrecta: string; onResult: (result: boolean | null) => void; children: React.ReactNode; }) => {
-    const [isVerifying, setIsVerifying] = useState(false);
-    const { toast } = useToast();
+const ButtonVerificarConceptual = ({
+  respuesta,
+  preguntaId,
+  respuestaCorrecta,
+  onResult,
+  onRespuestaChange,
+  children,
+}: {
+  respuesta: string;
+  preguntaId: string;
+  respuestaCorrecta: string;
+  onResult: (result: boolean | null) => void;
+  onRespuestaChange: (value: string) => void;
+  children: React.ReactNode;
+}) => {
+  const [isVerifying, setIsVerifying] = useState(false);
+  const { toast } = useToast();
 
-    const handleVerify = async () => {
-        if (!respuesta.trim()) {
-            toast({ title: "Respuesta vacía", description: "Por favor, escribe una respuesta.", variant: "destructive" });
-            onResult(false);
-            return;
-        }
-        setIsVerifying(true);
-        onResult(null);
-        try {
-            const res = await verificarRespuestaAction({ preguntaId, respuestaUsuario: respuesta, respuestaCorrecta });
-            onResult(res.esCorrecta);
-            toast({ title: res.esCorrecta ? "¡Respuesta Correcta!" : "Respuesta Incorrecta", description: res.feedback });
-        } catch (error) {
-            toast({ title: "Error", description: "No se pudo verificar la respuesta.", variant: "destructive" });
-            onResult(false);
-        } finally {
-            setIsVerifying(false);
-        }
-    };
+  const handleVerify = async () => {
+    if (!respuesta.trim()) {
+      toast({ title: 'Respuesta vacía', description: 'Por favor, escribe una respuesta.', variant: 'destructive' });
+      onResult(false);
+      return;
+    }
+    setIsVerifying(true);
+    onResult(null);
+    try {
+      const res = await verificarRespuestaAction({ preguntaId, respuestaUsuario: respuesta, respuestaCorrecta });
+      onResult(res.esCorrecta);
+      toast({ title: res.esCorrecta ? '¡Respuesta Correcta!' : 'Respuesta Incorrecta', description: res.feedback, duration: 5000 });
+    } catch (error) {
+      toast({ title: 'Error', description: 'No se pudo verificar la respuesta.', variant: 'destructive' });
+      onResult(false);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
-    return (
-        <div className="space-y-2">
-            <Label htmlFor={preguntaId}>{children}</Label>
-            <div className="flex gap-2">
-                <Textarea
-                    id={preguntaId}
-                    placeholder="Escribe aquí tu conclusión..."
-                    value={respuesta}
-                    onChange={(e) => {
-                        const inputElement = e.target as HTMLTextAreaElement;
-                        // Directly call a state setter from parent.
-                        // This might require passing down a function like `setRespuestaAct2a`
-                        // For now, this is a simplified example.
-                        // You'll need to lift state up or pass setters down.
-                        // This is a placeholder to show the structure.
-                    }}
-                />
-                 <Button onClick={handleVerify} disabled={isVerifying} size="sm" variant="secondary">
-                    {isVerifying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                    Verificar
-                </Button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={preguntaId}>{children}</Label>
+      <div className="flex items-start gap-2">
+        <Textarea
+          id={preguntaId}
+          placeholder="Escribe aquí tu conclusión..."
+          value={respuesta}
+          onChange={(e) => onRespuestaChange(e.target.value)}
+        />
+        <Button onClick={handleVerify} disabled={isVerifying} size="sm" variant="secondary" className="mt-1">
+          {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+          <span className="sr-only">Verificar</span>
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 
@@ -139,6 +147,7 @@ export function ModuloEjercicios() {
                                                         preguntaId="angulo-central"
                                                         respuestaCorrecta="40"
                                                         onResult={setResultadoSkate}
+                                                        onRespuestaChange={setRespuestaSkate}
                                                      >Verificar</ButtonVerificarConceptual>
                                                 </div>
                                             </div>
@@ -153,19 +162,14 @@ export function ModuloEjercicios() {
                                     <Separator />
 
                                     <div className="space-y-4">
-                                         <p className="text-muted-foreground max-w-prose">
-                                            Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes.
-                                        </p>
-                                        
                                         <div className="p-4 border rounded-lg bg-background text-sm space-y-2">
-                                            <h4 className="font-semibold text-foreground">¿Cómo convertir grados a radianes?</h4>
-                                            <p className="text-muted-foreground">La relación fundamental es: <code className="bg-muted px-1.5 py-0.5 rounded">180° = π radianes</code>.</p>
-                                            <p className="text-muted-foreground">A partir de esa equivalencia, la fórmula para convertir cualquier ángulo de grados a radianes es:</p>
+                                            <h4 className="font-semibold text-foreground">Existe una fórmula muy directa para convertir grados a radianes.</h4>
+                                            <p className="text-muted-foreground">La relación fundamental es: <code className="bg-muted px-1.5 py-0.5 rounded">180° = π radianes</code>. A partir de esa equivalencia, la fórmula para convertir cualquier ángulo de grados a radianes es:</p>
                                             <code className="block text-center bg-muted p-2 rounded-md font-semibold">radianes = grados × (π / 180)</code>
                                         </div>
 
                                         <div className="space-y-2 pt-4">
-                                            <Label htmlFor="respuesta-radianes">Respuesta en radianes (usa 'pi' si es necesario):</Label>
+                                            <Label htmlFor="respuesta-radianes">Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes (usa 'pi' si es necesario):</Label>
                                             <div className="flex gap-2">
                                                 <Input 
                                                     id="respuesta-radianes" 
@@ -179,6 +183,7 @@ export function ModuloEjercicios() {
                                                     preguntaId="conversion-radianes"
                                                     respuestaCorrecta="2*pi/9"
                                                     onResult={setResultadoRadianes}
+                                                    onRespuestaChange={setRespuestaRadianes}
                                                 >Verificar</ButtonVerificarConceptual>
                                             </div>
                                         </div>
@@ -226,30 +231,18 @@ export function ModuloEjercicios() {
 
                                     <Separator/>
                                     
-                                    <div className="space-y-4">
+                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-lg">Actividad 2</h3>
                                         <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act2-a">a. ¿Qué tipo de triángulo representan las rampas dibujadas?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Textarea id="act2-a" placeholder="Escribe aquí tu conclusión..." value={respAct2a} onChange={(e) => { setRespAct2a(e.target.value); setResAct2a(null); }} className={cn(resAct2a === true && 'border-green-500', resAct2a === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct2a} preguntaId="tipo-triangulo-rampa" respuestaCorrecta="triángulo rectángulo" onResult={setResAct2a}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act2-b">b. ¿Qué semejanzas observas entre las rampas dibujadas?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Textarea id="act2-b" placeholder="Escribe aquí tus semejanzas..." value={respAct2b} onChange={(e) => { setRespAct2b(e.target.value); setResAct2b(null); }} className={cn(resAct2b === true && 'border-green-500', resAct2b === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct2b} preguntaId="semejanzas-rampa" respuestaCorrecta="misma pendiente implica mismos ángulos" onResult={setResAct2b}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act2-c">c. ¿Qué diferencias observas entre las rampas dibujadas?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Textarea id="act2-c" placeholder="Escribe aquí tus diferencias..." value={respAct2c} onChange={(e) => { setRespAct2c(e.target.value); setResAct2c(null); }} className={cn(resAct2c === true && 'border-green-500', resAct2c === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct2c} preguntaId="diferencias-rampa" respuestaCorrecta="diferente pendiente implica diferente inclinación" onResult={setResAct2c}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
+                                            <ButtonVerificarConceptual respuesta={respAct2a} preguntaId="tipo-triangulo-rampa" respuestaCorrecta="triángulo rectángulo" onResult={setResAct2a} onRespuestaChange={setRespAct2a}>
+                                                a. ¿Qué tipo de triángulo representan las rampas dibujadas?
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respAct2b} preguntaId="semejanzas-rampa" respuestaCorrecta="misma pendiente implica mismos ángulos" onResult={setResAct2b} onRespuestaChange={setRespAct2b}>
+                                                b. ¿Qué semejanzas observas entre las rampas dibujadas?
+                                            </ButtonVerificarConceptual>
+                                             <ButtonVerificarConceptual respuesta={respAct2c} preguntaId="diferencias-rampa" respuestaCorrecta="diferente pendiente implica diferente inclinación" onResult={setResAct2c} onRespuestaChange={setRespAct2c}>
+                                                c. ¿Qué diferencias observas entre las rampas dibujadas?
+                                            </ButtonVerificarConceptual>
                                         </div>
                                         <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Dibujo de rampa en GeoGebra" />
                                     </div>
@@ -259,27 +252,15 @@ export function ModuloEjercicios() {
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-lg">Actividad 3</h3>
                                         <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act3-a">a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 12%?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Input id="act3-a" placeholder="Respuesta en grados..." value={respAct3a} onChange={(e) => { setRespAct3a(e.target.value); setResAct3a(null); }} className={cn(resAct3a === true && 'border-green-500', resAct3a === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act3-b">b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Input id="act3-b" placeholder="Respuesta en grados..." value={respAct3b} onChange={(e) => { setRespAct3b(e.target.value); setResAct3b(null); }} className={cn(resAct3b === true && 'border-green-500', resAct3b === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct3b} preguntaId="angulo-8-porciento" respuestaCorrecta="4.57" onResult={setResAct3b}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act3-c">c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Input id="act3-c" placeholder="Respuesta en grados..." value={respAct3c} onChange={(e) => { setRespAct3c(e.target.value); setResAct3c(null); }} className={cn(resAct3c === true && 'border-green-500', resAct3c === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct3c} preguntaId="angulo-6-porciento" respuestaCorrecta="3.43" onResult={setResAct3c}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
+                                             <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a} onRespuestaChange={setRespAct3a}>
+                                               a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 12%? (grados)
+                                            </ButtonVerificarConceptual>
+                                             <ButtonVerificarConceptual respuesta={respAct3b} preguntaId="angulo-8-porciento" respuestaCorrecta="4.57" onResult={setResAct3b} onRespuestaChange={setRespAct3b}>
+                                               b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%? (grados)
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respAct3c} preguntaId="angulo-6-porciento" respuestaCorrecta="3.43" onResult={setResAct3c} onRespuestaChange={setRespAct3c}>
+                                               c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%? (grados)
+                                            </ButtonVerificarConceptual>
                                         </div>
                                         <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra" />
                                     </div>
@@ -295,27 +276,15 @@ export function ModuloEjercicios() {
                                     <div className="space-y-6">
                                         <h3 className="font-semibold text-lg">Actividad 5 (Cierre)</h3>
                                         <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act5-a">a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten determinar el ángulo de un triángulo rectángulo conociendo sus lados, sin necesidad de representarlo gráficamente?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Textarea id="act5-a" placeholder="Describe los comandos o funciones..." value={respAct5a} onChange={(e) => { setRespAct5a(e.target.value); setResAct5a(null); }} className={cn(resAct5a === true && 'border-green-500', resAct5a === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct5a} preguntaId="comandos-inversos" respuestaCorrecta="acosd, asind, atand" onResult={setResAct5a}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act5-b">b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Input id="act5-b" placeholder="Escribe el porcentaje..." value={respAct5b} onChange={(e) => { setRespAct5b(e.target.value); setResAct5b(null); }} className={cn(resAct5b === true && 'border-green-500', resAct5b === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct5b} preguntaId="pendiente-4-grados" respuestaCorrecta="7%" onResult={setResAct5b}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="act5-c">c. Si la altura es 25 cm, ¿cuál sería la distancia horizontal para esa rampa de 4°?</Label>
-                                                <div className="flex items-start gap-2">
-                                                    <Input id="act5-c" placeholder="Escribe la distancia en cm..." value={respAct5c} onChange={(e) => { setRespAct5c(e.target.value); setResAct5c(null); }} className={cn(resAct5c === true && 'border-green-500', resAct5c === false && 'border-red-500')}/>
-                                                    <ButtonVerificarConceptual respuesta={respAct5c} preguntaId="distancia-rampa-4-grados" respuestaCorrecta="357.5" onResult={setResAct5c}>Verificar</ButtonVerificarConceptual>
-                                                </div>
-                                            </div>
+                                            <ButtonVerificarConceptual respuesta={respAct5a} preguntaId="comandos-inversos" respuestaCorrecta="acosd, asind, atand" onResult={setResAct5a} onRespuestaChange={setRespAct5a}>
+                                               a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten determinar el ángulo de un triángulo rectángulo conociendo sus lados, sin necesidad de representarlo gráficamente?
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respAct5b} preguntaId="pendiente-4-grados" respuestaCorrecta="7%" onResult={setResAct5b} onRespuestaChange={setRespAct5b}>
+                                               b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?
+                                            </ButtonVerificarConceptual>
+                                             <ButtonVerificarConceptual respuesta={respAct5c} preguntaId="distancia-rampa-4-grados" respuestaCorrecta="357.5" onResult={setResAct5c} onRespuestaChange={setRespAct5c}>
+                                               c. Si la altura es 25 cm, ¿cuál sería la distancia horizontal para esa rampa de 4°? (en cm)
+                                            </ButtonVerificarConceptual>
                                         </div>
                                         <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Calculadora científica" />
                                     </div>
