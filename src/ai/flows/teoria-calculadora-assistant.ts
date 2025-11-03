@@ -31,7 +31,7 @@ REGLAS DE COMPORTAMIENTO OBLIGATORIAS:
     - **Caso específico 'La Rampa':** Si el contexto es sobre "la-rampa", tu primer mensaje debe ser: "**¡Hola! He cargado el material para el módulo 'La Rampa' que se resuelve con calculadora. Puedo ayudarte con la Actividad 1, la Actividad 4 y la Actividad 5. Para las actividades 2 y 3, que son de dibujo, mi compañero, el Tutor de GeoGebra, es el experto. ¿Con cuál de las actividades que tengo (1, 4 o 5) necesitas ayuda para comenzar?**".
     - **Caso general:** Si no es 'La Rampa', tu primera respuesta debe ser un saludo y una pregunta proactiva que invite al usuario a elegir con qué ejercicio quiere empezar. Ejemplo: "**¡Hola! He cargado el material para este módulo. ¿Con cuál de las actividades necesitas ayuda para comenzar?**".
 
-3.  **INICIO DE UN EJERCICIO:** Cuando el usuario te pida empezar con una actividad específica (ej: "vamos con la actividad 1"), tu primera respuesta debe ser la **primera pregunta guía o instrucción real** para resolver ese ejercicio, basándote en el material de referencia que tienes. NO le pidas al usuario que te explique de qué trata.
+3.  **INICIO DE UN EJERCICIO:** Cuando el usuario te pida empezar con una actividad específica (ej: "vamos con la actividad 1"), tu primera respuesta debe ser una pregunta guía que demuestre que entiendes el contexto. **En lugar de preguntar de qué trata, resume la tarea y plantea el primer paso**. Por ejemplo, para la Actividad 1 de 'La Rampa', una respuesta adecuada sería: "**¡Perfecto, empecemos con la Actividad 1! Veo que tenemos una tabla con distancias horizontales y pendientes, y nuestro objetivo es calcular la 'diferencia de nivel'. Para la primera fila, si la distancia es de 100 cm y la pendiente es del 12%, ¿cómo calcularías esa diferencia de nivel?**".
 
 4.  **MANEJO DE DUDAS (COMPORTAMIENTO SOCRÁTICO):**
     - Si el alumno expresa duda, no sabe cómo continuar o pide ayuda explícitamente (ej: 'no sé', 'ayúdame', 'explícame el paso'), **NO ESPERES**. Toma la iniciativa.
@@ -65,39 +65,18 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     let dynamicSystemPrompt = systemPrompt;
     let fullHistory = history || [];
 
-    // Si es el primer turno y hay contexto, lo añadimos como el primer mensaje del "usuario".
-    if (contextoEjercicio) {
-      if (fullHistory.length === 0) {
-        // Inicia la conversación con el contexto
+    // Esta lógica asegura que el contexto inicial solo se use en el primer turno para la presentación.
+    if (contextoEjercicio && fullHistory.length === 0) {
         fullHistory.push({ role: 'user', content: [{ text: `He activado el siguiente material. Por favor, preséntate y guíame como se indica en tus instrucciones de sistema. CONTEXTO:\n${contextoEjercicio}` }] });
-      } else {
-        // Para turnos posteriores, el contexto se añade al prompt de sistema para que no se pierda.
+    } else if (contextoEjercicio) {
+        // En turnos posteriores, el contexto se añade al prompt del sistema para que no se pierda.
         dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
-      }
     }
-
-    // Separamos el historial del último mensaje para pasarlo como prompt
-    const conversationHistory = fullHistory.slice(0, -1);
-    const lastMessage = fullHistory[fullHistory.length - 1];
-    const promptContent = lastMessage ? lastMessage.content : [];
-    
-    // Validar que el prompt no esté vacío
-    if (!promptContent.length || (promptContent.length === 1 && 'text' in promptContent[0] && !promptContent[0].text.trim())) {
-        // Si el prompt está vacío, y hay un historial, probablemente sea un error.
-        // Por seguridad, podemos devolver una respuesta por defecto o lanzar un error claro.
-        if(conversationHistory.length > 0) {
-            return { response: "No he recibido tu pregunta. ¿Puedes intentarlo de nuevo?" };
-        }
-        // Si no hay nada, es un error de flujo.
-         throw new Error("Se intentó llamar a la IA sin ninguna pregunta o contexto inicial.");
-    }
-
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
-      history: conversationHistory,
-      prompt: promptContent,
+      history: fullHistory,
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
