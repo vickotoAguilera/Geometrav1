@@ -24,7 +24,7 @@ interface GenkitMessage {
 }
 
 interface TutorTeoricoChatProps {
-  activeContextFiles: string[];
+  contextFiles: string[];
   groupId: string;
 }
 
@@ -53,7 +53,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ contextFiles, groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -63,76 +63,56 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
   const chatStorageKey = `chat-teorico-${groupId}`;
   
   const [isReady, setIsReady] = useState(false);
-  const initializedExercisesRef = useRef<Set<string>>(new Set());
+  const initializedRef = useRef(false);
 
-  // Load history from localStorage on component mount
+  // Load history from localStorage and initialize conversation
    useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    setIsReady(false);
+
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-    if (savedMessagesRaw) {
-      const savedMessages = JSON.parse(savedMessagesRaw);
-      setMessages(savedMessages);
-      // Populate already initialized exercises to avoid re-triggering intro prompts
-      const initialized = new Set<string>();
-      savedMessages.forEach((msg: any) => {
-        // This logic assumes we add a contextFile property to messages
-        // For now, we will re-initialize on every mount, which is inefficient but safe.
-        // A better approach would be to store which files are in context.
-      });
-      initializedExercisesRef.current = initialized;
-    }
-    setIsReady(true);
-  }, [chatStorageKey]);
-  
-  // React to new context files being activated
-  useEffect(() => {
-    if (!isReady) return;
+    const savedMessages = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
+    setMessages(savedMessages);
 
-    const newContextFiles = activeContextFiles.filter(file => !initializedExercisesRef.current.has(file));
-    
-    if (newContextFiles.length > 0) {
-      
-      const fileToInitialize = newContextFiles[0]; // Process one by one
-      initializedExercisesRef.current.add(fileToInitialize);
-      
-      const autoPrompt = messages.length === 0
-        ? `He activado la guía '${fileToInitialize}'. Por favor, dame la primera instrucción para resolverlo con lápiz y papel.`
-        : `Ahora también he activado la guía '${fileToInitialize}'. ¿Cómo se relaciona con lo que ya hemos discutido?`;
-        
-      const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
-      const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
-
-      const currentHistory = [...messages, userMessage];
-      setMessages([...currentHistory, assistantPlaceholder]);
-      
-      startTransition(async () => {
-        try {
-          const result = await getGuiaEjercicio(fileToInitialize);
-          if ('error' in result) {
-              throw new Error(result.error);
-          }
-          
-          const newFileContent = `--- INICIO GUÍA: ${fileToInitialize}.md ---\n${result.content}\n--- FIN GUÍA: ${fileToInitialize}.md ---\n\n`;
-
-          const genkitHistory: GenkitMessage[] = currentHistory.map(m => ({
-            role: m.role,
-            content: [{ text: m.content }],
-          }));
-          
-          const { response } = await teoriaCalculadoraAssistant({
-            history: genkitHistory,
-            contextoEjercicio: newFileContent
-          });
-
-          setMessages(prev => [...prev.slice(0, -1), { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response }]);
-        } catch (error) {
-          console.error("Error al iniciar/continuar chat teórico:", error);
-          toast({ variant: "destructive", title: "Error del tutor", description: "No se pudo obtener una respuesta." });
-          setMessages(messages); // Revert on error
+    const initializeAndFetch = async () => {
+        if (savedMessages.length > 0) {
+            setIsReady(true);
+            return;
         }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeContextFiles, isReady]);
+
+        if (contextFiles.length > 0) {
+            const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
+            setMessages([assistantPlaceholder]);
+            
+            try {
+                let combinedContent = '';
+                for (const file of contextFiles) {
+                    const result = await getGuiaEjercicio(file);
+                    if ('content' in result) {
+                        combinedContent += `--- INICIO GUÍA: ${file}.md ---\n${result.content}\n--- FIN GUÍA: ${file}.md ---\n\n`;
+                    }
+                }
+                
+                const { response } = await teoriaCalculadoraAssistant({
+                    history: [],
+                    contextoEjercicio: combinedContent
+                });
+
+                setMessages(prev => [...prev.slice(0, -1), { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response }]);
+            } catch (error) {
+                console.error("Error al iniciar chat teórico:", error);
+                toast({ variant: "destructive", title: "Error del tutor", description: "No se pudo cargar el contexto inicial." });
+                setMessages([]);
+            }
+        }
+        setIsReady(true);
+    };
+
+    initializeAndFetch();
+
+  }, [chatStorageKey, contextFiles, toast]);
+
 
   // Save conversation to localStorage
   useEffect(() => {
@@ -153,14 +133,14 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
   
   const handleResetConversation = () => {
     localStorage.removeItem(chatStorageKey);
-    initializedExercisesRef.current.clear();
+    initializedRef.current = false; // Reset initialization flag
     setMessages([]);
     toast({ title: 'Conversación reiniciada', description: 'El historial de este chat ha sido borrado.' });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || activeContextFiles.length === 0) return;
+    if (!input.trim() || isPending || contextFiles.length === 0) return;
 
     const currentInput = input;
     setInput('');
@@ -173,8 +153,6 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
     
     startTransition(async () => {
         try {
-            // We only send the new user message, assuming the AI maintains context via history.
-            // The system prompt of the AI is designed to be cumulative.
             const genkitHistory: GenkitMessage[] = newHistory.map(m => ({
               role: m.role,
               content: [{ text: m.content }],
@@ -248,10 +226,10 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={activeContextFiles.length > 0 ? "Pregúntale al tutor..." : "Activa una actividad para empezar"}
-            disabled={isPending || !isReady || activeContextFiles.length === 0}
+            placeholder={contextFiles.length > 0 ? "Pregúntale al tutor..." : "Activa una actividad para empezar"}
+            disabled={isPending || !isReady || contextFiles.length === 0}
           />
-          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || activeContextFiles.length === 0}>
+          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || contextFiles.length === 0}>
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
         </form>
