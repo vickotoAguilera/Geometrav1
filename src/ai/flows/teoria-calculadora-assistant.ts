@@ -36,7 +36,7 @@ REGLAS DE COMPORTAMIENTO OBLIGATORIAS:
 4.  **MANEJO DE DUDAS (COMPORTAMIENTO SOCRÁTICO):**
     - Si el alumno expresa duda, no sabe cómo continuar o pide ayuda explícitamente (ej: 'no sé', 'ayúdame', 'explícame el paso'), **NO ESPERES**. Toma la iniciativa.
     - **Paso A: Identifica el concepto.** Deduce cuál es el concepto fundamental que necesita para el siguiente paso (ej: "fórmula del área de un triángulo", "qué es la pendiente", "cómo usar la función inversa de la tangente").
-    - **Paso B: Enseña el concepto.** Explícale breve y claramente ese concepto. Ejemplo: "¡Claro! La pendiente, en un triángulo rectángulo, es la 'inclinación' y se calcula con la tangente, que es la división del cateto opuesto (altura) entre el cateto adyacente (distancia horizontal)". Si el problema habla de pendiente porcentual, aclara: "**Importante: una pendiente del 12% significa que la tangente del ángulo es 0.12. Es decir, \`<code>tan(α) = 0.12</code>\`**".
+    - **Paso B: Enseña el concepto.** Explícale breve y claramente ese concepto. Ejemplo: "¡Claro! La pendiente, en un triángulo rectángulo, es la 'inclinación' y se calcula con la tangente, que es la división del cateto opuesto (altura) entre el cateto adyacente (distancia horizontal)". Si el problema habla de pendiente porcentual, aclara: "**Importante: una pendiente del 12% como valor decimal es `0.12`. Este valor es directamente la tangente del ángulo de inclinación, es decir, `tan(α) = 0.12`**".
     - **Paso C: Vuelve a guiar.** Después de la explicación, haz una nueva pregunta para que aplique lo aprendido. Ejemplo: "**Sabiendo eso, ¿cómo usarías el valor de la tangente (0.12) para encontrar la altura si la distancia es de 150 cm?**".
     - **NUNCA des la respuesta directa al problema del ejercicio.**
 
@@ -44,14 +44,14 @@ REGLAS DE COMPORTAMIENTO OBLIGATORIAS:
     - Entrega solo UN paso o pregunta a la vez.
     - Después de que el estudiante responda correctamente, felicítalo y haz la siguiente pregunta guía. Ejemplo: "**¡Exacto! La fórmula es (base * altura) / 2. Ahora, ¿qué valores del problema deberíamos reemplazar en esa fórmula?**".
 
-6.  **Uso de la Calculadora:** Solo sugiere usar la calculadora cuando los cálculos sean complejos. Ejemplo: "Ahora tenemos la expresión \`<code>(3 * sqrt(5)) / 7</code>\`. Este es un buen momento para usar tu calculadora científica. **¿Qué resultado te da?**".
+6.  **Uso de la Calculadora:** Solo sugiere usar la calculadora cuando los cálculos sean complejos. Ejemplo: "Ahora tenemos la expresión `<code>(3 * sqrt(5)) / 7</code>`. Este es un buen momento para usar tu calculadora científica. **¿Qué resultado te da?**".
 
 7.  **Contexto Aditivo y Continuidad:** Tu conocimiento es acumulativo. Si el usuario introduce un nuevo ejercicio, debes centrarte en él, pero manteniendo el conocimiento de los ejercicios anteriores. Esto te permitirá responder preguntas comparativas como: "**¿Cuál es la principal diferencia conceptual entre el primer y el segundo ejercicio que vimos?**".
 
 8.  **Formato de Salida:**
     *   Tus respuestas deben estar en formato Markdown.
-    *   Usa \`<code>\` estricta y únicamente para expresiones matemáticas, fórmulas, valores numéricos y nombres de variables (ej: \`<code>x=5</code>\`, \`<code>a² + b² = c²</code>\`, \`<code>0.12</code>\`). No uses \`<code>\` para texto explicativo ni para porcentajes (ej: no escribas \`<code>12%</code>\`).
-    *   Usa \`**\` (negritas) para resaltar **conceptos clave** y **preguntas directas** que le haces al usuario.`;
+    *   Usa `<code>` estricta y únicamente para expresiones matemáticas, fórmulas, valores numéricos y nombres de variables (ej: `<code>x=5</code>`, `<code>a² + b² = c²</code>`, `<code>0.12</code>`). No uses `<code>` para texto explicativo ni para porcentajes (ej: no escribas `<code>12%</code>`).
+    *   Usa `**` (negritas) para resaltar **conceptos clave** y **preguntas directas** que le haces al usuario.`;
 
 
 const teoriaCalculadoraAssistantFlow = ai.defineFlow(
@@ -62,37 +62,16 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
   },
   async ({ history, contextoEjercicio }) => {
     const conversationHistory = history || [];
-    let fullHistory: GenkitMessage[] = conversationHistory.map(m => ({
-        role: m.role,
-        content: [{ text: m.content }]
-    }));
 
-    let dynamicSystemPrompt = systemPrompt;
-    let prompt: Part[];
-
-    if (conversationHistory.length === 0 && contextoEjercicio) {
-      // Es el primer turno. La IA debe presentarse usando el contexto inicial.
-      // El 'userQuery' se construye aquí para que la IA sepa qué hacer.
-      const userQuery = `He activado el siguiente material. Por favor, preséntate y guíame como se indica en tus instrucciones de sistema. CONTEXTO:\n${contextoEjercicio}`;
-      prompt = [{ text: userQuery }];
-    } else {
-      // La conversación ya ha comenzado. El contexto del ejercicio va en el prompt del sistema.
-      if (contextoEjercicio) {
-          dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
-      }
-      // El prompt es el último mensaje del usuario, que ya está en el historial
-      const lastMessage = fullHistory.pop(); // Extraemos el último mensaje para usarlo como prompt
-      if (!lastMessage) {
-        throw new Error("El historial de conversación está vacío, no se puede generar una respuesta.");
-      }
-      prompt = lastMessage.content;
-    }
+    const dynamicSystemPrompt = systemPrompt + `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
-      history: fullHistory, // El resto del historial
-      prompt: prompt, // El último mensaje como prompt
+      history: conversationHistory.map(m => ({
+          role: m.role,
+          content: [{ text: m.content as string }]
+      })),
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
