@@ -15,7 +15,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeReact from 'rehype-react';
-import { jsx, jsxs } from 'react/jsx/runtime';
+import { jsx, jsxs } from 'react/jsx-runtime';
 
 
 interface EjercicioInteractivoProps {
@@ -26,8 +26,7 @@ interface EjercicioInteractivoProps {
 const reactComponents = {
     // Map markdown `img` tags to our custom `MarkdownImage` component
     img: (props: any) => {
-      const decodedSrc = props.src;
-      return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
+      return createElement(MarkdownImage, { src: props.src, alt: props.alt });
     },
     // Allow iframe tags to be rendered, which is needed for YouTube videos.
     iframe: (props: any) => {
@@ -37,7 +36,7 @@ const reactComponents = {
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
-  const [guiaContent, setGuiaContent = useState<React.ReactNode | null>(null);
+  const [guiaContent, setGuiaContent] = useState<React.ReactNode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   const storageKey = `respuesta-${groupId}-${ejercicioId}`;
