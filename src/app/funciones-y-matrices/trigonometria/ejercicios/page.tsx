@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
-import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
+import { EjercicioInteractivo, TablaActividad1 } from "@/components/ejercicio-interactivo";
 import { Separator } from "@/components/ui/separator";
 import { MarkdownImage } from "@/components/markdown-image";
 
@@ -127,7 +127,7 @@ export default function EjerciciosTrigonometriaPage() {
                         </AccordionContent>
                     </Card>
                 </AccordionItem>
-                 <AccordionItem value="item-1.2">
+                <AccordionItem value="item-1.2">
                     <Card>
                         <AccordionTrigger className="p-6">
                             <div className="flex flex-col items-start text-left">
@@ -148,6 +148,10 @@ export default function EjerciciosTrigonometriaPage() {
                                     <p>
                                         Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chile establece que la pendiente máxima permitida para rampas es del <strong>12%</strong> para distancias horizontales de hasta 150 cm. Esto significa que, por cada 100 cm de recorrido horizontal, la rampa puede tener hasta 12 cm de altura. Cuando la distancia horizontal es mayor a 150 cm, la pendiente debe reducirse a un <strong>8%</strong>.
                                     </p>
+                                    <Separator className="my-6" />
+                                    <h3 className="text-lg font-semibold">Actividad 1 (Actividad generadora)</h3>
+                                    <p className="text-muted-foreground">Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:</p>
+                                    <TablaActividad1 />
                                 </div>
                              </CardContent>
                              <CardFooter>

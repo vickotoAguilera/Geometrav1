@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
+import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -25,7 +26,6 @@ interface GenkitMessage {
 interface TutorTeoricoChatProps {
   ejercicioId: string;
   groupId: string;
-  initialContext: string; // Recibe el contexto del .md
 }
 
 const parseResponse = (content: string) => {
@@ -47,14 +47,14 @@ const parseResponse = (content: string) => {
         lastTextIndex = textMatch.index + textMatch[0].length;
     }
 
-    if (lastTextIndex < content.length) {
-        textSubParts.push({ type: 'text', value: content.substring(lastTextIndex) });
+    if (lastTextIndex < part.value.length) {
+        textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex) });
     }
     return textSubParts;
 };
 
 
-export function TutorTeoricoChat({ ejercicioId, groupId, initialContext }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -64,8 +64,26 @@ export function TutorTeoricoChat({ ejercicioId, groupId, initialContext }: Tutor
   const chatStorageKey = `chat-teorico-${groupId}`;
   
   const [isReady, setIsReady] = useState(false);
+  const [initialContext, setInitialContext] = useState('');
+
+
+  useEffect(() => {
+    async function loadGuia() {
+        const result = await getGuiaEjercicio(ejercicioId);
+        if ('content' in result) {
+            setInitialContext(result.content);
+        } else {
+            console.error(result.error);
+            setInitialContext('Error al cargar la guía.');
+        }
+    }
+    loadGuia();
+  }, [ejercicioId]);
+
 
   const loadAndInitialize = async (isReset: boolean = false) => {
+    if (!initialContext) return;
+
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
     let currentHistory: ChatMessage[] = savedMessagesRaw && !isReset ? JSON.parse(savedMessagesRaw) : [];
     

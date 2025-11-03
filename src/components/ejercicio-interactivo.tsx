@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createElement, Fragment } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,10 +8,7 @@ import { BookText, CirclePlay, Loader2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
-import { Card, CardContent } from './ui/card';
-import { MarkdownImage } from './markdown-image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -60,7 +57,7 @@ export const TablaActividad1 = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 my-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {celdas.map((celda, i) => (
           <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
@@ -181,61 +178,10 @@ interface EjercicioInteractivoProps {
 }
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
-  // Este estado contendrá el contenido del Markdown, pero NO se renderizará.
-  // Se usará para pasarlo como contexto a los tutores.
-  const [guiaContext, setGuiaContext] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   
-  useEffect(() => {
-    const fetchGuiaContext = async () => {
-        setIsLoading(true);
-        const result = await getGuiaEjercicio(ejercicioId);
-        if ('content' in result) {
-            setGuiaContext(result.content);
-        } else {
-            console.error(result.error);
-            setGuiaContext('Error al cargar la guía.');
-        }
-        setIsLoading(false);
-    };
-
-    fetchGuiaContext();
-  }, [ejercicioId]);
-  
-  if (isLoading) {
-    return (
-        <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
-            <div className="flex justify-center items-center h-40">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <p className="ml-4">Cargando Módulo Interactivo...</p>
-            </div>
-        </div>
-    );
-  }
-  
-  // Renderiza el contenido interactivo específico para cada guía
-  const renderContenidoInteractivo = () => {
-    switch (ejercicioId) {
-        case 'la-rampa':
-            return (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <h3>SITUACIÓN DE MODELACIÓN 1: LA RAMPA</h3>
-                    <p>Las rampas son esenciales para garantizar la accesibilidad... (y el resto del texto introductorio).</p>
-                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
-                </div>
-            );
-        // Aquí podríamos añadir más casos para otras guías si fuera necesario
-        default:
-            return null;
-    }
-  }
-
-
   return (
     <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
       
-      {renderContenidoInteractivo()}
-
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="explicacion-teorica" className="border-none">
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -253,8 +199,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
                 </Link>
             </div>
             <AccordionContent className="mt-4">
-                {/* Pasamos el contexto cargado del .md al tutor */}
-                <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} initialContext={guiaContext} />
+                <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} />
             </AccordionContent>
         </AccordionItem>
       </Accordion>
