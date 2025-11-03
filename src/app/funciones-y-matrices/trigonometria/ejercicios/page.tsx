@@ -7,23 +7,18 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Bot, BookOpen, Calculator } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+import { BookOpen } from 'lucide-react';
+import { useState } from 'react';
+import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 
 // Componente para un solo ejercicio
-const EjercicioRespuesta = ({ pregunta, placeholder }: { pregunta: string, placeholder: string }) => {
+const EjercicioRespuesta = ({ pregunta, placeholder }: { pregunta: React.ReactNode, placeholder: string }) => {
     return (
         <div className="space-y-2 p-4 border rounded-lg bg-card/50">
-            <p className="text-sm font-medium" dangerouslySetInnerHTML={{ __html: pregunta }}></p>
+            <div className="text-sm font-medium">{pregunta}</div>
             <div className="flex items-center gap-2">
-                <Input placeholder={placeholder} />
-                <Button variant="outline" size="icon" className="flex-shrink-0">
+                <Input placeholder={placeholder} disabled />
+                <Button variant="outline" size="icon" className="flex-shrink-0" disabled>
                     <BookOpen className="w-4 h-4" />
                 </Button>
             </div>
@@ -31,49 +26,16 @@ const EjercicioRespuesta = ({ pregunta, placeholder }: { pregunta: string, place
     );
 };
 
-// Componente para los botones de ayuda de la IA
-const AyudaContextualIA = () => {
-    return (
-        <TooltipProvider>
-            <div className="flex items-center gap-2">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            disabled
-                        >
-                            <Calculator className="h-5 w-5" />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Ayuda con el Tutor Teórico (Próximamente)</p>
-                    </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            disabled
-                        >
-                            <Bot className="h-5 w-5" />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Resolver con Tutor de GeoGebra (Próximamente)</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
-        </TooltipProvider>
-    );
-}
-
-
 export default function NuevaEjerciciosPage() {
+  const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
+
+  const handleTeoricoToggle = (groupId: string) => {
+      setActiveTeorico(prev => ({
+          isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+          groupId: groupId,
+      }));
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -81,7 +43,7 @@ export default function NuevaEjerciciosPage() {
         <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                Pon a prueba tus conocimientos. Cada módulo tiene ejercicios para que resuelvas y verifiques con ayuda de la IA.
+                Bienvenido. Aquí puedes poner a prueba tus conocimientos con la ayuda de tutores de IA especializados.
             </p>
         </div>
         
@@ -103,18 +65,31 @@ export default function NuevaEjerciciosPage() {
                                     
                                     <div className="space-y-4">
                                        <EjercicioRespuesta 
-                                            pregunta="<b>Ejercicio 1:</b> El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?"
+                                            pregunta={<><b>Ejercicio 1:</b> El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?</>}
                                             placeholder="Respuesta en grados..."
                                        />
                                        <EjercicioRespuesta 
-                                            pregunta="<b>Ejercicio 2:</b> Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? (Recuerda que `180° = π radianes`)."
+                                            pregunta={<><b>Ejercicio 2:</b> Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? (Recuerda que `180° = π radianes`).</>}
                                             placeholder="Respuesta en radianes..."
                                        />
                                     </div>
 
                                     <div className="flex justify-end pt-4">
-                                        <AyudaContextualIA />
+                                        <AyudaContextual
+                                            ejercicioId="plaza-skate"
+                                            groupId="trigonometria-basica"
+                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
+                                        />
                                     </div>
+
+                                    {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                       <EjercicioInteractivo 
+                                            key="trigonometria-basica"
+                                            groupId="trigonometria-basica"
+                                            contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
+                                       />
+                                    )}
 
                                 </div>
                             </CardContent>
@@ -131,4 +106,3 @@ export default function NuevaEjerciciosPage() {
     </div>
   );
 }
-
