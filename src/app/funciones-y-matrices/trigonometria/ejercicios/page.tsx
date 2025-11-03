@@ -27,13 +27,13 @@ const CentralAngleTheoremVisual = () => (
 
             {/* Central Angle */}
             <path d="M 10 30 L 50 50 L 90 30" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
-            <path d="M 65 42 A 15 15 0 0 0 50 50" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" transform="rotate(-15, 50, 50)" />
-            <text x="56" y="38" fontSize="8" fill="hsl(var(--primary))">2α</text>
+            <path d="M 65 42 A 15 15 0 0 0 35 42" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
+            <text x="46" y="38" fontSize="8" fill="hsl(var(--primary))">2α</text>
             
             {/* Inscribed Angle */}
             <path d="M 10 30 L 50 95 L 90 30" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
-            <path d="M 45 85 A 15 15 0 0 1 55 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" transform="translate(1, -5)"/>
-            <text x="48" y="82" fontSize="8" fill="hsl(var(--foreground))">α</text>
+            <path d="M 45 85 A 10 10 0 0 1 55 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" />
+            <text x="48" y="78" fontSize="8" fill="hsl(var(--foreground))">α</text>
         </svg>
         <p className="text-xs text-center text-muted-foreground mt-2 px-2">
            El ángulo del centro (`2α`) es siempre el doble que el ángulo inscrito (`α`) que abarca el mismo arco.
