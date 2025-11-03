@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Check, X, BookOpen } from 'lucide-react';
+import { Loader2, Check, X, BookOpen, Calculator, Bot } from 'lucide-react';
+import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
@@ -76,7 +77,7 @@ const ButtonVerificarConceptual = ({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={preguntaId}>{children}</Label>
+      <div className={cn("text-sm font-medium", verificationResult === false ? "text-red-500" : "text-foreground")}>{children}</div>
       <div className="flex items-start gap-2">
         <Textarea
           id={preguntaId}
@@ -136,6 +137,26 @@ export function ModuloEjercicios() {
     const [resAct5b, setResAct5b] = useState<boolean | null>(null);
     const [respAct5c, setRespAct5c] = useState('');
     const [resAct5c, setResAct5c] = useState<boolean | null>(null);
+
+     // Estados para Módulo 1.2
+    const [activeContextFilesAngulos, setActiveContextFilesAngulos] = useState<string[]>([]);
+    const [respuestasAngulos, setRespuestasAngulos] = useState(new Array(27).fill(''));
+    const [resultadosAngulos, setResultadosAngulos] = useState<(boolean | null)[]>(new Array(27).fill(null));
+
+    const handleRespuestaAngulos = (index: number, value: string) => {
+        const nuevasRespuestas = [...respuestasAngulos];
+        nuevasRespuestas[index] = value;
+        setRespuestasAngulos(nuevasRespuestas);
+        const nuevosResultados = [...resultadosAngulos];
+        nuevosResultados[index] = null;
+        setResultadosAngulos(nuevosResultados);
+    };
+
+    const handleResultadoAngulos = (index: number, result: boolean | null) => {
+        const nuevosResultados = [...resultadosAngulos];
+        nuevosResultados[index] = result;
+        setResultadosAngulos(nuevosResultados);
+    };
     
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => ({
@@ -150,6 +171,13 @@ export function ModuloEjercicios() {
             setActiveContextFilesRampa(prev => [...prev, actividadId]);
         }
     }
+     const handleAngulosContext = () => {
+        if (activeContextFilesAngulos.length === 0) {
+            // Carga ambos contextos la primera vez
+            setActiveContextFilesAngulos(['angulos-y-razones/tutor-geogebra/actividad', 'angulos-y-razones/tutor-calculadora/actividad']);
+        }
+    };
+
     
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -334,6 +362,85 @@ export function ModuloEjercicios() {
                         </Card>
                     </AccordionContent>
                 </AccordionItem>
+
+                 <AccordionItem value="item-3">
+                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.2: Ángulos y Razones Trigonométricas</AccordionTrigger>
+                    <AccordionContent>
+                         <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-6">
+                                     <div className="prose prose-invert max-w-none">
+                                        <p className="text-muted-foreground">Esta actividad te familiarizará con el uso de GeoGebra y la calculadora para trabajar con ángulos y razones trigonométricas.</p>
+                                        <h3 className="font-semibold text-lg">Actividades en GeoGebra (1-9)</h3>
+                                        <div className="space-y-4">
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[1]} preguntaId="act-tec-2" respuestaCorrecta="36.87, 53.13, 90" onResult={(r) => handleResultadoAngulos(1, r)} onRespuestaChange={(v) => handleRespuestaAngulos(1, v)}>
+                                                **Actividad 2:** Construye el triángulo con vértices A=(0,0), B=(4,0) y C=(4,3) usando `Polígono(A,B,C)`. Luego, usa `ÁngulosInteriores(t1)` (si t1 es tu polígono). Escribe los tres ángulos interiores (aproximados a dos decimales) separados por comas.
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[2]} preguntaId="act-tec-3" respuestaCorrecta="270, 60, 57.3" onResult={(r) => handleResultadoAngulos(2, r)} onRespuestaChange={(v) => handleRespuestaAngulos(2, v)}>
+                                                **Actividad 3:** Usando el comando `Ángulo()`, convierte `3pi/2`, `pi/3` y `1` rad a grados. Escribe los resultados (aproximados a un decimal) separados por comas.
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[3]} preguntaId="act-tec-4" respuestaCorrecta="0.5, 0.87, 0.58" onResult={(r) => handleResultadoAngulos(3, r)} onRespuestaChange={(v) => handleRespuestaAngulos(3, v)}>
+                                                **Actividad 4:** Calcula `sin(30°)`, `cos(30°)` y `tan(30°)`. Escribe los resultados (aproximados a dos decimales) separados por comas.
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[6]} preguntaId="act-tec-7" respuestaCorrecta="30, 60, 26.57" onResult={(r) => handleResultadoAngulos(6, r)} onRespuestaChange={(v) => handleRespuestaAngulos(6, v)}>
+                                                **Actividad 7:** Usando `asind(0.5)`, `acosd(0.5)` y `atand(0.5)`, ¿qué ángulos en grados obtienes? Escribe los resultados (aproximados a dos decimales) separados por comas.
+                                            </ButtonVerificarConceptual>
+                                        </div>
+                                    </div>
+                                    
+                                    <Separator/>
+                                    
+                                    <div className="prose prose-invert max-w-none">
+                                        <h3 className="font-semibold text-lg">Actividades con Calculadora (10-27)</h3>
+                                        <div style={{position: 'relative', paddingBottom: '56.25%', height: '0', overflow: 'hidden', maxWidth: '100%', borderRadius: '0.5rem', marginBottom: '1rem'}}>
+                                            <iframe style={{position: 'absolute', top: '0', left: '0', width: '100%', height: '100%'}} src="https://www.youtube.com/embed/eFROC2qbNFI" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                        </div>
+                                        <div className="space-y-4">
+                                             <ButtonVerificarConceptual respuesta={respuestasAngulos[9]} preguntaId="act-tec-10" respuestaCorrecta="0.5" onResult={(r) => handleResultadoAngulos(9, r)} onRespuestaChange={(v) => handleRespuestaAngulos(9, v)}>
+                                                **Actividad 10 (Modo DEG):** ¿Cuál es el valor de `sin(30°)`?
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[12]} preguntaId="act-tec-13" respuestaCorrecta="30" onResult={(r) => handleResultadoAngulos(12, r)} onRespuestaChange={(v) => handleRespuestaAngulos(12, v)}>
+                                                **Actividad 13 (Modo DEG):** ¿Cuál es el ángulo (en grados) cuyo seno es 0.5?
+                                            </ButtonVerificarConceptual>
+                                            <ButtonVerificarConceptual respuesta={respuestasAngulos[15]} preguntaId="act-tec-16" respuestaCorrecta="-0.99" onResult={(r) => handleResultadoAngulos(15, r)} onRespuestaChange={(v) => handleRespuestaAngulos(15, v)}>
+                                                **Actividad 16 (Modo RAD):** ¿Cuál es el valor de `sin(30 rad)`? (Aprox. a dos decimales).
+                                            </ButtonVerificarConceptual>
+                                             <ButtonVerificarConceptual respuesta={respuestasAngulos[18]} preguntaId="act-tec-19" respuestaCorrecta="0.52" onResult={(r) => handleResultadoAngulos(18, r)} onRespuestaChange={(v) => handleRespuestaAngulos(18, v)}>
+                                                **Actividad 19 (Modo RAD):** ¿Cuál es el ángulo (en radianes) cuyo seno es 0.5? (Aprox. a dos decimales).
+                                            </ButtonVerificarConceptual>
+                                             <ButtonVerificarConceptual respuesta={respuestasAngulos[21]} preguntaId="act-tec-22" respuestaCorrecta="0.7071" onResult={(r) => handleResultadoAngulos(21, r)} onRespuestaChange={(v) => handleRespuestaAngulos(21, v)}>
+                                                **Actividad 22 (Modo GRA):** ¿Cuál es el valor de `sin(50g)`? (Aprox. a cuatro decimales).
+                                            </ButtonVerificarConceptual>
+                                        </div>
+                                    </div>
+                                    
+                                    <Separator />
+
+                                    <div className="flex justify-end pt-4">
+                                        <AyudaContextual
+                                            ejercicioId="angulos-y-razones"
+                                            groupId="angulos-y-razones"
+                                            onTeoricoToggle={() => {
+                                                handleTeoricoToggle('angulos-y-razones');
+                                                handleAngulosContext();
+                                            }}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'angulos-y-razones'}
+                                        />
+                                    </div>
+
+                                    {activeTeorico.isOpen && activeTeorico.groupId === 'angulos-y-razones' && (
+                                       <EjercicioInteractivo 
+                                            key="angulos-y-razones"
+                                            groupId="angulos-y-razones"
+                                            initialContextFiles={activeContextFilesAngulos}
+                                       />
+                                    )}
+
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </AccordionContent>
+                 </AccordionItem>
             </Accordion>
         </div>
     );
