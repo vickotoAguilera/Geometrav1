@@ -64,4 +64,3 @@ const verificadorRespuestaFlow = ai.defineFlow(
     return output;
   }
 );
-```
