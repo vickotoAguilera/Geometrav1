@@ -45,7 +45,9 @@ export function ModuloEjercicios() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-center gap-4">
+                                        <div className="flex flex-col items-center gap-4 text-center">
+                                            <h4 className="font-semibold text-foreground">Teorema del Ángulo Central</h4>
+                                            <p className="text-xs text-muted-foreground max-w-xs">La medida del ángulo del centro que subtiende un arco es siempre el doble de la medida de cualquier ángulo inscrito que subtiende el mismo arco.</p>
                                             <TeoremaAnguloCentralSVG className="w-48 h-48" />
                                             <AyudaContextual 
                                                 ejercicioId="plaza-skate"
