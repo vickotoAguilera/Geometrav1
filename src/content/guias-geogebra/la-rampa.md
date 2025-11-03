@@ -13,6 +13,14 @@ Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chil
 
 ---
 
+### ACTIVIDAD 1 (actividad generadora)
+
+Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:
+
+_La siguiente tabla es interactiva. Ingresa los valores que calcules en las celdas y luego presiona "Verificar Tabla" para que la IA corrija tus respuestas._
+
+---
+
 ### ACTIVIDAD 2
 
 Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas, para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
@@ -46,13 +54,15 @@ a. Completa la tabla siguiente usando GeoGebra o tu calculadora para calcular lo
 
 Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y los del seno, coseno, tangente y cocientes a cuatro lugares decimales.
 
-b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
+_La siguiente tabla es interactiva. Ingresa los valores que calcules en las celdas y luego presiona "Verificar Tabla" para que la IA corrija tus respuestas._
 
 <markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png" alt="Tabla de razones trigonométricas en GeoGebra." />
 
+b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
+
 ---
 
-### ACTIVIDAD 5 (Actividad de cierre)
+### ACTIVIDAD 5 (actividad de cierre)
 
 a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten determinar el ángulo de un triángulo rectángulo conociendo sus lados, sin necesidad de representarlo gráficamente? Verifícalo con los datos obtenidos en la tabla de la actividad anterior.
 b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?
