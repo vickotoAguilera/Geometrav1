@@ -4,12 +4,11 @@ import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
-import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+// import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { BookOpen } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
+import { BookOpen, Calculator, Bot } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 
 
@@ -24,10 +23,6 @@ export default function NuevaPaginaEjercicios() {
 
     const handleTeoricoToggle = (groupId: string) => {
         // La lógica del tutor teórico permanece desactivada por ahora
-        // setActiveTeorico(prev => ({
-        //     isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-        //     groupId: groupId,
-        // }));
     };
 
     return (
@@ -62,10 +57,10 @@ export default function NuevaPaginaEjercicios() {
                                                     <div key={index} className="space-y-3 p-4 border rounded-lg bg-card">
                                                         <div className="text-sm font-medium text-foreground" dangerouslySetInnerHTML={{ __html: ej.pregunta.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                                                         <div className="flex items-start gap-2">
-                                                            <Textarea
+                                                            <Input
                                                                 id={ej.id}
                                                                 placeholder="Escribe aquí tu respuesta..."
-                                                                disabled // Deshabilitado por ahora
+                                                                disabled 
                                                             />
                                                             <Button size="icon" variant="secondary" className="mt-1 flex-shrink-0" disabled>
                                                                 <BookOpen className="h-4 w-4" />
@@ -75,7 +70,7 @@ export default function NuevaPaginaEjercicios() {
                                                     </div>
                                                 ))}
                                             </div>
-
+                                           {/* 
                                             <div className="flex justify-end pt-4">
                                                 <AyudaContextual
                                                     ejercicioId="plaza-skate"
@@ -84,14 +79,7 @@ export default function NuevaPaginaEjercicios() {
                                                     isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
                                             </div>
-
-                                            {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
-                                               <EjercicioInteractivo 
-                                                    key="trigonometria-basica"
-                                                    groupId="trigonometria-basica"
-                                                    contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
-                                               />
-                                            )} */}
+                                             */}
                                         </div>
                                     </CardContent>
                                 </Card>
