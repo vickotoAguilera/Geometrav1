@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -26,6 +25,7 @@ interface GenkitMessage {
 interface TutorTeoricoChatProps {
   ejercicioId: string;
   groupId: string;
+  initialContext: string; // Recibe el contexto del .md
 }
 
 const parseResponse = (content: string) => {
@@ -54,7 +54,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ ejercicioId, groupId, initialContext }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -69,17 +69,16 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
     let currentHistory: ChatMessage[] = savedMessagesRaw && !isReset ? JSON.parse(savedMessagesRaw) : [];
     
-    // Si no hay historial o si se está reiniciando, comienza con el prompt automático.
     if (currentHistory.length === 0) {
       setIsReady(false);
-      const guideResult = await getGuiaEjercicio(ejercicioId);
-      if ('error' in guideResult) {
-        toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar la guía del ejercicio.' });
-        setIsReady(true);
-        return;
+      
+      const newContext = initialContext;
+      if (!newContext || newContext.startsWith('Error')) {
+          toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el contexto de la guía para el tutor.' });
+          setIsReady(true);
+          return;
       }
       
-      const newContext = guideResult.content;
       const autoPrompt = `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`;
 
       const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
@@ -111,9 +110,11 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   };
 
   useEffect(() => {
-    loadAndInitialize();
+    if (initialContext) {
+        loadAndInitialize();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, groupId]);
+  }, [ejercicioId, groupId, initialContext]);
 
   useEffect(() => {
     if (isReady && messages.length > 0) {
@@ -139,12 +140,12 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   const handleResetConversation = () => {
     localStorage.removeItem(chatStorageKey);
     setMessages([]);
-    loadAndInitialize(true); // Llama a la función de inicialización con 'reset' en true
+    loadAndInitialize(true);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending) return;
+    if (!input.trim() || isPending || !initialContext) return;
 
     const currentInput = input;
     setInput('');
@@ -155,13 +156,12 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
     const newHistory = [...messages, userMessage];
     setMessages([...newHistory, assistantPlaceholder]);
 
-    const guideResult = await getGuiaEjercicio(ejercicioId);
-    if ('error' in guideResult) {
+    const currentContext = initialContext;
+    if (!currentContext || currentContext.startsWith('Error')) {
       toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el contexto para responder.' });
-      setMessages(messages); // Revertir
+      setMessages(messages);
       return;
     }
-    const currentContext = guideResult.content;
     
     startTransition(async () => {
         try {

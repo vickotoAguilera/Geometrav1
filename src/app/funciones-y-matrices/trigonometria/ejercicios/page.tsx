@@ -174,10 +174,10 @@ export default function EjerciciosTrigonometriaPage() {
                             </div>
                         </AccordionTrigger>
                         <AccordionContent className="p-6 space-y-8">
-                             {/* Sección de la Guía Teórica */}
+                            {/* Sección de la Guía Teórica */}
                             <div>
-                                 <h3 className="text-xl font-semibold mb-4 border-b pb-2">Guía Teórica y Visual</h3>
-                                 <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
+                                <h3 className="text-xl font-semibold mb-4 border-b pb-2">Guía Teórica y Visual</h3>
+                                <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
                             </div>
 
                             <Separator />

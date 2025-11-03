@@ -12,12 +12,6 @@ import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { Card, CardContent } from './ui/card';
 import { MarkdownImage } from './markdown-image';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import rehypeRaw from 'rehype-raw';
-import rehypeReact from 'rehype-react';
-import { jsx, jsxs } from 'react/jsx-runtime';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -186,55 +180,61 @@ interface EjercicioInteractivoProps {
   groupId: string;
 }
 
-const reactComponents = {
-    markdownimage: MarkdownImage,
-    iframe: (props: any) => {
-        // Asegúrate de que el 'key' se maneje correctamente si está dentro de un mapa
-        return createElement('iframe', props);
-    }
-};
-
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
-  const [guiaContent, setGuiaContent] = useState<React.ReactNode | null>(null);
+  // Este estado contendrá el contenido del Markdown, pero NO se renderizará.
+  // Se usará para pasarlo como contexto a los tutores.
+  const [guiaContext, setGuiaContext] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    const fetchAndProcessGuia = async () => {
+    const fetchGuiaContext = async () => {
         setIsLoading(true);
         const result = await getGuiaEjercicio(ejercicioId);
         if ('content' in result) {
-            const processor = unified()
-                .use(remarkParse)
-                .use(remarkRehype, { allowDangerousHtml: true })
-                .use(rehypeRaw)
-                 // @ts-ignore
-                .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents });
-            const processedContent = await processor.process(result.content);
-            setGuiaContent(processedContent.result);
+            setGuiaContext(result.content);
         } else {
             console.error(result.error);
-            setGuiaContent(<p>Error al cargar la guía.</p>);
+            setGuiaContext('Error al cargar la guía.');
         }
         setIsLoading(false);
     };
 
-    fetchAndProcessGuia();
+    fetchGuiaContext();
   }, [ejercicioId]);
   
+  if (isLoading) {
+    return (
+        <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
+            <div className="flex justify-center items-center h-40">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <p className="ml-4">Cargando Módulo Interactivo...</p>
+            </div>
+        </div>
+    );
+  }
+  
+  // Renderiza el contenido interactivo específico para cada guía
+  const renderContenidoInteractivo = () => {
+    switch (ejercicioId) {
+        case 'la-rampa':
+            return (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <h3>SITUACIÓN DE MODELACIÓN 1: LA RAMPA</h3>
+                    <p>Las rampas son esenciales para garantizar la accesibilidad... (y el resto del texto introductorio).</p>
+                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
+                </div>
+            );
+        // Aquí podríamos añadir más casos para otras guías si fuera necesario
+        default:
+            return null;
+    }
+  }
+
+
   return (
     <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
       
-      {isLoading ? (
-        <div className="flex justify-center items-center h-40">
-            <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : (
-        <Card>
-            <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
-               {guiaContent}
-            </CardContent>
-        </Card>
-      )}
+      {renderContenidoInteractivo()}
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="explicacion-teorica" className="border-none">
@@ -253,7 +253,8 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
                 </Link>
             </div>
             <AccordionContent className="mt-4">
-                <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} />
+                {/* Pasamos el contexto cargado del .md al tutor */}
+                <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} initialContext={guiaContext} />
             </AccordionContent>
         </AccordionItem>
       </Accordion>
