@@ -53,7 +53,7 @@ Para calcular el valor de seno, coseno y tangente de un ángulo que mide `30 rad
 - `cos(30rad)`
 - `tan(30rad)`
 
-![Resultado de Actividad 5 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3-B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-3.jpeg)
+![Resultado de Actividad 5 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-3.jpeg)
 
 ## ACTIVIDAD 6: Calcular razones trigonométricas (ángulo en gradianes)
 

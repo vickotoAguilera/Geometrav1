@@ -27,7 +27,7 @@ const reactComponents = {
     // Map markdown `img` tags to our custom `MarkdownImage` component
     img: (props: any) => {
       // The path from markdown might be URL encoded, so we decode it.
-      const decodedSrc = decodeURIComponent(props.src);
+      const decodedSrc = props.src;
       return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
     },
   };
