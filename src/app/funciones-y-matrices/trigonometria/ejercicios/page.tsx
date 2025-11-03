@@ -27,16 +27,16 @@ const CentralAngleTheoremVisual = () => (
 
             {/* Central Angle */}
             <path d="M 10 30 L 50 50 L 90 30" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
-            <path d="M 65 40 A 15 15 0 0 0 35 40" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
+            <path d="M 60 42 A 10 10 0 0 0 40 42" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
             <text x="47" y="38" fontSize="8" fill="hsl(var(--primary))">2α</text>
             
             {/* Inscribed Angle */}
             <path d="M 10 30 L 50 95 L 90 30" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
-            <path d="M 40 85 A 15 15 0 0 1 60 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" />
-            <text x="48" y="82" fontSize="8" fill="hsl(var(--foreground))">α</text>
+            <path d="M 45 85 A 15 15 0 0 1 55 85" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.5" />
+            <text x="48" y="80" fontSize="8" fill="hsl(var(--foreground))">α</text>
         </svg>
-        <p className="text-xs text-center text-muted-foreground mt-2">
-            El ángulo del centro (2α) es siempre el doble que el ángulo inscrito (α) que abarca el mismo arco.
+        <p className="text-xs text-center text-muted-foreground mt-2 px-2">
+           El ángulo del centro (`2α`) es siempre el doble que el ángulo inscrito (`α`) que abarca el mismo arco.
         </p>
     </div>
 );
@@ -75,7 +75,7 @@ export default function EjerciciosTrigonometriaPage() {
                                         <div className="p-4 border rounded-lg bg-background flex flex-col">
                                             <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
                                             <p className="mt-2 text-muted-foreground flex-1">
-                                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
+                                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α de 20°** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
                                             </p>
                                         </div>
                                         <CentralAngleTheoremVisual/>
