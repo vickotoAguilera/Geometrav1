@@ -10,7 +10,7 @@ export function TeoremaAnguloCentralSVG(props: SVGProps<SVGSVGElement>) {
 
       {/* Center Point O */}
       <circle cx="60" cy="60" r="2" fill="hsl(var(--primary))" />
-      <text x="63" y="58" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">O</text>
+      <text x="58" y="68" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">O</text>
 
       {/* Points on Circumference */}
       <circle cx="21.6" cy="30.5" r="2" fill="hsl(var(--foreground))" />
@@ -24,7 +24,7 @@ export function TeoremaAnguloCentralSVG(props: SVGProps<SVGSVGElement>) {
 
       {/* Central Angle (2 * alpha) */}
       <path d="M 21.6 30.5 L 60 60 L 98.4 30.5" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
-      <path d="M 80 50 A 20 20 0 0 0 40 50" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.8" />
+      <path d="M 75 48 A 20 20 0 0 0 45 48" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.8" />
       <text x="56" y="52" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">2α</text>
 
       {/* Inscribed Angle (alpha) */}
