@@ -13,17 +13,9 @@ Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chil
 
 ---
 
-### ACTIVIDAD 1 (actividad generadora)
-
-Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:
-
-_La siguiente tabla es interactiva. Ingresa los valores que calcules en las celdas y luego presiona "Verificar Tabla" para que la IA corrija tus respuestas._
-
----
-
 ### ACTIVIDAD 2
 
-Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
+Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas, , para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
 
 a. ¿Qué tipo de triángulo representa las rampas dibujadas?
 b. ¿Qué semejanzas observas entre las rampas dibujadas?
@@ -42,23 +34,6 @@ b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendie
 c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%?
 
 <markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en una rampa con GeoGebra." />
-
----
-
-### ACTIVIDAD 4
-
-a. Completa la tabla siguiente usando GeoGebra o tu calculadora para calcular los valores del seno, coseno y tangente del ángulo especificado en cada caso. Considera las siguientes definiciones:
-- **D**: distancia horizontal que recorre la rampa
-- **N**: elevación vertical de la rampa (diferencia de nivel)
-- **H**: Longitud de la rampa medida a lo largo de la hipotenusa del triángulo rectángulo que representa la rampa
-
-Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y los del seno, coseno, tangente y cocientes a cuatro lugares decimales.
-
-_La siguiente tabla es interactiva. Ingresa los valores que calcules en las celdas y luego presiona "Verificar Tabla" para que la IA corrija tus respuestas._
-
-<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png" alt="Tabla de razones trigonométricas en GeoGebra." />
-
-b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
 
 ---
 

@@ -2,7 +2,8 @@ import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
-import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
+import { EjercicioInteractivo, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
+import { Separator } from "@/components/ui/separator";
 
 const CentralAngleTheoremVisual = () => (
     <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-background/50 h-full">
@@ -162,7 +163,7 @@ export default function EjerciciosTrigonometriaPage() {
                         </AccordionContent>
                     </Card>
                 </AccordionItem>
-                <AccordionItem value="item-1.2">
+                 <AccordionItem value="item-1.2">
                     <Card>
                         <AccordionTrigger className="p-6">
                             <div className="flex flex-col items-start text-left">
@@ -172,19 +173,29 @@ export default function EjerciciosTrigonometriaPage() {
                                 </CardDescription>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent>
-                             <CardContent>
-                                <div className="p-4 border rounded-lg bg-background flex flex-col">
-                                    <h4 className="font-semibold flex items-center gap-2"><Accessibility />Guía de la Rampa</h4>
-                                    <p className="mt-2 text-muted-foreground flex-1">
-                                        Analiza la normativa de construcción de rampas de acceso, calcula pendientes, ángulos y utiliza las razones trigonométricas para resolver problemas de diseño.
-                                    </p>
+                        <AccordionContent className="p-6 space-y-8">
+                             {/* Sección de la Guía Teórica */}
+                            <div>
+                                 <h3 className="text-xl font-semibold mb-4 border-b pb-2">Guía Teórica y Visual</h3>
+                                 <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
+                            </div>
+
+                            <Separator />
+
+                            {/* Sección de Actividades Interactivas */}
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-4 border-b pb-2">Actividad 1 (Interactiva)</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">Considerando la ilustración de la guía, completa la siguiente tabla con las diferentes medidas que podría tener una rampa y verifica tus respuestas.</p>
+                                    <TablaActividad1 />
                                 </div>
-                                <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
-                            </CardContent>
-                            <CardFooter>
-                                <p className="text-xs text-muted-foreground">Este módulo utiliza un tutor especializado para guiarte en el problema.</p>
-                            </CardFooter>
+
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-4 border-b pb-2">Actividad 4 (Interactiva)</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">Completa la tabla siguiente usando GeoGebra o tu calculadora y luego verifica tus respuestas.</p>
+                                    <TablaActividad4 />
+                                </div>
+                            </div>
                         </AccordionContent>
                     </Card>
                 </AccordionItem>

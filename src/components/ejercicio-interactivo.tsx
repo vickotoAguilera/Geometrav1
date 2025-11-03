@@ -24,7 +24,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
-const TablaActividad1 = () => {
+export const TablaActividad1 = () => {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
@@ -95,7 +95,7 @@ const TablaActividad1 = () => {
   );
 };
 
-const TablaActividad4 = () => {
+export const TablaActividad4 = () => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
@@ -187,26 +187,18 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
-    // CORRECCIÓN: El nombre del componente debe empezar con Mayúscula.
-    markdownimage: MarkdownImage, // Use lowercase for the tag in markdown
+    markdownimage: MarkdownImage,
     iframe: (props: any) => {
+        // Asegúrate de que el 'key' se maneje correctamente si está dentro de un mapa
         return createElement('iframe', props);
     }
 };
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
-  const [respuesta, setRespuesta] = useState('');
   const [guiaContent, setGuiaContent] = useState<React.ReactNode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  const storageKey = `respuesta-${groupId}-${ejercicioId}`;
-
   useEffect(() => {
-    const savedRespuesta = localStorage.getItem(storageKey);
-    if (savedRespuesta) {
-      setRespuesta(savedRespuesta);
-    }
-
     const fetchAndProcessGuia = async () => {
         setIsLoading(true);
         const result = await getGuiaEjercicio(ejercicioId);
@@ -227,13 +219,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
     };
 
     fetchAndProcessGuia();
-  }, [storageKey, ejercicioId]);
-
-  const handleRespuestaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newRespuesta = e.target.value;
-    setRespuesta(newRespuesta);
-    localStorage.setItem(storageKey, newRespuesta);
-  };
+  }, [ejercicioId]);
   
   return (
     <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
@@ -246,14 +232,6 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         <Card>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
                {guiaContent}
-               {ejercicioId === 'la-rampa' && (
-                <>
-                    <h3 id="actividad-1-interactiva">ACTIVIDAD 1 (interactiva)</h3>
-                    <TablaActividad1 />
-                    <h3 id="actividad-4-interactiva" className='mt-8'>ACTIVIDAD 4 (interactiva)</h3>
-                    <TablaActividad4 />
-                </>
-               )}
             </CardContent>
         </Card>
       )}
@@ -279,18 +257,6 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
             </AccordionContent>
         </AccordionItem>
       </Accordion>
-
-      <div className="space-y-2">
-        <Label htmlFor={`respuesta-${ejercicioId}`} className="font-semibold">
-          Tu Respuesta Final:
-        </Label>
-        <Input
-          id={`respuesta-${ejercicioId}`}
-          value={respuesta}
-          onChange={handleRespuestaChange}
-          placeholder="Ingresa aquí tu resultado si el ejercicio lo pide..."
-        />
-      </div>
     </div>
   );
 }
