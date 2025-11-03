@@ -4,13 +4,13 @@ import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
-// import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
-// import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BookOpen } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 
 
 const ejerciciosPlazaSkate = [
@@ -20,14 +20,15 @@ const ejerciciosPlazaSkate = [
 
 
 export default function NuevaPaginaEjercicios() {
-    // const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
+    const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
 
-    // const handleTeoricoToggle = (groupId: string) => {
-    //     setActiveTeorico(prev => ({
-    //         isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-    //         groupId: groupId,
-    //     }));
-    // };
+    const handleTeoricoToggle = (groupId: string) => {
+        // La lógica del tutor teórico permanece desactivada por ahora
+        // setActiveTeorico(prev => ({
+        //     isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+        //     groupId: groupId,
+        // }));
+    };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -58,13 +59,13 @@ export default function NuevaPaginaEjercicios() {
                                             
                                             <div className="space-y-4">
                                                 {ejerciciosPlazaSkate.map((ej, index) => (
-                                                     <div key={index} className="space-y-3 p-4 border rounded-lg bg-card">
-                                                        <div className="text-sm font-medium text-foreground">{ej.pregunta}</div>
+                                                    <div key={index} className="space-y-3 p-4 border rounded-lg bg-card">
+                                                        <div className="text-sm font-medium text-foreground" dangerouslySetInnerHTML={{ __html: ej.pregunta.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                                                         <div className="flex items-start gap-2">
                                                             <Textarea
-                                                            id={ej.id}
-                                                            placeholder="Escribe aquí tu respuesta..."
-                                                            disabled
+                                                                id={ej.id}
+                                                                placeholder="Escribe aquí tu respuesta..."
+                                                                disabled // Deshabilitado por ahora
                                                             />
                                                             <Button size="icon" variant="secondary" className="mt-1 flex-shrink-0" disabled>
                                                                 <BookOpen className="h-4 w-4" />
@@ -75,7 +76,7 @@ export default function NuevaPaginaEjercicios() {
                                                 ))}
                                             </div>
 
-                                            {/* <div className="flex justify-end pt-4">
+                                            <div className="flex justify-end pt-4">
                                                 <AyudaContextual
                                                     ejercicioId="plaza-skate"
                                                     groupId="trigonometria-basica"
@@ -84,7 +85,7 @@ export default function NuevaPaginaEjercicios() {
                                                 />
                                             </div>
 
-                                            {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                            {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
                                                <EjercicioInteractivo 
                                                     key="trigonometria-basica"
                                                     groupId="trigonometria-basica"
