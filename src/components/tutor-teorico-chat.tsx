@@ -4,13 +4,13 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2 } from 'lucide-react';
+import { Bot, User, Send, Loader2, RefreshCw } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions'; // Reutilizamos esta acción
+import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -65,29 +65,27 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   
   const [isReady, setIsReady] = useState(false);
 
-  // Cargar conversación y manejar contexto inicial
-  useEffect(() => {
-    const loadAndInitialize = async () => {
-      const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-      let currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
-      
+  const loadAndInitialize = async (isReset: boolean = false) => {
+    const savedMessagesRaw = localStorage.getItem(chatStorageKey);
+    let currentHistory: ChatMessage[] = savedMessagesRaw && !isReset ? JSON.parse(savedMessagesRaw) : [];
+    
+    // Si no hay historial o si se está reiniciando, comienza con el prompt automático.
+    if (currentHistory.length === 0) {
+      setIsReady(false);
       const guideResult = await getGuiaEjercicio(ejercicioId);
       if ('error' in guideResult) {
         toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar la guía del ejercicio.' });
-        setMessages(currentHistory); // Mantener historial antiguo si la nueva guía falla
         setIsReady(true);
         return;
       }
       
       const newContext = guideResult.content;
-      const autoPrompt = currentHistory.length === 0
-        ? `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`
-        : `Ahora también he activado el ejercicio '${ejercicioId}'. Considera este nuevo contexto en nuestra conversación.`;
+      const autoPrompt = `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`;
 
       const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
       const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
       
-      const updatedHistory = [...currentHistory, userMessage];
+      const updatedHistory = [userMessage];
       setMessages([...updatedHistory, assistantPlaceholder]);
       
       startTransition(() => {
@@ -102,17 +100,21 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
         .catch(error => {
           console.error("Error al iniciar chat teórico:", error);
           toast({ variant: "destructive", title: "Error del tutor", description: "No se pudo obtener una respuesta." });
-          setMessages(currentHistory);
+          setMessages([]);
         })
         .finally(() => setIsReady(true));
       });
-    };
+    } else {
+        setMessages(currentHistory);
+        setIsReady(true);
+    }
+  };
 
+  useEffect(() => {
     loadAndInitialize();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ejercicioId, groupId]);
 
-  // Guardar conversación en localStorage
   useEffect(() => {
     if (isReady && messages.length > 0) {
       try {
@@ -120,6 +122,8 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
       } catch (error) {
         console.error("Failed to save to localStorage", error);
       }
+    } else if (isReady && messages.length === 0) {
+        localStorage.removeItem(chatStorageKey);
     }
   }, [messages, chatStorageKey, isReady]);
 
@@ -131,6 +135,12 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
       }, 0);
     }
   }, [messages, isPending]);
+  
+  const handleResetConversation = () => {
+    localStorage.removeItem(chatStorageKey);
+    setMessages([]);
+    loadAndInitialize(true); // Llama a la función de inicialización con 'reset' en true
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -181,6 +191,13 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
 
   return (
     <div className="flex flex-col h-full bg-secondary/30 rounded-b-lg">
+      <div className="flex justify-between items-center p-2 border-b bg-background rounded-t-lg">
+        <h4 className="text-sm font-semibold ml-2">Tutor Teórico</h4>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleResetConversation} title="Reiniciar conversación">
+            <RefreshCw className="w-4 h-4"/>
+        </Button>
+      </div>
+
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-6">
           {messages.map((message) => (
