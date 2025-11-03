@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AyudaContextual, EjercicioInteractivo, TablaActividad1 } from "@/components/ejercicio-interactivo";
+import { AyudaContextual, EjercicioInteractivo, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
 import { Check, Loader2 } from 'lucide-react';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
 import { cn } from '@/lib/utils';
+import { MarkdownImage } from './markdown-image';
 
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
@@ -27,6 +28,10 @@ export function ModuloEjercicios() {
     
     const [resultadoSkate, setResultadoSkate] = useState<boolean | null>(null);
     const [resultadoRadianes, setResultadoRadianes] = useState<boolean | null>(null);
+
+    const [resultadosTabla1, setResultadosTabla1] = useState<(boolean | null)[]>([]);
+    const [resultadosTabla4, setResultadosTabla4] = useState<(boolean | null)[]>([]);
+
 
     const { toast } = useToast();
 
@@ -182,10 +187,35 @@ export function ModuloEjercicios() {
                          <Card>
                             <CardContent className="pt-6">
                                 <div className="space-y-6">
-                                    <h3 className="font-semibold text-lg">Actividad 1</h3>
-                                    <p className="text-muted-foreground">Considerando la normativa de accesibilidad, completa la tabla calculando la "diferencia de nivel" (altura) para cada rampa.</p>
-                                    <TablaActividad1 onVerify={(results) => console.log('Tabla 1 verificada', results)} />
+                                    <div className="prose prose-invert max-w-none">
+                                        <p className="text-muted-foreground">Las rampas son esenciales para garantizar la accesibilidad en espacios públicos y privados, permitiendo a las personas con discapacidad una movilidad segura y autónoma. La norma en Chile establece que la pendiente máxima es del 12% para distancias de hasta 150 cm, y del 8% para distancias mayores.</p>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de persona en silla de ruedas" />
+                                    </div>
                                     
+                                    <Separator/>
+
+                                    <h3 className="font-semibold text-lg">Actividad 1</h3>
+                                    <p className="text-muted-foreground">Considerando la normativa, completa la tabla calculando la "diferencia de nivel" (altura) para cada rampa.</p>
+                                    <TablaActividad1 onVerify={(results) => setResultadosTabla1(results)} />
+
+                                    <Separator/>
+
+                                    <h3 className="font-semibold text-lg">Actividad 2 y 3</h3>
+                                    <p className="text-muted-foreground">Usa GeoGebra para dibujar las rampas de la tabla anterior y medir sus ángulos. Esto te ayudará a entender la relación entre pendiente y ángulo. ¿Qué tipo de triángulo representan? ¿Qué semejanzas y diferencias observas? ¿Cuál es el ángulo para una pendiente del 12%? ¿Y del 8%?</p>
+                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra" />
+
+                                    <Separator/>
+
+                                    <h3 className="font-semibold text-lg">Actividad 4</h3>
+                                    <p className="text-muted-foreground">Completa la siguiente tabla usando GeoGebra o tu calculadora para encontrar las razones trigonométricas. Considera **D** (Distancia horizontal), **N** (Diferencia de Nivel/altura) y **H** (Hipotenusa/largo de la rampa).</p>
+                                    <TablaActividad4 onVerify={(results) => setResultadosTabla4(results)} />
+
+                                    <Separator/>
+                                    
+                                    <h3 className="font-semibold text-lg">Actividad 5 (Cierre)</h3>
+                                    <p className="text-muted-foreground">Ahora reflexiona sobre lo aprendido: ¿Qué herramientas de GeoGebra o tu calculadora te permiten obtener un ángulo a partir de sus lados? Si quisieras una rampa con 4° de inclinación, ¿qué pendiente debería tener? Y si la altura debe ser de 25 cm, ¿cuál sería la distancia horizontal?</p>
+                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Calculadora científica" />
+
                                     <Separator />
                                     
                                     <div className="flex justify-end pt-4">
