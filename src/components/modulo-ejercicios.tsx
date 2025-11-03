@@ -29,9 +29,9 @@ export function ModuloEjercicios() {
 
     const handleVerificarSkate = () => {
         const respuestaLimpia = respuestaSkate.trim().replace('°', '');
-        const respuestaCorrecta1 = "40";
+        const respuestaCorrecta = "40";
         
-        if (respuestaLimpia === respuestaCorrecta1) {
+        if (respuestaLimpia === respuestaCorrecta) {
             toast({
                 title: "¡Respuesta Correcta!",
                 description: "La medida del ángulo central es 40°. ¡Bien hecho!",
@@ -129,6 +129,15 @@ export function ModuloEjercicios() {
                                     <p className="text-muted-foreground max-w-prose">
                                         Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
                                     </p>
+                                    
+                                    <div className="p-4 border rounded-lg bg-background text-sm space-y-2">
+                                        <h4 className="font-semibold text-foreground">¿Cómo convertir grados a radianes?</h4>
+                                        <p className="text-muted-foreground">Existe una fórmula muy directa. Es una "regla de tres" o un factor de conversión.</p>
+                                        <p className="text-muted-foreground">La relación fundamental es: <code className="bg-muted px-1.5 py-0.5 rounded">180° = π radianes</code></p>
+                                        <p className="text-muted-foreground">A partir de esa equivalencia, la fórmula para convertir cualquier ángulo de grados a radianes es:</p>
+                                        <code className="block text-center bg-muted p-2 rounded-md font-semibold">radianes = grados × (π / 180)</code>
+                                    </div>
+
                                     <div className="space-y-2 pt-4">
                                         <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
                                         <Input 
