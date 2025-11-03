@@ -20,11 +20,8 @@ interface MarkdownImageProps {
 
 export function MarkdownImage({ src, alt }: MarkdownImageProps) {
 
-  // The markdown path is absolute from the root, e.g., /imagenes-ejercicios/...
-  // but Next.js serves from /public, so we need to remove the leading slash for the Image component
-  // if the path is not already a valid URL.
-  const imagePath = src.startsWith('http') ? src : src.startsWith('/') ? src.slice(1) : src;
-
+  // The markdown path might be URL encoded, so we decode it.
+  const decodedSrc = decodeURIComponent(src);
 
   return (
     <Dialog>
@@ -43,7 +40,7 @@ export function MarkdownImage({ src, alt }: MarkdownImageProps) {
         </DialogHeader>
         <div className="relative w-full aspect-video mt-4">
            <Image 
-                src={`/${imagePath}`} 
+                src={decodedSrc} 
                 alt={alt} 
                 layout="fill"
                 objectFit="contain"
