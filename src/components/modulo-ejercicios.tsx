@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2, Check, Bot, Calculator, FileText, ChevronDown, BookOpen, X } from 'lucide-react';
+import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
@@ -32,27 +33,46 @@ const ButtonVerificarConceptual = ({
   children: React.ReactNode;
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   const handleVerify = async () => {
     if (!respuesta.trim()) {
       toast({ title: 'Respuesta vacía', description: 'Por favor, escribe una respuesta.', variant: 'destructive' });
+      setVerificationResult(false);
       onResult(false);
       return;
     }
     setIsVerifying(true);
+    setVerificationResult(null);
     onResult(null);
+
     try {
       const res = await verificarRespuestaAction({ preguntaId, respuestaUsuario: respuesta, respuestaCorrecta });
+      setVerificationResult(res.esCorrecta);
       onResult(res.esCorrecta);
       toast({ title: res.esCorrecta ? '¡Respuesta Correcta!' : 'Respuesta Incorrecta', description: res.feedback, duration: 5000 });
     } catch (error) {
       toast({ title: 'Error', description: 'No se pudo verificar la respuesta.', variant: 'destructive' });
+      setVerificationResult(false);
       onResult(false);
     } finally {
       setIsVerifying(false);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    onRespuestaChange(e.target.value);
+    setVerificationResult(null); // Reset verification on change
+    onResult(null);
+  };
+  
+  const getIcon = () => {
+    if (isVerifying) return <Loader2 className="h-4 w-4 animate-spin" />;
+    if (verificationResult === true) return <Check className="h-4 w-4 text-green-500" />;
+    if (verificationResult === false) return <X className="h-4 w-4 text-red-500" />;
+    return <BookOpen className="h-4 w-4" />;
+  }
 
   return (
     <div className="space-y-2">
@@ -62,10 +82,15 @@ const ButtonVerificarConceptual = ({
           id={preguntaId}
           placeholder="Escribe aquí tu conclusión..."
           value={respuesta}
-          onChange={(e) => onRespuestaChange(e.target.value)}
+          onChange={handleInputChange}
+           className={cn(
+            'transition-colors',
+            verificationResult === true && 'border-green-500 focus-visible:ring-green-500',
+            verificationResult === false && 'border-red-500 focus-visible:ring-red-500'
+          )}
         />
         <Button onClick={handleVerify} disabled={isVerifying} size="sm" variant="secondary" className="mt-1">
-          {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+          {getIcon()}
           <span className="sr-only">Verificar</span>
         </Button>
       </div>
@@ -132,7 +157,7 @@ export function ModuloEjercicios() {
                                             <p className="text-muted-foreground max-w-prose">
                                                 En el parque de una ciudad hay instaladas cámaras de vigilancia. Una de ellas, ubicada en el punto B de una plaza circular, enfoca con un ángulo de 20° (ángulo inscrito) un objeto sospechoso en el punto C. El encargado de seguridad necesita dirigir la cámara principal, ubicada en el centro O, hacia el mismo objeto. Para ello, necesita saber cuál es la medida del ángulo central (α) que debe formar la cámara principal.
                                             </p>
-                                            <div className="space-y-2 pt-4">
+                                             <div className="space-y-2 pt-4">
                                                 <Label htmlFor="respuesta-skate">Tu respuesta (medida del ángulo α en grados):</Label>
                                                 <div className="flex gap-2">
                                                     <Input 
@@ -140,7 +165,7 @@ export function ModuloEjercicios() {
                                                         placeholder="Escribe la medida del ángulo..."
                                                         value={respuestaSkate}
                                                         onChange={(e) => { setRespuestaSkate(e.target.value); setResultadoSkate(null); }}
-                                                        className={cn(resultadoSkate === true && 'border-green-500', resultadoSkate === false && 'border-red-500')}
+                                                        className={cn('transition-colors', resultadoSkate === true && 'border-green-500 focus-visible:ring-green-500', resultadoSkate === false && 'border-red-500 focus-visible:ring-red-500')}
                                                     />
                                                      <ButtonVerificarConceptual
                                                         respuesta={respuestaSkate}
@@ -176,7 +201,7 @@ export function ModuloEjercicios() {
                                                     placeholder="Escribe tu respuesta en radianes..."
                                                     value={respuestaRadianes}
                                                     onChange={(e) => { setRespuestaRadianes(e.target.value); setResultadoRadianes(null); }}
-                                                    className={cn(resultadoRadianes === true && 'border-green-500', resultadoRadianes === false && 'border-red-500')}
+                                                    className={cn('transition-colors', resultadoRadianes === true && 'border-green-500 focus-visible:ring-green-500', resultadoRadianes === false && 'border-red-500 focus-visible:ring-red-500')}
                                                 />
                                                  <ButtonVerificarConceptual
                                                     respuesta={respuestaRadianes}
@@ -252,7 +277,7 @@ export function ModuloEjercicios() {
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-lg">Actividad 3</h3>
                                         <div className="space-y-4">
-                                             <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a} onRespuestaChange={setRespAct3a}>
+                                            <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a} onRespuestaChange={setRespAct3a}>
                                                a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 12%? (grados)
                                             </ButtonVerificarConceptual>
                                              <ButtonVerificarConceptual respuesta={respAct3b} preguntaId="angulo-8-porciento" respuestaCorrecta="4.57" onResult={setResAct3b} onRespuestaChange={setRespAct3b}>
@@ -299,6 +324,13 @@ export function ModuloEjercicios() {
                                             isTeoricoOpen={isTeoricoOpen}
                                         />
                                     </div>
+                                     {isTeoricoOpen && (
+                                       <EjercicioInteractivo 
+                                            ejercicioId="la-rampa"
+                                            groupId="la-rampa"
+                                            initialContextFiles={activeContextFiles}
+                                       />
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
