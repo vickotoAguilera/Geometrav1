@@ -24,3 +24,5 @@ import '@/ai/flows/funciones-matrices-assistant.ts';
 import '@/ai/flows/schemas/funciones-matrices-schemas.ts';
 import '@/ai/flows/teoria-calculadora-assistant.ts';
 import '@/ai/flows/schemas/teoria-calculadora-schemas.ts';
+import '@/ai/flows/verificador-tablas-flow.ts';
+import '@/ai/flows/schemas/verificador-tablas-schemas.ts';
