@@ -1,5 +1,9 @@
+---
+title: 'Situación de Modelación 1: La Rampa'
+description: 'Aprende sobre accesibilidad, pendientes y trigonometría aplicando tus conocimientos en un contexto real.'
+---
 
-# SITUACIÓN DE MODELACIÓN 1: LA RAMPA
+## SITUACIÓN DE MODELACIÓN 1: LA RAMPA
 
 Las rampas son esenciales para garantizar la accesibilidad en espacios públicos y privados, permitiendo a las personas con discapacidad una movilidad segura y autónoma. Factores como la pendiente máxima permitida y las dimensiones óptimas son determinantes para facilitar el acceso sin comprometer la estabilidad o la comodidad del usuario. La correcta implementación de materiales antideslizantes y barras de apoyo también juega un papel vital en la funcionalidad y seguridad de estas estructuras.
 
@@ -13,14 +17,14 @@ Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chil
 
 Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:
 
-| Distancia horizontal (D) en cm | Diferencia de nivel en cm | Pendiente en % | Pendiente en decimal |
+| Distancia horizontal (D) expresada en cm | Diferencia de nivel expresada en cm | Pendiente expresada como porcentaje | Pendiente expresada como decimal |
 | :--- | :--- | :--- | :--- |
-| 100 | | 12% | |
-| 150 | | 12% | |
-| 50 | | 12% | |
-| 200 | | 8% | |
-| 300 | | 8% | |
-| 180 | | 8% | |
+| | | 12% | |
+| | | 12% | |
+| | | 12% | |
+| | | 8% | |
+| | | 8% | |
+| | | 8% | |
 
 ---
 
@@ -57,7 +61,7 @@ a. Completa la tabla siguiente usando GeoGebra o tu calculadora para calcular lo
 
 Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y los del seno, coseno, tangente y cocientes a cuatro lugares decimales.
 
-| Pendiente de la rampa | Ángulo de inclinación (α) | sen(α) | cos(α) | tan(α) | N/H | N/D | D/H |
+| Pendiente de la rampa | Medida del ángulo de inclinación de la rampa (α) en grados | sen(α) | cos(α) | tan(α) | N/H | N/D | D/H |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **12%** | | | | | | | |
 | **8%** | | | | | | | |
@@ -76,4 +80,3 @@ b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál d
 c. Considerando que la diferencia de nivel deseada para la rampa mencionada en la pregunta anterior es de 25 cm, ¿cuál debería ser la distancia horizontal que la rampa debe recorrer?
 
 ![Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica.](/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png)
-
