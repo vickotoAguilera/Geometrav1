@@ -10,11 +10,29 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Card, CardContent } from './ui/card';
+import { MarkdownImage } from './markdown-image';
+import parse from 'html-react-parser';
+
 
 interface EjercicioInteractivoProps {
   ejercicioId: string;
   groupId: string;
 }
+
+const reactComponents = {
+    'markdown-image': MarkdownImage
+};
+
+const parseOptions = {
+  replace: (domNode: any) => {
+    if (domNode.attribs && domNode.name && reactComponents[domNode.name as keyof typeof reactComponents]) {
+      const Component = reactComponents[domNode.name as keyof typeof reactComponents];
+      // Pass the props from the parsed HTML tag to your React component
+      return <Component {...domNode.attribs} />;
+    }
+  }
+};
+
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
@@ -59,7 +77,9 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         </div>
       ) : (
         <Card>
-            <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6" dangerouslySetInnerHTML={{ __html: guiaHtml || '' }} />
+            <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
+               {guiaHtml ? parse(guiaHtml, parseOptions) : null}
+            </CardContent>
         </Card>
       )}
 
