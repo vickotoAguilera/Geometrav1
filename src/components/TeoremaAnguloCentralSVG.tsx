@@ -24,13 +24,13 @@ export function TeoremaAnguloCentralSVG(props: SVGProps<SVGSVGElement>) {
 
       {/* Central Angle (2 * alpha) */}
       <path d="M 21.6 30.5 L 60 60 L 98.4 30.5" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
-      <path d="M 60 60 Q 68 52, 75 56" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.8" />
-      <text x="68" y="50" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">2α</text>
+      <path d="M 70 45 A 15 15 0 0 0 50 45" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.8" transform="rotate(-18, 60, 60)"/>
+      <text x="56" y="47" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">2α</text>
 
       {/* Inscribed Angle (alpha) */}
       <path d="M 21.6 30.5 L 60 110 L 98.4 30.5" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
-      <path d="M 60 110 Q 60 102, 65 102" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.8" transform="translate(-8, -10) rotate(22, 60, 110)"/>
-      <text x="58" y="98" fontSize="8" fill="hsl(var(--foreground))">α</text>
+      <path d="M 69 100 A 10 10 0 0 0 51 100" fill="none" stroke="hsl(var(--foreground))" strokeWidth="0.8" transform="rotate(22, 60, 110)"/>
+      <text x="58" y="102" fontSize="8" fill="hsl(var(--foreground))">α</text>
     </svg>
   );
 }
