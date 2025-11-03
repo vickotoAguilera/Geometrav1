@@ -53,7 +53,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ contextFiles, groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
