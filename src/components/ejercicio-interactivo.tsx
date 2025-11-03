@@ -14,6 +14,7 @@ import { MarkdownImage } from './markdown-image';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import rehypeRaw from 'rehype-raw';
 import rehypeReact from 'rehype-react';
 import { jsx, jsxs } from 'react/jsx-runtime';
 
@@ -24,11 +25,10 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
-    // Map markdown `img` tags to our custom `MarkdownImage` component
     img: (props: any) => {
-      return createElement(MarkdownImage, { src: props.src, alt: props.alt });
+      const decodedSrc = props.src;
+      return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
     },
-    // Allow iframe tags to be rendered, which is needed for YouTube videos.
     iframe: (props: any) => {
         return createElement('iframe', props);
     }
@@ -54,6 +54,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
             const processedContent = await unified()
                 .use(remarkParse)
                 .use(remarkRehype, { allowDangerousHtml: true })
+                .use(rehypeRaw)
                 // @ts-ignore
                 .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents })
                 .process(result.content);
