@@ -12,7 +12,7 @@ import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
-import { AyudaContextual, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
+import { AyudaContextual, TablaActividad1, TablaActividad4, EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
 import { Textarea } from './ui/textarea';
 import { MarkdownImage } from './markdown-image';
