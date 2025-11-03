@@ -28,9 +28,10 @@ export function ModuloEjercicios() {
     };
 
     const handleVerificarSkate = () => {
+        const respuestaLimpia = respuestaSkate.trim().replace('°', '');
         const respuestaCorrecta1 = "40";
-        const respuestaCorrecta2 = "40°";
-        if (respuestaSkate.trim() === respuestaCorrecta1 || respuestaSkate.trim() === respuestaCorrecta2) {
+        
+        if (respuestaLimpia === respuestaCorrecta1) {
             toast({
                 title: "¡Respuesta Correcta!",
                 description: "La medida del ángulo central es 40°. ¡Bien hecho!",
@@ -46,9 +47,9 @@ export function ModuloEjercicios() {
     };
 
     const handleVerificarRadianes = () => {
-        const respuestaTrimmed = respuestaRadianes.replace(/\s/g, '').toLowerCase();
-        const respuestasCorrectas = ["2π/9", "2pi/9", "40π/180", "40pi/180"];
-        if (respuestasCorrectas.includes(respuestaTrimmed)) {
+        const respuestaLimpia = respuestaRadianes.replace(/\s/g, '').toLowerCase();
+        const respuestasCorrectas = ["2π/9", "2pi/9", "40π/180", "40pi/180", "(2/9)pi", "2/9pi", "2*pi/9", "pi*2/9"];
+        if (respuestasCorrectas.includes(respuestaLimpia)) {
              toast({
                 title: "¡Respuesta Correcta!",
                 description: "40° equivalen a 2π/9 radianes. ¡Excelente!",
@@ -83,7 +84,7 @@ export function ModuloEjercicios() {
                                                 <Label htmlFor="respuesta-skate">Tu respuesta (medida del ángulo α):</Label>
                                                 <Input 
                                                     id="respuesta-skate" 
-                                                    placeholder="Ej: 40°" 
+                                                    placeholder="Escribe la medida del ángulo..." 
                                                     value={respuestaSkate}
                                                     onChange={(e) => setRespuestaSkate(e.target.value)}
                                                 />
@@ -126,13 +127,13 @@ export function ModuloEjercicios() {
                             <CardContent className="pt-6">
                                <div className="space-y-4">
                                     <p className="text-muted-foreground max-w-prose">
-                                        Considerando el resultado del ejercicio anterior, donde el ángulo central es de 40°, ¿cuál es su medida equivalente en radianes? Utiliza `π` (pi) en tu respuesta para que sea exacta.
+                                        Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
                                     </p>
                                     <div className="space-y-2 pt-4">
                                         <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
                                         <Input 
                                             id="respuesta-radianes" 
-                                            placeholder="Ej: 2π/9"
+                                            placeholder="Escribe tu respuesta en radianes..."
                                             value={respuestaRadianes}
                                             onChange={(e) => setRespuestaRadianes(e.target.value)}
                                         />
