@@ -10,6 +10,7 @@ import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
 import { Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from './ui/separator';
 
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
@@ -68,13 +69,14 @@ export function ModuloEjercicios() {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
-                {/* Módulo 1.0 */}
+                {/* Módulo 1 */}
                 <AccordionItem value="item-1">
-                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
+                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central y Radianes</AccordionTrigger>
                     <AccordionContent>
                         <Card>
                             <CardContent className="pt-6">
-                                <div className="space-y-4">
+                                <div className="space-y-6">
+                                    {/* --- EJERCICIO 1.0 --- */}
                                     <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                         <div className="flex-1 space-y-4">
                                             <p className="text-muted-foreground max-w-prose">
@@ -84,7 +86,7 @@ export function ModuloEjercicios() {
                                                 <Label htmlFor="respuesta-skate">Tu respuesta (medida del ángulo α):</Label>
                                                 <Input 
                                                     id="respuesta-skate" 
-                                                    placeholder="Escribe la medida del ángulo..." 
+                                                    placeholder="Escribe la medida del ángulo..."
                                                     value={respuestaSkate}
                                                     onChange={(e) => setRespuestaSkate(e.target.value)}
                                                 />
@@ -98,75 +100,59 @@ export function ModuloEjercicios() {
                                             <h4 className="font-semibold text-foreground">Teorema del Ángulo Central</h4>
                                             <p className="text-xs text-muted-foreground max-w-xs">La medida del ángulo del centro que subtiende un arco es siempre el doble de la medida de cualquier ángulo inscrito que subtiende el mismo arco.</p>
                                             <TeoremaAnguloCentralSVG className="w-48 h-48" />
-                                            <AyudaContextual 
-                                                ejercicioId="plaza-skate"
-                                                groupId="trigonometria-basica"
-                                                onTeoricoToggle={() => handleTeoricoToggle('plaza-skate')}
-                                                isTeoricoOpen={isTeoricoOpen}
-                                            />
                                         </div>
                                     </div>
                                     
-                                    {isTeoricoOpen && (
-                                       <EjercicioInteractivo 
-                                            ejercicioId="plaza-skate"
-                                            groupId="trigonometria-basica"
-                                            initialContextFiles={activeContextFiles}
-                                       />
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </AccordionContent>
-                </AccordionItem>
-                {/* Módulo 1.1 */}
-                <AccordionItem value="item-2">
-                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Conversión de Grados a Radianes</AccordionTrigger>
-                     <AccordionContent>
-                        <Card>
-                            <CardContent className="pt-6">
-                               <div className="space-y-4">
-                                    <p className="text-muted-foreground max-w-prose">
-                                        Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
-                                    </p>
-                                    
-                                    <div className="p-4 border rounded-lg bg-background text-sm space-y-2">
-                                        <h4 className="font-semibold text-foreground">¿Cómo convertir grados a radianes?</h4>
-                                        <p className="text-muted-foreground">Existe una fórmula muy directa. Es una "regla de tres" o un factor de conversión.</p>
-                                        <p className="text-muted-foreground">La relación fundamental es: <code className="bg-muted px-1.5 py-0.5 rounded">180° = π radianes</code></p>
-                                        <p className="text-muted-foreground">A partir de esa equivalencia, la fórmula para convertir cualquier ángulo de grados a radianes es:</p>
-                                        <code className="block text-center bg-muted p-2 rounded-md font-semibold">radianes = grados × (π / 180)</code>
+                                    <Separator />
+
+                                    {/* --- EJERCICIO 1.1 --- */}
+                                    <div className="space-y-4">
+                                        <p className="text-muted-foreground max-w-prose">
+                                            Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
+                                        </p>
+                                        
+                                        <div className="p-4 border rounded-lg bg-background text-sm space-y-2">
+                                            <h4 className="font-semibold text-foreground">¿Cómo convertir grados a radianes?</h4>
+                                            <p className="text-muted-foreground">Existe una fórmula muy directa. Es una "regla de tres" o un factor de conversión.</p>
+                                            <p className="text-muted-foreground">La relación fundamental es: <code className="bg-muted px-1.5 py-0.5 rounded">180° = π radianes</code></p>
+                                            <p className="text-muted-foreground">A partir de esa equivalencia, la fórmula para convertir cualquier ángulo de grados a radianes es:</p>
+                                            <code className="block text-center bg-muted p-2 rounded-md font-semibold">radianes = grados × (π / 180)</code>
+                                        </div>
+
+                                        <div className="space-y-2 pt-4">
+                                            <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
+                                            <Input 
+                                                id="respuesta-radianes" 
+                                                placeholder="Escribe tu respuesta en radianes..."
+                                                value={respuestaRadianes}
+                                                onChange={(e) => setRespuestaRadianes(e.target.value)}
+                                            />
+                                            <Button onClick={handleVerificarRadianes} className="w-full md:w-auto">
+                                                <Check className="mr-2 h-4 w-4" />
+                                                Verificar Respuesta
+                                            </Button>
+                                        </div>
                                     </div>
 
-                                    <div className="space-y-2 pt-4">
-                                        <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
-                                        <Input 
-                                            id="respuesta-radianes" 
-                                            placeholder="Escribe tu respuesta en radianes..."
-                                            value={respuestaRadianes}
-                                            onChange={(e) => setRespuestaRadianes(e.target.value)}
-                                        />
-                                        <Button onClick={handleVerificarRadianes} className="w-full md:w-auto">
-                                            <Check className="mr-2 h-4 w-4" />
-                                            Verificar Respuesta
-                                        </Button>
-                                    </div>
+                                    <Separator />
+
+                                    {/* --- Ayuda y Chat --- */}
                                     <div className="flex justify-end pt-4">
                                         <AyudaContextual
                                             ejercicioId="conversion-radianes"
                                             groupId="trigonometria-basica"
                                             onTeoricoToggle={() => handleTeoricoToggle('conversion-radianes')}
-                                            isTeoricoOpen={isTeoricoOpen && activeContextFiles.includes('conversion-radianes')}
+                                            isTeoricoOpen={isTeoricoOpen}
                                         />
                                     </div>
-                                     {isTeoricoOpen && activeContextFiles.includes('conversion-radianes') && (
+                                     {isTeoricoOpen && (
                                        <EjercicioInteractivo 
                                             ejercicioId="conversion-radianes"
                                             groupId="trigonometria-basica"
                                             initialContextFiles={activeContextFiles}
                                        />
                                     )}
-                               </div>
+                                </div>
                             </CardContent>
                         </Card>
                     </AccordionContent>
