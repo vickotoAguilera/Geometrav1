@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input';
+import { Label } from "@/components/ui/label';
 import { AyudaContextual, EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
@@ -16,6 +16,7 @@ export function ModuloEjercicios() {
     const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
     const [activeContextFiles, setActiveContextFiles] = useState<string[]>(['plaza-skate']);
     const [respuestaSkate, setRespuestaSkate] = useState('');
+    const [respuestaRadianes, setRespuestaRadianes] = useState('');
     const { toast } = useToast();
 
 
@@ -39,6 +40,24 @@ export function ModuloEjercicios() {
             toast({
                 title: "Respuesta Incorrecta",
                 description: "Inténtalo de nuevo. Recuerda la relación entre el ángulo inscrito y el ángulo central.",
+                variant: 'destructive',
+            });
+        }
+    };
+
+    const handleVerificarRadianes = () => {
+        const respuestaTrimmed = respuestaRadianes.replace(/\s/g, '').toLowerCase();
+        const respuestasCorrectas = ["2π/9", "2pi/9", "40π/180", "40pi/180"];
+        if (respuestasCorrectas.includes(respuestaTrimmed)) {
+             toast({
+                title: "¡Respuesta Correcta!",
+                description: "40° equivalen a 2π/9 radianes. ¡Excelente!",
+                variant: 'default',
+            });
+        } else {
+             toast({
+                title: "Respuesta Incorrecta",
+                description: "Revisa tu cálculo. Recuerda que 180° = π radianes.",
                 variant: 'destructive',
             });
         }
@@ -95,6 +114,49 @@ export function ModuloEjercicios() {
                                        />
                                     )}
                                 </div>
+                            </CardContent>
+                        </Card>
+                    </AccordionContent>
+                </AccordionItem>
+                {/* Módulo 1.1 */}
+                <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Conversión de Grados a Radianes</AccordionTrigger>
+                     <AccordionContent>
+                        <Card>
+                            <CardContent className="pt-6">
+                               <div className="space-y-4">
+                                    <p className="text-muted-foreground max-w-prose">
+                                        Considerando el resultado del ejercicio anterior, donde el ángulo central es de 40°, ¿cuál es su medida equivalente en radianes? Utiliza `π` (pi) en tu respuesta para que sea exacta.
+                                    </p>
+                                    <div className="space-y-2 pt-4">
+                                        <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
+                                        <Input 
+                                            id="respuesta-radianes" 
+                                            placeholder="Ej: 2π/9"
+                                            value={respuestaRadianes}
+                                            onChange={(e) => setRespuestaRadianes(e.target.value)}
+                                        />
+                                        <Button onClick={handleVerificarRadianes} className="w-full md:w-auto">
+                                            <Check className="mr-2 h-4 w-4" />
+                                            Verificar Respuesta
+                                        </Button>
+                                    </div>
+                                    <div className="flex justify-end pt-4">
+                                        <AyudaContextual
+                                            ejercicioId="conversion-radianes"
+                                            groupId="trigonometria-basica"
+                                            onTeoricoToggle={() => handleTeoricoToggle('conversion-radianes')}
+                                            isTeoricoOpen={isTeoricoOpen && activeContextFiles.includes('conversion-radianes')}
+                                        />
+                                    </div>
+                                     {isTeoricoOpen && activeContextFiles.includes('conversion-radianes') && (
+                                       <EjercicioInteractivo 
+                                            ejercicioId="conversion-radianes"
+                                            groupId="trigonometria-basica"
+                                            initialContextFiles={activeContextFiles}
+                                       />
+                                    )}
+                               </div>
                             </CardContent>
                         </Card>
                     </AccordionContent>
