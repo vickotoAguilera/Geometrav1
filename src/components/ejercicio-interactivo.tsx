@@ -175,35 +175,6 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
         }).finally(() => setIsPending(false));
     };
     
-    const renderRow = (pendiente: string, startIndex: number) => {
-        const cells = [];
-        for (let i = 0; i < 7; i++) {
-            const index = startIndex + i;
-            cells.push(
-                <TableCell key={index}>
-                    <Input
-                        type="text"
-                        placeholder="..."
-                        value={respuestas[index]}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
-                        className={cn(
-                            'w-24 text-center',
-                            resultados[index] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
-                            resultados[index] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
-                        )}
-                    />
-                </TableCell>
-            );
-        }
-        return (
-            <TableRow>
-                <TableCell className="font-semibold">{pendiente}</TableCell>
-                {cells}
-            </TableRow>
-        );
-    };
-
-
     return (
         <div className="space-y-4">
             <p className="text-sm text-muted-foreground">Completa la tabla con los valores solicitados y luego verifica tus respuestas.</p>
@@ -222,9 +193,60 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {renderRow('12%', 0)}
-                        {renderRow('8%', 7)}
-                        {renderRow('6%', 14)}
+                        <TableRow>
+                            <TableCell className="font-semibold">12%</TableCell>
+                            {Array.from({ length: 7 }).map((_, i) => (
+                                <TableCell key={i}>
+                                    <Input
+                                        type="text"
+                                        placeholder="..."
+                                        value={respuestas[i]}
+                                        onChange={(e) => handleInputChange(i, e.target.value)}
+                                        className={cn(
+                                            'w-24 text-center',
+                                            resultados[i] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+                                            resultados[i] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+                                        )}
+                                    />
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                         <TableRow>
+                            <TableCell className="font-semibold">8%</TableCell>
+                            {Array.from({ length: 7 }).map((_, i) => (
+                                <TableCell key={i + 7}>
+                                    <Input
+                                        type="text"
+                                        placeholder="..."
+                                        value={respuestas[i + 7]}
+                                        onChange={(e) => handleInputChange(i + 7, e.target.value)}
+                                        className={cn(
+                                            'w-24 text-center',
+                                            resultados[i + 7] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+                                            resultados[i + 7] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+                                        )}
+                                    />
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">6%</TableCell>
+                             {Array.from({ length: 7 }).map((_, i) => (
+                                <TableCell key={i + 14}>
+                                    <Input
+                                        type="text"
+                                        placeholder="..."
+                                        value={respuestas[i + 14]}
+                                        onChange={(e) => handleInputChange(i + 14, e.target.value)}
+                                        className={cn(
+                                            'w-24 text-center',
+                                            resultados[i + 14] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+                                            resultados[i + 14] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+                                        )}
+                                    />
+                                </TableCell>
+                            ))}
+                        </TableRow>
                     </TableBody>
                 </Table>
             </div>
