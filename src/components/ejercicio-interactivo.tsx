@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createElement } from 'react';
+import { useState, useEffect, createElement, Fragment } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,7 +52,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
                 .use(remarkParse)
                 .use(remarkRehype, { allowDangerousHtml: true })
                 // @ts-ignore
-                .use(rehypeReact, { createElement, components: reactComponents })
+                .use(rehypeReact, { createElement, Fragment, components: reactComponents })
                 .process(result.content);
             setGuiaContent(processedContent.result);
         } else {
