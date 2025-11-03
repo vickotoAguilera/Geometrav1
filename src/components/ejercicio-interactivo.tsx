@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BookText, CirclePlay, Loader2, Check } from 'lucide-react';
+import { BookText, CirclePlay, Loader2, Check, Bot, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
@@ -12,6 +12,58 @@ import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+
+// Este componente contendrá los dos botones de ayuda
+export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string; groupId: string; }) {
+  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+
+  return (
+    <TooltipProvider>
+      <div className="flex items-center gap-2">
+        <Accordion type="single" collapsible value={isTeoricoOpen ? "item-1" : ""} onValueChange={(value) => setIsTeoricoOpen(!!value)}>
+            <AccordionItem value="item-1" className="border-none">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <AccordionTrigger className="p-0 hover:no-underline">
+                             <div className="h-9 w-9 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                                <Calculator className="h-5 w-5"/>
+                             </div>
+                        </AccordionTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Ayuda con el Tutor Teórico</p>
+                    </TooltipContent>
+                </Tooltip>
+                 <AccordionContent className="mt-4">
+                    <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
+                <div className="h-9 w-9 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                    <Bot className="h-5 w-5" />
+                </div>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Resolver con Tutor de GeoGebra</p>
+          </TooltipContent>
+        </Tooltip>
+
+      </div>
+    </TooltipProvider>
+  );
+}
 
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
@@ -177,6 +229,8 @@ interface EjercicioInteractivoProps {
   groupId: string;
 }
 
+// Este componente ahora es más general y ya no tiene el campo de input ni los botones grandes.
+// Su propósito principal es usar el Accordion para el Tutor Teórico.
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   
   return (
@@ -188,13 +242,13 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
                 <AccordionTrigger className="flex-1 w-full">
                     <div className="py-2 px-4 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground transition-colors w-full flex justify-center items-center gap-2 font-semibold">
                          <BookText className="mr-2 h-4 w-4" />
-                         Consultar al Tutor Teórico
+                         Consultar al Tutor Teórico (General)
                     </div>
                 </AccordionTrigger>
                 <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref className="flex-1 w-full">
                     <div className="py-2 px-4 rounded-md border bg-primary text-primary-foreground hover:bg-primary/90 transition-colors w-full flex justify-center items-center gap-2 font-semibold">
                         <CirclePlay className="mr-2 h-4 w-4" />
-                        Resolver con Tutor de GeoGebra
+                        Resolver con Tutor de GeoGebra (General)
                     </div>
                 </Link>
             </div>
