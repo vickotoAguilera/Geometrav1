@@ -59,24 +59,36 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     inputSchema: TeoriaCalculadoraAssistantInputSchema,
     outputSchema: TeoriaCalculadoraAssistantOutputSchema,
   },
-  async (input) => {
-    const { history, contextoEjercicio } = input;
-    
-    let dynamicSystemPrompt = systemPrompt;
-    let fullHistory = history || [];
+  async ({ history, contextoEjercicio }) => {
+    // Asegurarse de que el historial sea siempre un array
+    const conversationHistory = history || [];
 
-    // Esta lógica asegura que el contexto inicial solo se use en el primer turno para la presentación.
-    if (contextoEjercicio && fullHistory.length === 0) {
-        fullHistory.push({ role: 'user', content: [{ text: `He activado el siguiente material. Por favor, preséntate y guíame como se indica en tus instrucciones de sistema. CONTEXTO:\n${contextoEjercicio}` }] });
-    } else if (contextoEjercicio) {
-        // En turnos posteriores, el contexto se añade al prompt del sistema para que no se pierda.
-        dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
+    // Lógica para construir el prompt y el sistema dinámicamente
+    let dynamicSystemPrompt = systemPrompt;
+    let prompt: Part[];
+
+    if (conversationHistory.length === 0 && contextoEjercicio) {
+      // Es el primer turno, la IA debe presentarse usando el contexto inicial.
+      prompt = [{ text: `He activado el siguiente material. Por favor, preséntate y guíame como se indica en tus instrucciones de sistema. CONTEXTO:\n${contextoEjercicio}` }];
+    } else {
+      // La conversación ya ha comenzado. El contexto se añade al system prompt para que persista.
+      if (contextoEjercicio) {
+          dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
+      }
+      // El prompt es el último mensaje del usuario (el cual ya está en el historial)
+      prompt = conversationHistory[conversationHistory.length - 1]?.content || [];
+    }
+
+    if (prompt.length === 0) {
+        throw new Error("El prompt está vacío. No se puede generar una respuesta de la IA.");
     }
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
-      history: fullHistory,
+      // Pasamos todo el historial menos el último mensaje, que es el prompt actual
+      history: conversationHistory.slice(0, -1),
+      prompt: prompt,
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
