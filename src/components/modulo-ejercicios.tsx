@@ -46,6 +46,7 @@ export function ModuloEjercicios() {
     const handleVerificarSkate = async () => {
         if (!respuestaSkate.trim()) {
             toast({ title: "Respuesta vacía", description: "Por favor, escribe una respuesta.", variant: "destructive" });
+            setResultadoSkate(false);
             return;
         }
         setIsVerifyingSkate(true);
@@ -68,6 +69,7 @@ export function ModuloEjercicios() {
     const handleVerificarRadianes = async () => {
         if (!respuestaRadianes.trim()) {
             toast({ title: "Respuesta vacía", description: "Por favor, escribe una respuesta.", variant: "destructive" });
+            setResultadoRadianes(false);
             return;
         }
         setIsVerifyingRadianes(true);
@@ -199,17 +201,56 @@ export function ModuloEjercicios() {
                                     <TablaActividad1 onVerify={(results) => setResultadosTabla1(results)} />
 
                                     <Separator/>
-
-                                    <h3 className="font-semibold text-lg">Actividad 2 y 3</h3>
-                                    <p className="text-muted-foreground">Usa GeoGebra para dibujar y medir las rampas. Luego, anota tus conclusiones: ¿Qué tipo de triángulo representan? ¿Qué semejanzas y diferencias observas? ¿Qué ángulos corresponden a las pendientes del 12% y 8%?</p>
-                                    <Textarea placeholder="Escribe aquí tus conclusiones de las actividades 2 y 3..." className="mt-2"/>
-                                     <div className="flex justify-end">
-                                        <Button variant="secondary" size="sm" onClick={() => toast({title: "Función no implementada", description: "La verificación para esta pregunta abierta se conectará pronto."})}>
-                                            <Send className="mr-2 h-4 w-4"/>
-                                            Discutir con la IA
-                                        </Button>
+                                    
+                                    <div className="space-y-4">
+                                        <h3 className="font-semibold text-lg">Actividad 2</h3>
+                                        <p className="text-muted-foreground">Usa GeoGebra para dibujar y medir las rampas. Luego, anota tus conclusiones.</p>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act2-a">a. ¿Qué tipo de triángulo representan las rampas dibujadas?</Label>
+                                            <Textarea id="act2-a" placeholder="Escribe aquí tu conclusión..."/>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act2-b">b. ¿Qué semejanzas observas entre las rampas dibujadas?</Label>
+                                            <Textarea id="act2-b" placeholder="Escribe aquí tus semejanzas..."/>
+                                        </div>
+                                         <div className="space-y-2">
+                                            <Label htmlFor="act2-c">c. ¿Qué diferencias observas entre las rampas dibujadas?</Label>
+                                            <Textarea id="act2-c" placeholder="Escribe aquí tus diferencias..."/>
+                                        </div>
+                                        <div className="flex justify-end">
+                                            <Button variant="secondary" size="sm" onClick={() => {toast({title: "Verificación conceptual", description: "Esta pregunta es abierta. Usa el Tutor Teórico para discutir tu respuesta."}); handleTeoricoToggle('la-rampa')}}>
+                                                <Send className="mr-2 h-4 w-4"/>
+                                                Verificar con IA
+                                            </Button>
+                                        </div>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Dibujo de rampa en GeoGebra" />
                                     </div>
-                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra" />
+                                    
+                                    <Separator/>
+
+                                    <div className="space-y-4">
+                                        <h3 className="font-semibold text-lg">Actividad 3</h3>
+                                        <p className="text-muted-foreground">Usa GeoGebra para medir los ángulos interiores de las rampas. Luego, anota tus conclusiones.</p>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act3-a">a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 12%?</Label>
+                                            <Input id="act3-a" placeholder="Respuesta en grados..."/>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act3-b">b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%?</Label>
+                                            <Input id="act3-b" placeholder="Respuesta en grados..."/>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act3-c">c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%?</Label>
+                                            <Input id="act3-c" placeholder="Respuesta en grados..."/>
+                                        </div>
+                                        <div className="flex justify-end">
+                                            <Button variant="secondary" size="sm" onClick={() => toast({title: "Verificación no implementada", description: "La verificación para estas preguntas se conectará pronto."})}>
+                                                <Send className="mr-2 h-4 w-4"/>
+                                                Verificar con IA
+                                            </Button>
+                                        </div>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra" />
+                                    </div>
 
                                     <Separator/>
 
@@ -219,29 +260,29 @@ export function ModuloEjercicios() {
 
                                     <Separator/>
                                     
-                                    <h3 className="font-semibold text-lg">Actividad 5 (Cierre)</h3>
-                                    <p className="text-muted-foreground">Ahora reflexiona sobre lo aprendido:</p>
-                                    <div className="space-y-4 mt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="act5-q1">a. ¿Qué herramientas te permiten obtener un ángulo a partir de sus lados?</Label>
-                                            <Textarea id="act5-q1" placeholder="Describe los comandos o funciones..."/>
+                                    <div className="space-y-6">
+                                        <h3 className="font-semibold text-lg">Actividad 5 (Cierre)</h3>
+                                        <p className="text-muted-foreground">Ahora reflexiona sobre lo aprendido:</p>
+                                        <div className="space-y-4">
+                                            <Label htmlFor="act5-a">a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten determinar el ángulo de un triángulo rectángulo conociendo sus lados, sin necesidad de representarlo gráficamente?</Label>
+                                            <Textarea id="act5-a" placeholder="Describe los comandos o funciones..."/>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="act5-q2">b. Para 4° de inclinación, ¿qué pendiente debería tener la rampa?</Label>
-                                            <Input id="act5-q2" placeholder="Escribe el porcentaje..."/>
+                                        <div className="space-y-4">
+                                            <Label htmlFor="act5-b">b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?</Label>
+                                            <Input id="act5-b" placeholder="Escribe el porcentaje..."/>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="act5-q3">c. Si la altura es 25 cm, ¿cuál sería la distancia horizontal para esa rampa de 4°?</Label>
-                                            <Input id="act5-q3" placeholder="Escribe la distancia en cm..."/>
+                                        <div className="space-y-4">
+                                            <Label htmlFor="act5-c">c. Si la altura es 25 cm, ¿cuál sería la distancia horizontal para esa rampa de 4°?</Label>
+                                            <Input id="act5-c" placeholder="Escribe la distancia en cm..."/>
                                         </div>
-                                         <div className="flex justify-end">
-                                             <Button variant="secondary" size="sm" onClick={() => toast({title: "Función no implementada", description: "La verificación para esta pregunta abierta se conectará pronto."})}>
+                                         <div className="flex justify-end pt-2">
+                                             <Button variant="secondary" size="sm" onClick={() => toast({title: "Verificación no implementada", description: "La verificación para estas preguntas se conectará pronto."})}>
                                                 <Send className="mr-2 h-4 w-4"/>
-                                                Verificar y discutir con la IA
+                                                Verificar con IA
                                             </Button>
                                         </div>
+                                        <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Calculadora científica" />
                                     </div>
-                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Calculadora científica" />
 
                                     <Separator />
                                     
