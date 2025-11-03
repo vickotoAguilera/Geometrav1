@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Check, Bot, Calculator, FileText, ChevronDown, BookOpen, X } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, Check, X, BookOpen } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
@@ -16,6 +15,7 @@ import { AyudaContextual, TablaActividad1, TablaActividad4, EjercicioInteractivo
 import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
 import { Textarea } from './ui/textarea';
 import { MarkdownImage } from './markdown-image';
+
 
 const ButtonVerificarConceptual = ({
   respuesta,
@@ -44,7 +44,7 @@ const ButtonVerificarConceptual = ({
       return;
     }
     setIsVerifying(true);
-    setVerificationResult(null);
+    setVerificationResult(null); // Reset icon
     onResult(null);
 
     try {
@@ -89,7 +89,7 @@ const ButtonVerificarConceptual = ({
             verificationResult === false && 'border-red-500 focus-visible:ring-red-500'
           )}
         />
-        <Button onClick={handleVerify} disabled={isVerifying} size="sm" variant="secondary" className="mt-1">
+        <Button onClick={handleVerify} disabled={isVerifying} size="icon" variant="secondary" className="mt-1 flex-shrink-0">
           {getIcon()}
           <span className="sr-only">Verificar</span>
         </Button>
@@ -101,7 +101,8 @@ const ButtonVerificarConceptual = ({
 
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
-    
+    const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
+
     // Estados para Módulo 1.0
     const [respuestaSkate, setRespuestaSkate] = useState('');
     const [resultadoSkate, setResultadoSkate] = useState<boolean | null>(null);
@@ -132,16 +133,17 @@ export function ModuloEjercicios() {
     const [respAct5c, setRespAct5c] = useState('');
     const [resAct5c, setResAct5c] = useState<boolean | null>(null);
     
-    const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
-    const [activeContextFiles, setActiveContextFiles] = useState<string[]>(['plaza-skate']);
-
-    const handleTeoricoToggle = (ejercicioId: string) => {
-        setIsTeoricoOpen(prev => !prev);
-        if (!activeContextFiles.includes(ejercicioId)) {
-            setActiveContextFiles(prev => [...prev, ejercicioId]);
-        }
+    
+    const handleTeoricoToggle = (groupId: string) => {
+        setActiveTeorico(prev => ({
+            // Si el grupo es el mismo, se alterna. Si es diferente, se abre.
+            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+            groupId: groupId
+        }));
     };
     
+    const contextFilesModulo1_0 = ['plaza-skate'];
+    const contextFilesModulo1_1 = ['la-rampa-actividad-1', 'la-rampa-actividad-2', 'la-rampa-actividad-3', 'la-rampa-actividad-4', 'la-rampa-actividad-5'];
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -220,15 +222,15 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
-                                            onTeoricoToggle={() => handleTeoricoToggle('plaza-skate')}
-                                            isTeoricoOpen={isTeoricoOpen}
+                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                         />
                                     </div>
-                                     {isTeoricoOpen && (
+                                     {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
                                        <EjercicioInteractivo 
-                                            ejercicioId="plaza-skate"
+                                            key="trigonometria-basica"
                                             groupId="trigonometria-basica"
-                                            initialContextFiles={activeContextFiles}
+                                            initialContextFiles={contextFilesModulo1_0}
                                        />
                                     )}
                                 </div>
@@ -321,14 +323,14 @@ export function ModuloEjercicios() {
                                             ejercicioId="la-rampa"
                                             groupId="la-rampa"
                                             onTeoricoToggle={() => handleTeoricoToggle('la-rampa')}
-                                            isTeoricoOpen={isTeoricoOpen}
+                                            isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa'}
                                         />
                                     </div>
-                                     {isTeoricoOpen && (
+                                     {activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa' && (
                                        <EjercicioInteractivo 
-                                            ejercicioId="la-rampa"
+                                            key="la-rampa"
                                             groupId="la-rampa"
-                                            initialContextFiles={activeContextFiles}
+                                            initialContextFiles={contextFilesModulo1_1}
                                        />
                                     )}
                                 </div>
