@@ -190,7 +190,7 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
         />
       </TableCell>
     );
-    
+
     return (
         <div className="space-y-4">
             <p className="text-sm text-muted-foreground">Completa la tabla con los valores solicitados y luego verifica tus respuestas.</p>
@@ -211,15 +211,33 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
                     <TableBody>
                         <TableRow>
                             <TableCell className="font-semibold">12%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i))}
+                            {renderInputCell(0)}
+                            {renderInputCell(1)}
+                            {renderInputCell(2)}
+                            {renderInputCell(3)}
+                            {renderInputCell(4)}
+                            {renderInputCell(5)}
+                            {renderInputCell(6)}
                         </TableRow>
                          <TableRow>
                             <TableCell className="font-semibold">8%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i + 7))}
+                            {renderInputCell(7)}
+                            {renderInputCell(8)}
+                            {renderInputCell(9)}
+                            {renderInputCell(10)}
+                            {renderInputCell(11)}
+                            {renderInputCell(12)}
+                            {renderInputCell(13)}
                         </TableRow>
                         <TableRow>
                             <TableCell className="font-semibold">6%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => renderInputCell(i + 14))}
+                            {renderInputCell(14)}
+                            {renderInputCell(15)}
+                            {renderInputCell(16)}
+                            {renderInputCell(17)}
+                            {renderInputCell(18)}
+                            {renderInputCell(19)}
+                            {renderInputCell(20)}
                         </TableRow>
                     </TableBody>
                 </Table>
