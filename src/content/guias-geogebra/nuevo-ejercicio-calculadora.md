@@ -2,14 +2,25 @@
 
 En trigonometría, es común que los estudiantes prefieran usar la calculadora. A continuación, te guiaremos para que puedas configurarla y usarla correctamente según la unidad angular que desees.
 
+### Video de Apoyo
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto; margin-bottom: 1rem; border-radius: 0.5rem;">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+    src="https://www.youtube.com/embed/eFROC2qbNFI" 
+    title="YouTube video player" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
+
 ### Configuración de la Calculadora
 
 Revisa el modo de tu calculadora. Las opciones son:
 - **Grados:** `DEG`
 - **Radianes:** `RAD`
 - **Gradianes:** `GRA`
-
-Puedes ver un video de apoyo en la siguiente dirección: https://www.youtube.com/watch?v=eFROC2qbNFI
 
 ---
 ### PARTE 1: Modo Grados (DEG)
