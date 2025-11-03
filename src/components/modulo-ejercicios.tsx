@@ -8,18 +8,27 @@ import { Label } from '@/components/ui/label';
 import { AyudaContextual, EjercicioInteractivo, TablaActividad1 } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
+import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
+import { cn } from '@/lib/utils';
 
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
     const [activeContextFiles, setActiveContextFiles] = useState<string[]>(['plaza-skate']);
+    
     const [respuestaSkate, setRespuestaSkate] = useState('');
     const [respuestaRadianes, setRespuestaRadianes] = useState('');
-    const { toast } = useToast();
+    
+    const [isVerifyingSkate, setIsVerifyingSkate] = useState(false);
+    const [isVerifyingRadianes, setIsVerifyingRadianes] = useState(false);
+    
+    const [resultadoSkate, setResultadoSkate] = useState<boolean | null>(null);
+    const [resultadoRadianes, setResultadoRadianes] = useState<boolean | null>(null);
 
+    const { toast } = useToast();
 
     const handleTeoricoToggle = (ejercicioId: string) => {
         setIsTeoricoOpen(prev => !prev);
@@ -28,48 +37,54 @@ export function ModuloEjercicios() {
         }
     };
 
-    const handleVerificarSkate = () => {
-        const respuestaLimpia = respuestaSkate.trim().replace('°', '');
-        const respuestaCorrecta = "40";
-        
-        if (respuestaLimpia === respuestaCorrecta) {
-            toast({
-                title: "¡Respuesta Correcta!",
-                description: "La medida del ángulo central es 40°. ¡Bien hecho!",
-                variant: 'default',
+    const handleVerificarSkate = async () => {
+        if (!respuestaSkate.trim()) {
+            toast({ title: "Respuesta vacía", description: "Por favor, escribe una respuesta.", variant: "destructive" });
+            return;
+        }
+        setIsVerifyingSkate(true);
+        setResultadoSkate(null);
+        try {
+            const res = await verificarRespuestaAction({
+                preguntaId: 'angulo-central',
+                respuestaUsuario: respuestaSkate,
+                respuestaCorrecta: '40'
             });
-        } else {
-            toast({
-                title: "Respuesta Incorrecta",
-                description: "Inténtalo de nuevo. Recuerda la relación entre el ángulo inscrito y el ángulo central.",
-                variant: 'destructive',
-            });
+            setResultadoSkate(res.esCorrecta);
+            toast({ title: res.esCorrecta ? "¡Respuesta Correcta!" : "Respuesta Incorrecta", description: res.feedback });
+        } catch (error) {
+            toast({ title: "Error", description: "No se pudo verificar la respuesta.", variant: "destructive" });
+        } finally {
+            setIsVerifyingSkate(false);
         }
     };
 
-    const handleVerificarRadianes = () => {
-        const respuestaLimpia = respuestaRadianes.replace(/\s/g, '').toLowerCase();
-        const respuestasCorrectas = ["2π/9", "2pi/9", "40π/180", "40pi/180", "(2/9)pi", "2/9pi", "2*pi/9", "pi*2/9"];
-        if (respuestasCorrectas.includes(respuestaLimpia)) {
-             toast({
-                title: "¡Respuesta Correcta!",
-                description: "40° equivalen a 2π/9 radianes. ¡Excelente!",
-                variant: 'default',
+    const handleVerificarRadianes = async () => {
+        if (!respuestaRadianes.trim()) {
+            toast({ title: "Respuesta vacía", description: "Por favor, escribe una respuesta.", variant: "destructive" });
+            return;
+        }
+        setIsVerifyingRadianes(true);
+        setResultadoRadianes(null);
+        try {
+            const res = await verificarRespuestaAction({
+                preguntaId: 'conversion-radianes',
+                respuestaUsuario: respuestaRadianes,
+                respuestaCorrecta: '2*pi/9'
             });
-        } else {
-             toast({
-                title: "Respuesta Incorrecta",
-                description: "Revisa tu cálculo. Recuerda que 180° = π radianes.",
-                variant: 'destructive',
-            });
+            setResultadoRadianes(res.esCorrecta);
+            toast({ title: res.esCorrecta ? "¡Respuesta Correcta!" : "Respuesta Incorrecta", description: res.feedback });
+        } catch (error) {
+            toast({ title: "Error", description: "No se pudo verificar la respuesta.", variant: "destructive" });
+        } finally {
+            setIsVerifyingRadianes(false);
         }
     };
-
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
-                {/* Módulo 1.0 */}
+                {/* Módulo 1.0 y 1.1 unificados */}
                 <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
                     <AccordionContent>
@@ -88,10 +103,11 @@ export function ModuloEjercicios() {
                                                         id="respuesta-skate" 
                                                         placeholder="Escribe la medida del ángulo..."
                                                         value={respuestaSkate}
-                                                        onChange={(e) => setRespuestaSkate(e.target.value)}
+                                                        onChange={(e) => { setRespuestaSkate(e.target.value); setResultadoSkate(null); }}
+                                                        className={cn(resultadoSkate === true && 'border-green-500', resultadoSkate === false && 'border-red-500')}
                                                     />
-                                                    <Button onClick={handleVerificarSkate}>
-                                                        <Check className="mr-2 h-4 w-4" />
+                                                    <Button onClick={handleVerificarSkate} disabled={isVerifyingSkate}>
+                                                        {isVerifyingSkate ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Check className="mr-2 h-4 w-4" />}
                                                         Verificar
                                                     </Button>
                                                 </div>
@@ -126,10 +142,11 @@ export function ModuloEjercicios() {
                                                     id="respuesta-radianes" 
                                                     placeholder="Escribe tu respuesta en radianes..."
                                                     value={respuestaRadianes}
-                                                    onChange={(e) => setRespuestaRadianes(e.target.value)}
+                                                    onChange={(e) => { setRespuestaRadianes(e.target.value); setResultadoRadianes(null); }}
+                                                    className={cn(resultadoRadianes === true && 'border-green-500', resultadoRadianes === false && 'border-red-500')}
                                                 />
-                                                <Button onClick={handleVerificarRadianes}>
-                                                    <Check className="mr-2 h-4 w-4" />
+                                                <Button onClick={handleVerificarRadianes} disabled={isVerifyingRadianes}>
+                                                    {isVerifyingRadianes ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Check className="mr-2 h-4 w-4" />}
                                                     Verificar
                                                 </Button>
                                             </div>
