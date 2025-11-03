@@ -29,7 +29,6 @@ interface TutorTeoricoChatProps {
 }
 
 const parseResponse = (content: string) => {
-    const codeRegex = /<code>(.*?)<\/code>/gs;
     const textSubParts: ({type: 'text' | 'code' | 'bold', value: string})[] = [];
     let lastTextIndex = 0;
     let combinedRegex = new RegExp(/<code>(.*?)<\/code>|\*\*(.*?)\*\*/gs);
@@ -39,16 +38,16 @@ const parseResponse = (content: string) => {
         if (textMatch.index > lastTextIndex) {
             textSubParts.push({type: 'text', value: content.substring(lastTextIndex, textMatch.index)});
         }
-        if (textMatch[1]) {
+        if (textMatch[1]) { // <code> match
             textSubParts.push({type: 'code', value: textMatch[1]});
-        } else if (textMatch[2]) {
+        } else if (textMatch[2]) { // **bold** match
             textSubParts.push({type: 'bold', value: textMatch[2]});
         }
         lastTextIndex = textMatch.index + textMatch[0].length;
     }
 
-    if (lastTextIndex < part.value.length) {
-        textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex) });
+    if (lastTextIndex < content.length) {
+        textSubParts.push({ type: 'text', value: content.substring(lastTextIndex) });
     }
     return textSubParts;
 };
