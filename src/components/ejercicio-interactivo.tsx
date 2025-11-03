@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createElement } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,10 @@ import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Card, CardContent } from './ui/card';
 import { MarkdownImage } from './markdown-image';
-import parse from 'html-react-parser';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeReact from 'rehype-react';
 
 
 interface EjercicioInteractivoProps {
@@ -20,23 +23,17 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
-    'markdown-image': MarkdownImage
-};
-
-const parseOptions = {
-  replace: (domNode: any) => {
-    if (domNode.attribs && domNode.name && reactComponents[domNode.name as keyof typeof reactComponents]) {
-      const Component = reactComponents[domNode.name as keyof typeof reactComponents];
-      // Pass the props from the parsed HTML tag to your React component
-      return <Component {...domNode.attribs} />;
-    }
-  }
-};
-
+    // Map markdown `img` tags to our custom `MarkdownImage` component
+    img: (props: any) => {
+      // The path from markdown might be URL encoded, so we decode it.
+      const decodedSrc = decodeURIComponent(props.src);
+      return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
+    },
+  };
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
-  const [guiaHtml, setGuiaHtml] = useState<string | null>(null);
+  const [guiaContent, setGuiaContent] = useState<React.ReactNode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   const storageKey = `respuesta-${groupId}-${ejercicioId}`;
@@ -47,19 +44,25 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
       setRespuesta(savedRespuesta);
     }
 
-    const fetchGuia = async () => {
+    const fetchAndProcessGuia = async () => {
         setIsLoading(true);
         const result = await getGuiaEjercicio(ejercicioId);
-        if ('htmlContent' in result) {
-            setGuiaHtml(result.htmlContent);
+        if ('content' in result) {
+            const processedContent = await unified()
+                .use(remarkParse)
+                .use(remarkRehype, { allowDangerousHtml: true })
+                // @ts-ignore
+                .use(rehypeReact, { createElement, components: reactComponents })
+                .process(result.content);
+            setGuiaContent(processedContent.result);
         } else {
             console.error(result.error);
-            setGuiaHtml('<p>Error al cargar la guía.</p>');
+            setGuiaContent(<p>Error al cargar la guía.</p>);
         }
         setIsLoading(false);
     };
 
-    fetchGuia();
+    fetchAndProcessGuia();
   }, [storageKey, ejercicioId]);
 
   const handleRespuestaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +81,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
       ) : (
         <Card>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
-               {guiaHtml ? parse(guiaHtml, parseOptions) : null}
+               {guiaContent}
             </CardContent>
         </Card>
       )}
