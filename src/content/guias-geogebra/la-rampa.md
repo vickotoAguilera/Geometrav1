@@ -19,18 +19,18 @@ Considerando la ilustración, completa la siguiente tabla con las diferentes med
 
 | Distancia horizontal (D) expresada en cm | Diferencia de nivel expresada en cm | Pendiente expresada como porcentaje | Pendiente expresada como decimal |
 | :--- | :--- | :--- | :--- |
-| | | 12% | |
-| | | 12% | |
-| | | 12% | |
-| | | 8% | |
-| | | 8% | |
-| | | 8% | |
+| 100 | | 12% | |
+| 150 | | 12% | |
+| 50 | | 12% | |
+| 200 | | 8% | |
+| 300 | | 8% | |
+| 180 | | 8% | |
 
 ---
 
 ### ACTIVIDAD 2
 
-Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
+Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas, para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
 
 a. ¿Qué tipo de triángulo representa las rampas dibujadas?
 b. ¿Qué semejanzas observas entre las rampas dibujadas?

@@ -25,10 +25,15 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
+    // La clave 'img' es importante porque le dice al procesador:
+    // "cuando encuentres una etiqueta <img>, en lugar de renderizarla
+    // como una imagen normal, usa mi componente MarkdownImage".
     img: (props: any) => {
-      const decodedSrc = props.src;
+      // Decodificamos la ruta de la imagen que puede venir con caracteres especiales.
+      const decodedSrc = decodeURIComponent(props.src);
       return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
     },
+    // También permitimos iframes para los videos.
     iframe: (props: any) => {
         return createElement('iframe', props);
     }
@@ -51,10 +56,12 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         setIsLoading(true);
         const result = await getGuiaEjercicio(ejercicioId);
         if ('content' in result) {
+            // Se procesa el contenido del archivo .md
             const processedContent = await unified()
-                .use(remarkParse)
-                .use(remarkRehype, { allowDangerousHtml: true })
-                .use(rehypeRaw)
+                .use(remarkParse) // Parsea el Markdown
+                .use(remarkRehype, { allowDangerousHtml: true }) // Lo convierte a un formato intermedio (hast)
+                .use(rehypeRaw) // Permite el HTML crudo (como <iframe>)
+                // Convierte el formato intermedio a React, usando nuestros componentes personalizados.
                 // @ts-ignore
                 .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents })
                 .process(result.content);
