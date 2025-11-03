@@ -211,15 +211,15 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
                     <TableBody>
                         <TableRow>
                             <TableCell className="font-semibold">12%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i))}
+                            {Array.from({ length: 7 }).map((_, i) => crearCeldaInput(i))}
                         </TableRow>
                         <TableRow>
                             <TableCell className="font-semibold">8%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i + 7))}
+                            {Array.from({ length: 7 }).map((_, i) => crearCeldaInput(i + 7))}
                         </TableRow>
                         <TableRow>
                             <TableCell className="font-semibold">6%</TableCell>
-                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i + 14))}
+                            {Array.from({ length: 7 }).map((_, i) => crearCeldaInput(i + 14))}
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -246,7 +246,7 @@ export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInt
   useEffect(() => {
     const loadContext = async () => {
       setIsLoading(true);
-      if (contextFileNames.length > 0) {
+      if (contextFileNames && contextFileNames.length > 0) {
         try {
           let combinedContent = '';
           for (const file of contextFileNames) {
