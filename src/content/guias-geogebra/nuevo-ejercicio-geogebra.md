@@ -6,7 +6,7 @@ Esta actividad tiene por objetivo familiarizar a los estudiantes, mediante la in
 
 Ingresa a la siguiente dirección: https://www.geogebra.org/classic
 
-![Interfaz de GeoGebra Clásico](https://storage.googleapis.com/res-a-stage.appspot.com/projects%2FlzaIUlC6n1I3V37yCgK3%2Fimages%2F12531ac9-e68d-426c-a89c-a111a8b9e697.png)
+![Interfaz de GeoGebra Clásico](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24.jpeg)
 
 A lo largo del documento, utilizaremos el término **grados** para referirnos a grados sexagesimales y **gradianes** para referirnos a grados centesimales. De esta manera, las medidas de los ángulos se expresarán en radianes, grados y gradianes. Por ejemplo:
 - Radianes: `1.23 rad`
@@ -26,12 +26,16 @@ Para construir el triángulo con vértices `A = (0, 0)`, `B = (4, 0)` y `C = (4,
 
 Observa en la Vista Algebraica que, además de calcularse las medidas de los ángulos, también se han determinado las longitudes de los lados (`a=3`, `b=5`, `c=4`) y el área del triángulo (`t1=6`).
 
+![Resultado de Actividad 2 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24.jpeg)
+
 ## ACTIVIDAD 3: Transformar de radianes a grados
 
 Para transformar la medida en radianes de los ángulos `3π/2`, `π/3` y `1` a grados, escribe en la barra de entrada lo siguiente:
 - `Ángulo(3pi/2)`
 - `Ángulo(pi/3)`
 - `Ángulo(1)`
+
+![Resultado de Actividad 3 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-1.jpeg)
 
 ## ACTIVIDAD 4: Calcular razones trigonométricas (ángulo en grados)
 
@@ -40,12 +44,16 @@ Para calcular el valor de seno, coseno y tangente de un ángulo que mide `30°`,
 - `cos(30°)`
 - `tan(30°)`
 
+![Resultado de Actividad 4 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-2.jpeg)
+
 ## ACTIVIDAD 5: Calcular razones trigonométricas (ángulo en radianes)
 
 Para calcular el valor de seno, coseno y tangente de un ángulo que mide `30 radianes`, escribe en la barra de entrada:
 - `sin(30rad)`
 - `cos(30rad)`
 - `tan(30rad)`
+
+![Resultado de Actividad 5 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3-B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-3.jpeg)
 
 ## ACTIVIDAD 6: Calcular razones trigonométricas (ángulo en gradianes)
 
@@ -54,12 +62,16 @@ GeoGebra no calcula directamente con gradianes. Para ello, es necesario converti
 - `cos(0.9*50°)`
 - `tan(0.9*50°)`
 
+![Resultado de Actividad 6 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-4.jpeg)
+
 ## ACTIVIDAD 7: Calcular el ángulo en grados a partir de la razón
 
 Para calcular la medida en grados de un ángulo cuyo valor de seno, coseno y tangente es `0.5`, escribe en la barra de entrada:
 - `asind(0.5)`
 - `acosd(0.5)`
 - `atand(0.5)`
+
+![Resultado de Actividad 7 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-5.jpeg)
 
 ## ACTIVIDAD 8: Calcular el ángulo en radianes a partir de la razón
 
@@ -68,9 +80,13 @@ Para obtener el valor directamente en radianes, multiplica el resultado por `π/
 - `pi/180°*acosd(0.5)`
 - `pi/180°*atand(0.5)`
 
+![Resultado de Actividad 8 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-6.jpeg)
+
 ## ACTIVIDAD 9: Calcular el ángulo en gradianes a partir de la razón
 
 Para obtener el valor en gradianes, multiplica el resultado por `100/90°`. Para un valor de `0.5`, escribe en la barra de entrada:
 - `100/90°*asind(0.5)`
 - `100/90°*acosd(0.5)`
 - `100/90°*atand(0.5)`
+
+![Resultado de Actividad 9 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnol%C3%B3gica%201%20%C3%81ngulos%20y%20razones%20trigonom%C3%A9tricas/image-12-10-18-05-24-7.jpeg)
