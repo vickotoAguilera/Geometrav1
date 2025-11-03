@@ -7,15 +7,9 @@ description: 'Aprende sobre accesibilidad, pendientes y trigonometría aplicando
 
 Las rampas son esenciales para garantizar la accesibilidad en espacios públicos y privados, permitiendo a las personas con discapacidad una movilidad segura y autónoma. Factores como la pendiente máxima permitida y las dimensiones óptimas son determinantes para facilitar el acceso sin comprometer la estabilidad o la comodidad del usuario. La correcta implementación de materiales antideslizantes y barras de apoyo también juega un papel vital en la funcionalidad y seguridad de estas estructuras.
 
-<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
+<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
 
 Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chile establece que la pendiente máxima permitida para rampas es del **12%** para distancias horizontales de hasta 150 cm. Esto significa que, por cada 100 cm de recorrido horizontal, la rampa puede tener hasta 12 cm de altura. Cuando la distancia horizontal es mayor a 150 cm, la pendiente debe reducirse a un **8%**.
-
----
-
-### ACTIVIDAD 1 (Actividad generadora)
-
-Considerando la ilustración, completa la siguiente tabla interactiva para calcular la "Diferencia de nivel" que podría tener una rampa. Presiona "Verificar Tabla" para que la IA corrija tus respuestas.
 
 ---
 
@@ -27,7 +21,7 @@ a. ¿Qué tipo de triángulo representa las rampas dibujadas?
 b. ¿Qué semejanzas observas entre las rampas dibujadas?
 c. ¿Qué diferencias observas entre las rampas dibujadas?
 
-<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Representación de una rampa como un triángulo rectángulo en GeoGebra." />
+<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Representación de una rampa como un triángulo rectángulo en GeoGebra." />
 
 ---
 
@@ -39,7 +33,7 @@ a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendie
 b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%?
 c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%?
 
-<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en una rampa con GeoGebra." />
+<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en una rampa con GeoGebra." />
 
 ---
 
@@ -54,7 +48,7 @@ Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y lo
 
 b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
 
-<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png" alt="Tabla de razones trigonométricas en GeoGebra." />
+<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png" alt="Tabla de razones trigonométricas en GeoGebra." />
 
 ---
 
@@ -64,4 +58,4 @@ a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten de
 b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?
 c. Considerando que la diferencia de nivel deseada para la rampa mencionada en la pregunta anterior es de 25 cm, ¿cuál debería ser la distancia horizontal que la rampa debe recorrer?
 
-<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica." />
+<markdownimage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica." />

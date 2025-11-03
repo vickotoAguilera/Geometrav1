@@ -188,7 +188,7 @@ interface EjercicioInteractivoProps {
 
 const reactComponents = {
     // CORRECCIÓN: El nombre del componente debe empezar con Mayúscula.
-    MarkdownImage: MarkdownImage,
+    markdownimage: MarkdownImage, // Use lowercase for the tag in markdown
     iframe: (props: any) => {
         return createElement('iframe', props);
     }
