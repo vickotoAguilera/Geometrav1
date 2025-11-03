@@ -187,14 +187,12 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
-    img: (props: any) => {
-      const decodedSrc = decodeURIComponent(props.src);
-      return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
-    },
+    // CORRECCIÓN: El nombre del componente debe empezar con Mayúscula.
+    MarkdownImage: MarkdownImage,
     iframe: (props: any) => {
         return createElement('iframe', props);
     }
-  };
+};
 
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
   const [respuesta, setRespuesta] = useState('');
