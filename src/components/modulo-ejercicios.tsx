@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AyudaContextual, EjercicioInteractivo } from "@/components/ejercicio-interactivo";
+import { AyudaContextual, EjercicioInteractivo, TablaActividad1 } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
 import { Check } from 'lucide-react';
@@ -69,14 +69,13 @@ export function ModuloEjercicios() {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
-                {/* Módulo 1 */}
+                {/* Módulo 1.0 */}
                 <AccordionItem value="item-1">
-                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central y Radianes</AccordionTrigger>
+                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
                     <AccordionContent>
                         <Card>
                             <CardContent className="pt-6">
                                 <div className="space-y-6">
-                                    {/* --- EJERCICIO 1.0 --- */}
                                     <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                         <div className="flex-1 space-y-4">
                                             <p className="text-muted-foreground max-w-prose">
@@ -84,16 +83,18 @@ export function ModuloEjercicios() {
                                             </p>
                                             <div className="space-y-2 pt-4">
                                                 <Label htmlFor="respuesta-skate">Tu respuesta (medida del ángulo α):</Label>
-                                                <Input 
-                                                    id="respuesta-skate" 
-                                                    placeholder="Escribe la medida del ángulo..."
-                                                    value={respuestaSkate}
-                                                    onChange={(e) => setRespuestaSkate(e.target.value)}
-                                                />
-                                                <Button onClick={handleVerificarSkate} className="w-full md:w-auto">
-                                                    <Check className="mr-2 h-4 w-4" />
-                                                    Verificar Respuesta
-                                                </Button>
+                                                <div className="flex gap-2">
+                                                    <Input 
+                                                        id="respuesta-skate" 
+                                                        placeholder="Escribe la medida del ángulo..."
+                                                        value={respuestaSkate}
+                                                        onChange={(e) => setRespuestaSkate(e.target.value)}
+                                                    />
+                                                    <Button onClick={handleVerificarSkate}>
+                                                        <Check className="mr-2 h-4 w-4" />
+                                                        Verificar
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-center gap-4 text-center">
@@ -105,7 +106,6 @@ export function ModuloEjercicios() {
                                     
                                     <Separator />
 
-                                    {/* --- EJERCICIO 1.1 --- */}
                                     <div className="space-y-4">
                                         <p className="text-muted-foreground max-w-prose">
                                             Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
@@ -121,34 +121,68 @@ export function ModuloEjercicios() {
 
                                         <div className="space-y-2 pt-4">
                                             <Label htmlFor="respuesta-radianes">Respuesta en radianes:</Label>
-                                            <Input 
-                                                id="respuesta-radianes" 
-                                                placeholder="Escribe tu respuesta en radianes..."
-                                                value={respuestaRadianes}
-                                                onChange={(e) => setRespuestaRadianes(e.target.value)}
-                                            />
-                                            <Button onClick={handleVerificarRadianes} className="w-full md:w-auto">
-                                                <Check className="mr-2 h-4 w-4" />
-                                                Verificar Respuesta
-                                            </Button>
+                                            <div className="flex gap-2">
+                                                <Input 
+                                                    id="respuesta-radianes" 
+                                                    placeholder="Escribe tu respuesta en radianes..."
+                                                    value={respuestaRadianes}
+                                                    onChange={(e) => setRespuestaRadianes(e.target.value)}
+                                                />
+                                                <Button onClick={handleVerificarRadianes}>
+                                                    <Check className="mr-2 h-4 w-4" />
+                                                    Verificar
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <Separator />
 
-                                    {/* --- Ayuda y Chat --- */}
                                     <div className="flex justify-end pt-4">
                                         <AyudaContextual
-                                            ejercicioId="conversion-radianes"
+                                            ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
-                                            onTeoricoToggle={() => handleTeoricoToggle('conversion-radianes')}
+                                            onTeoricoToggle={() => handleTeoricoToggle('plaza-skate')}
                                             isTeoricoOpen={isTeoricoOpen}
                                         />
                                     </div>
                                      {isTeoricoOpen && (
                                        <EjercicioInteractivo 
-                                            ejercicioId="conversion-radianes"
+                                            ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
+                                            initialContextFiles={activeContextFiles}
+                                       />
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </AccordionContent>
+                </AccordionItem>
+                {/* Módulo 1.1 */}
+                <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Situación de Modelación 1 (La Rampa)</AccordionTrigger>
+                    <AccordionContent>
+                         <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-6">
+                                    <h3 className="font-semibold text-lg">Actividad 1</h3>
+                                    <p className="text-muted-foreground">Considerando la normativa de accesibilidad, completa la tabla calculando la "diferencia de nivel" (altura) para cada rampa.</p>
+                                    <TablaActividad1 onVerify={(results) => console.log('Tabla 1 verificada', results)} />
+                                    
+                                    <Separator />
+                                    
+                                    <div className="flex justify-end pt-4">
+                                        <AyudaContextual
+                                            ejercicioId="la-rampa-actividad-1"
+                                            groupId="la-rampa"
+                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-1')}
+                                            isTeoricoOpen={isTeoricoOpen}
+                                        />
+                                    </div>
+                                    {isTeoricoOpen && (
+                                       <EjercicioInteractivo 
+                                            ejercicioId="la-rampa-actividad-1"
+                                            groupId="la-rampa"
                                             initialContextFiles={activeContextFiles}
                                        />
                                     )}
