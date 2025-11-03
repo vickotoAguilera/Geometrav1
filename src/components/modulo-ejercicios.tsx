@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input';
-import { Label } from "@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AyudaContextual, EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
