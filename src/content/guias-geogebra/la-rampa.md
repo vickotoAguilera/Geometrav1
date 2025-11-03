@@ -7,7 +7,7 @@ description: 'Aprende sobre accesibilidad, pendientes y trigonometría aplicando
 
 Las rampas son esenciales para garantizar la accesibilidad en espacios públicos y privados, permitiendo a las personas con discapacidad una movilidad segura y autónoma. Factores como la pendiente máxima permitida y las dimensiones óptimas son determinantes para facilitar el acceso sin comprometer la estabilidad o la comodidad del usuario. La correcta implementación de materiales antideslizantes y barras de apoyo también juega un papel vital en la funcionalidad y seguridad de estas estructuras.
 
-![Ilustración de una persona en silla de ruedas usando una rampa.](/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png)
+<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
 
 Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chile establece que la pendiente máxima permitida para rampas es del **12%** para distancias horizontales de hasta 150 cm. Esto significa que, por cada 100 cm de recorrido horizontal, la rampa puede tener hasta 12 cm de altura. Cuando la distancia horizontal es mayor a 150 cm, la pendiente debe reducirse a un **8%**.
 
@@ -27,7 +27,7 @@ a. ¿Qué tipo de triángulo representa las rampas dibujadas?
 b. ¿Qué semejanzas observas entre las rampas dibujadas?
 c. ¿Qué diferencias observas entre las rampas dibujadas?
 
-![Representación de una rampa como un triángulo rectángulo en GeoGebra.](/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png)
+<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Representación de una rampa como un triángulo rectángulo en GeoGebra." />
 
 ---
 
@@ -39,7 +39,7 @@ a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendie
 b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%?
 c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%?
 
-![Medición de ángulos en una rampa con GeoGebra.](/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png)
+<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en una rampa con GeoGebra." />
 
 ---
 
@@ -52,16 +52,9 @@ a. Completa la tabla siguiente usando GeoGebra o tu calculadora para calcular lo
 
 Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y los del seno, coseno, tangente y cocientes a cuatro lugares decimales.
 
-| Pendiente de la rampa | Medida del ángulo de inclinación de la rampa (α) en grados | sen(α) | cos(α) | tan(α) | N/H | N/D | D/H |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **12%** | 6.84° | 0.1191 | 0.9929 | 0.1200 | 0.1191 | 0.1200 | 0.9929 |
-| **8%** | 4.57° | 0.0797 | 0.9968 | 0.0800 | 0.0797 | 0.0800 | 0.9968 |
-| **6%** | 3.43° | 0.0599 | 0.9982 | 0.0600 | 0.0599 | 0.0600 | 0.9982 |
-
-
 b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
 
-![Tabla de razones trigonométricas en GeoGebra.](/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png)
+<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/4.png" alt="Tabla de razones trigonométricas en GeoGebra." />
 
 ---
 
@@ -71,4 +64,4 @@ a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten de
 b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?
 c. Considerando que la diferencia de nivel deseada para la rampa mencionada en la pregunta anterior es de 25 cm, ¿cuál debería ser la distancia horizontal que la rampa debe recorrer?
 
-![Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica.](/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png)
+<MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica." />

@@ -20,11 +20,13 @@ import rehypeReact from 'rehype-react';
 import { jsx, jsxs } from 'react/jsx-runtime';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
 const TablaActividad1 = () => {
   const { toast } = useToast();
-  const [isPending, startTransition] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
   const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(6).fill(null));
 
@@ -39,7 +41,7 @@ const TablaActividad1 = () => {
   };
 
   const handleVerificar = () => {
-    startTransition(true);
+    setIsPending(true);
     verificarTablaAction({
       tablaId: 'tabla-actividad-1',
       respuestasUsuario: respuestas,
@@ -51,29 +53,29 @@ const TablaActividad1 = () => {
       .catch((err) => {
         toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla.' });
       })
-      .finally(() => startTransition(false));
+      .finally(() => setIsPending(false));
   };
 
   const celdas = [
-    { label: 'Distancia horizontal (cm)', valorInicial: '100', respuestaIndex: 0 },
-    { label: 'Distancia horizontal (cm)', valorInicial: '150', respuestaIndex: 1 },
-    { label: 'Distancia horizontal (cm)', valorInicial: '50', respuestaIndex: 2 },
-    { label: 'Distancia horizontal (cm)', valorInicial: '200', respuestaIndex: 3 },
-    { label: 'Distancia horizontal (cm)', valorInicial: '300', respuestaIndex: 4 },
-    { label: 'Distancia horizontal (cm)', valorInicial: '180', respuestaIndex: 5 },
+    { label: '100 cm', respuestaIndex: 0, pendiente: '12%' },
+    { label: '150 cm', respuestaIndex: 1, pendiente: '12%' },
+    { label: '50 cm', respuestaIndex: 2, pendiente: '12%' },
+    { label: '200 cm', respuestaIndex: 3, pendiente: '8%' },
+    { label: '300 cm', respuestaIndex: 4, pendiente: '8%' },
+    { label: '180 cm', respuestaIndex: 5, pendiente: '8%' },
   ];
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {celdas.map((celda, i) => (
           <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
-            <Label htmlFor={`celda-${i}`}>{celda.label}: <span className="font-bold">{celda.valorInicial}</span></Label>
-            <p className="text-sm text-muted-foreground">Tu respuesta (Diferencia de nivel):</p>
+            <Label htmlFor={`celda-${i}`}>Distancia Horizontal (D): <span className="font-bold">{celda.label}</span></Label>
+            <p className='text-xs text-muted-foreground'>Pendiente: {celda.pendiente}</p>
             <Input
               id={`celda-${i}`}
               type="text"
-              placeholder="Escribe el número"
+              placeholder="Diferencia de nivel..."
               value={respuestas[celda.respuestaIndex]}
               onChange={(e) => handleInputChange(celda.respuestaIndex, e.target.value)}
               className={cn(
@@ -87,10 +89,95 @@ const TablaActividad1 = () => {
       </div>
        <Button onClick={handleVerificar} disabled={isPending} className="w-full">
         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-        Verificar Tabla
+        Verificar Tabla 1
       </Button>
     </div>
   );
+};
+
+const TablaActividad4 = () => {
+    const { toast } = useToast();
+    const [isPending, setIsPending] = useState(false);
+    const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
+    const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(21).fill(null));
+
+    const handleInputChange = (index: number, value: string) => {
+        const nuevasRespuestas = [...respuestas];
+        nuevasRespuestas[index] = value;
+        setRespuestas(nuevasRespuestas);
+        const nuevosResultados = [...resultados];
+        nuevosResultados[index] = null;
+        setResultados(nuevosResultados);
+    };
+
+    const handleVerificar = () => {
+        setIsPending(true);
+        verificarTablaAction({
+            tablaId: 'tabla-actividad-4',
+            respuestasUsuario: respuestas,
+        }).then(res => {
+            setResultados(res.resultados);
+            toast({ title: 'Tabla 4 verificada', description: 'Revisa los colores para ver los resultados.' });
+        }).catch(err => {
+            toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla 4.' });
+        }).finally(() => setIsPending(false));
+    };
+
+    const crearCeldaInput = (index: number) => (
+        <TableCell>
+            <Input
+                type="text"
+                placeholder="..."
+                value={respuestas[index]}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                className={cn(
+                    'w-24 text-center',
+                    resultados[index] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+                    resultados[index] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+                )}
+            />
+        </TableCell>
+    );
+
+    return (
+        <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">Completa la tabla con los valores solicitados y luego verifica tus respuestas.</p>
+            <div className="overflow-x-auto">
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Pendiente</TableHead>
+                            <TableHead>Ángulo (α)</TableHead>
+                            <TableHead>sen(α)</TableHead>
+                            <TableHead>cos(α)</TableHead>
+                            <TableHead>tan(α)</TableHead>
+                            <TableHead>N/H</TableHead>
+                            <TableHead>N/D</TableHead>
+                            <TableHead>D/H</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell className="font-semibold">12%</TableCell>
+                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i))}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">8%</TableCell>
+                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i + 7))}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell className="font-semibold">6%</TableCell>
+                            {Array.from({ length: 7 }, (_, i) => crearCeldaInput(i + 14))}
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </div>
+            <Button onClick={handleVerificar} disabled={isPending} className="w-full">
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                Verificar Tabla 4
+            </Button>
+        </div>
+    );
 };
 
 
@@ -100,15 +187,10 @@ interface EjercicioInteractivoProps {
 }
 
 const reactComponents = {
-    // La clave 'img' es importante porque le dice al procesador:
-    // "cuando encuentres una etiqueta <img>, en lugar de renderizarla
-    // como una imagen normal, usa mi componente MarkdownImage".
     img: (props: any) => {
-      // Decodificamos la ruta de la imagen que puede venir con caracteres especiales.
       const decodedSrc = decodeURIComponent(props.src);
       return createElement(MarkdownImage, { src: decodedSrc, alt: props.alt });
     },
-    // También permitimos iframes para los videos.
     iframe: (props: any) => {
         return createElement('iframe', props);
     }
@@ -131,15 +213,13 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         setIsLoading(true);
         const result = await getGuiaEjercicio(ejercicioId);
         if ('content' in result) {
-            // Se procesa el contenido del archivo .md
-            const processedContent = await unified()
-                .use(remarkParse) // Parsea el Markdown
-                .use(remarkRehype, { allowDangerousHtml: true }) // Lo convierte a un formato intermedio (hast)
-                .use(rehypeRaw) // Permite el HTML crudo (como <iframe>)
-                // Convierte el formato intermedio a React, usando nuestros componentes personalizados.
-                // @ts-ignore
-                .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents })
-                .process(result.content);
+            const processor = unified()
+                .use(remarkParse)
+                .use(remarkRehype, { allowDangerousHtml: true })
+                .use(rehypeRaw)
+                 // @ts-ignore
+                .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents });
+            const processedContent = await processor.process(result.content);
             setGuiaContent(processedContent.result);
         } else {
             console.error(result.error);
@@ -168,8 +248,14 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         <Card>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
                {guiaContent}
-               {/* Renderizado condicional de la tabla interactiva */}
-               {ejercicioId === 'la-rampa' && <TablaActividad1 />}
+               {ejercicioId === 'la-rampa' && (
+                <>
+                    <h3 id="actividad-1-interactiva">ACTIVIDAD 1 (interactiva)</h3>
+                    <TablaActividad1 />
+                    <h3 id="actividad-4-interactiva" className='mt-8'>ACTIVIDAD 4 (interactiva)</h3>
+                    <TablaActividad4 />
+                </>
+               )}
             </CardContent>
         </Card>
       )}
