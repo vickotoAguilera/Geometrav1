@@ -23,7 +23,7 @@ _La siguiente tabla es interactiva. Ingresa los valores que calcules en las celd
 
 ### ACTIVIDAD 2
 
-Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas, para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
+Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando `Polígono`. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
 
 a. ¿Qué tipo de triángulo representa las rampas dibujadas?
 b. ¿Qué semejanzas observas entre las rampas dibujadas?
