@@ -4,6 +4,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 import { Separator } from "@/components/ui/separator";
+import { MarkdownImage } from "@/components/markdown-image";
+
 
 const CentralAngleTheoremVisual = () => (
     <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-background/50 h-full">
@@ -121,6 +123,35 @@ export default function EjerciciosTrigonometriaPage() {
                             </CardContent>
                             <CardFooter>
                                 <p className="text-xs text-muted-foreground">Todos los ejercicios de este módulo comparten el mismo chat y pizarra de GeoGebra.</p>
+                            </CardFooter>
+                        </AccordionContent>
+                    </Card>
+                </AccordionItem>
+                 <AccordionItem value="item-1.2">
+                    <Card>
+                        <AccordionTrigger className="p-6">
+                            <div className="flex flex-col items-start text-left">
+                                <CardTitle>Módulo 1.2: Situación de Modelación - La Rampa</CardTitle>
+                                <CardDescription className="mt-2">
+                                    Aprende sobre accesibilidad, pendientes y trigonometría aplicando tus conocimientos en un contexto real.
+                                </CardDescription>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                             <CardContent className="space-y-6 divide-y">
+                                 <div className="pt-6 prose prose-sm dark:prose-invert max-w-none">
+                                    <h3>SITUACIÓN DE MODELACIÓN 1: LA RAMPA</h3>
+                                    <p>
+                                        Las rampas son esenciales para garantizar la accesibilidad en espacios públicos y privados, permitiendo a las personas con discapacidad una movilidad segura y autónoma. Factores como la pendiente máxima permitida y las dimensiones óptimas son determinantes para facilitar el acceso sin comprometer la estabilidad o la comodidad del usuario. La correcta implementación de materiales antideslizantes y barras de apoyo también juega un papel vital en la funcionalidad y seguridad de estas estructuras.
+                                    </p>
+                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/1.png" alt="Ilustración de una persona en silla de ruedas usando una rampa." />
+                                    <p>
+                                        Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chile establece que la pendiente máxima permitida para rampas es del <strong>12%</strong> para distancias horizontales de hasta 150 cm. Esto significa que, por cada 100 cm de recorrido horizontal, la rampa puede tener hasta 12 cm de altura. Cuando la distancia horizontal es mayor a 150 cm, la pendiente debe reducirse a un <strong>8%</strong>.
+                                    </p>
+                                </div>
+                             </CardContent>
+                             <CardFooter>
+                                <p className="text-xs text-muted-foreground">Este módulo es una combinación de teoría y actividades interactivas.</p>
                             </CardFooter>
                         </AccordionContent>
                     </Card>
