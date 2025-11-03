@@ -1,4 +1,3 @@
-
 'use client';
 
 import Header from '@/components/header';
@@ -7,9 +6,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Bot, Calculator } from 'lucide-react';
 import { useState } from 'react';
-import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+// import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 
 // Componente para un solo ejercicio
 const EjercicioRespuesta = ({ pregunta, placeholder }: { pregunta: React.ReactNode, placeholder: string }) => {
@@ -43,7 +42,7 @@ export default function NuevaEjerciciosPage() {
         <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                Bienvenido. Aquí puedes poner a prueba tus conocimientos con la ayuda de tutores de IA especializados.
+                Resuelve los siguientes ejercicios. Próximamente podrás interactuar con nuestros tutores de IA.
             </p>
         </div>
         
@@ -75,21 +74,25 @@ export default function NuevaEjerciciosPage() {
                                     </div>
 
                                     <div className="flex justify-end pt-4">
-                                        <AyudaContextual
+                                        {/* <AyudaContextual
                                             ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
                                             onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
-                                        />
+                                        /> */}
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="outline" size="icon" className="h-9 w-9" disabled><Calculator className="h-5 w-5"/></Button>
+                                            <Button variant="outline" size="icon" className="h-9 w-9" disabled><Bot className="h-5 w-5"/></Button>
+                                        </div>
                                     </div>
 
-                                    {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                    {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
                                        <EjercicioInteractivo 
                                             key="trigonometria-basica"
                                             groupId="trigonometria-basica"
                                             contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
                                        />
-                                    )}
+                                    )} */}
 
                                 </div>
                             </CardContent>
