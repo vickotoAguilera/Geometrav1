@@ -4,7 +4,14 @@ import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
-import { ButtonVerificarConceptual, AyudaContextual, EjercicioInteractivo, TeoremaAnguloCentralSVG } from '@/components/modulo-ejercicios';
+// import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
+// import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { BookOpen } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+
 
 const ejerciciosPlazaSkate = [
     { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40' },
@@ -12,15 +19,15 @@ const ejerciciosPlazaSkate = [
 ];
 
 
-export default function EjerciciosTrigonometriaPage() {
-    const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
+export default function NuevaPaginaEjercicios() {
+    // const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
 
-    const handleTeoricoToggle = (groupId: string) => {
-        setActiveTeorico(prev => ({
-            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-            groupId: groupId,
-        }));
-    };
+    // const handleTeoricoToggle = (groupId: string) => {
+    //     setActiveTeorico(prev => ({
+    //         isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+    //         groupId: groupId,
+    //     }));
+    // };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -29,7 +36,7 @@ export default function EjerciciosTrigonometriaPage() {
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
                     <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                        Resuelve los siguientes ejercicios. Puedes verificar tus respuestas con la IA.
+                        Resuelve los siguientes ejercicios. Podrás verificar tus respuestas con la IA.
                     </p>
                 </div>
 
@@ -50,11 +57,21 @@ export default function EjerciciosTrigonometriaPage() {
                                             </div>
                                             
                                             <div className="space-y-4">
-                                                {ejerciciosPlazaSkate.map(ej => (
-                                                    <ButtonVerificarConceptual 
-                                                        key={ej.id} 
-                                                        ejercicio={ej}
-                                                    />
+                                                {ejerciciosPlazaSkate.map((ej, index) => (
+                                                     <div key={index} className="space-y-3 p-4 border rounded-lg bg-card">
+                                                        <div className="text-sm font-medium text-foreground">{ej.pregunta}</div>
+                                                        <div className="flex items-start gap-2">
+                                                            <Textarea
+                                                            id={ej.id}
+                                                            placeholder="Escribe aquí tu respuesta..."
+                                                            disabled
+                                                            />
+                                                            <Button size="icon" variant="secondary" className="mt-1 flex-shrink-0" disabled>
+                                                                <BookOpen className="h-4 w-4" />
+                                                                <span className="sr-only">Verificar</span>
+                                                            </Button>
+                                                        </div>
+                                                    </div>
                                                 ))}
                                             </div>
 
@@ -65,27 +82,22 @@ export default function EjerciciosTrigonometriaPage() {
                                                     onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
                                                     isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
-                                            </div> */}
+                                            </div>
 
-                                            {/* {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
-                                            <EjercicioInteractivo 
+                                            {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                               <EjercicioInteractivo 
                                                     key="trigonometria-basica"
                                                     groupId="trigonometria-basica"
                                                     contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
-                                            />
+                                               />
                                             )} */}
-
                                         </div>
                                     </CardContent>
                                 </Card>
                             </AccordionContent>
                         </AccordionItem>
-                        
-                        {/* Aquí se agregarán los futuros módulos */}
-
                     </Accordion>
                 </div>
-
             </main>
         </div>
     );
