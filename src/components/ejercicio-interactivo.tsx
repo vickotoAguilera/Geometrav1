@@ -15,6 +15,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeReact from 'rehype-react';
+import { jsx, jsxs } from 'react/jsx-runtime';
 
 
 interface EjercicioInteractivoProps {
@@ -52,7 +53,7 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
                 .use(remarkParse)
                 .use(remarkRehype, { allowDangerousHtml: true })
                 // @ts-ignore
-                .use(rehypeReact, { createElement, Fragment, components: reactComponents })
+                .use(rehypeReact, { createElement, Fragment, jsx, jsxs, components: reactComponents })
                 .process(result.content);
             setGuiaContent(processedContent.result);
         } else {
