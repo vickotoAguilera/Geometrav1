@@ -1,0 +1,1 @@
+Este es el archivo de guía para la parte de GeoGebra del nuevo ejercicio. El contenido final será proporcionado por el usuario.
