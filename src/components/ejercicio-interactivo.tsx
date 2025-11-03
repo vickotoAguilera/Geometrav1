@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Check, Bot, Calculator, FileText } from 'lucide-react';
+import { Loader2, Check, Bot, Calculator, FileText, Info } from 'lucide-react';
 import Link from 'next/link';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { useToast } from '@/hooks/use-toast';
@@ -235,35 +234,30 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
 
 interface EjercicioInteractivoProps {
   groupId: string;
-  initialContextFiles: string[];
+  activeContextFiles: string[];
 }
 
 
-export function EjercicioInteractivo({ groupId, initialContextFiles }: EjercicioInteractivoProps) {
-  const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
-  
-  useEffect(() => {
-    setActiveContextFiles(initialContextFiles);
-  }, [initialContextFiles]);
-
+export function EjercicioInteractivo({ groupId, activeContextFiles }: EjercicioInteractivoProps) {
 
   return (
     <div className="border-t pt-4 mt-4">
-        <Accordion type="single" collapsible defaultValue="item-1">
-        <AccordionItem value="item-1" className="border-b-0">
-            <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
-                Archivos de Contexto Cargados en la IA ({activeContextFiles.length})
-            </AccordionTrigger>
-            <AccordionContent className="pt-2 space-y-1">
-                {activeContextFiles.map(file => (
-                    <div key={file} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
-                        <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
-                        <span className="truncate font-medium text-primary">{file}.md</span>
-                    </div>
-                ))}
-            </AccordionContent>
-        </AccordionItem>
-        </Accordion>
+        <div className="p-2 border rounded-md mb-4 bg-background">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Info className="h-4 w-4 text-primary" />
+                <p>Archivos de contexto activos para la IA: <span className="font-bold text-primary">{activeContextFiles.length}</span></p>
+            </div>
+             {activeContextFiles.length > 0 && (
+                <div className="text-xs text-muted-foreground mt-2 pl-7 space-y-1">
+                    {activeContextFiles.map(file => (
+                        <div key={file} className="flex items-center gap-2">
+                             <FileText className="w-3 h-3 flex-shrink-0" />
+                             <span>{file.split('/').pop()}.md</span>
+                        </div>
+                    ))}
+                </div>
+             )}
+        </div>
         <TutorTeoricoChat 
             activeContextFiles={activeContextFiles}
             groupId={groupId} 
