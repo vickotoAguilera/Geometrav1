@@ -1,7 +1,7 @@
 import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Sigma } from "lucide-react";
+import { Sigma, Calculator, MonitorPlay } from "lucide-react";
 import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 
 const CentralAngleTheoremVisual = () => (
@@ -27,8 +27,10 @@ const CentralAngleTheoremVisual = () => (
 
             {/* Central Angle */}
             <path d="M 10 30 L 50 50 L 90 30" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
-            <path d="M 65 42 A 15 15 0 0 0 35 42" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
-            <text x="46" y="38" fontSize="8" fill="hsl(var(--primary))">2α</text>
+            <path d="M 50 50 L 50 20" fill="none" /> 
+            <path d="M 50 50 m -15 -10 a 15 15 0 0 1 30 0" fill="none" /> 
+            <path d="M 60 38 A 15 15 0 0 0 40 38" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5" />
+            <text x="46" y="35" fontSize="8" fill="hsl(var(--primary))">2α</text>
             
             {/* Inscribed Angle */}
             <path d="M 10 30 L 50 95 L 90 30" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1" />
@@ -96,7 +98,7 @@ export default function EjerciciosTrigonometriaPage() {
                                         <div className="p-4 border rounded-lg bg-background flex flex-col">
                                             <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio A: Ángulo de la Cámara Central</h4>
                                             <p className="mt-2 text-muted-foreground flex-1">
-                                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo **α de 20°** con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
+                                                La cámara situada en el punto B, enfocada hacia el punto C, forma un ángulo <strong>α de 20°</strong> con respecto al centro de la plaza. Si un guardia ha detectado un movimiento sospechoso en el punto C, ¿cuántos grados debe girar la cámara que se encuentra en el centro del árbol (O), actualmente dirigida al punto A, para obtener una mejor visualización del punto C?
                                             </p>
                                         </div>
                                         <CentralAngleTheoremVisual/>
@@ -121,6 +123,44 @@ export default function EjerciciosTrigonometriaPage() {
                             </CardContent>
                             <CardFooter>
                                 <p className="text-xs text-muted-foreground">Todos los ejercicios de este módulo comparten el mismo chat y pizarra de GeoGebra.</p>
+                            </CardFooter>
+                        </AccordionContent>
+                    </Card>
+                </AccordionItem>
+                <AccordionItem value="item-1.1">
+                    <Card>
+                        <AccordionTrigger className="p-6">
+                            <div className="flex flex-col items-start text-left">
+                                <CardTitle>Módulo 1.1: Actividad Tecnológica - Ángulos y Razones Trigonométricas</CardTitle>
+                                <CardDescription className="mt-2">
+                                    Este módulo te enseñará a usar GeoGebra y una calculadora científica para trabajar con trigonometría.
+                                </CardDescription>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                             <CardContent className="space-y-6 divide-y">
+                                <div className="pt-6">
+                                    <div className="p-4 border rounded-lg bg-background flex flex-col">
+                                        <h4 className="font-semibold flex items-center gap-2"><MonitorPlay />Guía de Uso de GeoGebra</h4>
+                                        <p className="mt-2 text-muted-foreground flex-1">
+                                            Aprende a construir triángulos, transformar ángulos y calcular razones trigonométricas usando los comandos de GeoGebra.
+                                        </p>
+                                    </div>
+                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-geogebra" groupId={groupId} />
+                                </div>
+
+                                <div className="pt-6">
+                                    <div className="p-4 border rounded-lg bg-background flex flex-col">
+                                        <h4 className="font-semibold flex items-center gap-2"><Calculator />Guía de Uso de Calculadora Científica</h4>
+                                        <p className="mt-2 text-muted-foreground flex-1">
+                                            Aprende a configurar tu calculadora en modo Grados (DEG), Radianes (RAD) y Gradianes (GRA) para resolver problemas trigonométricos.
+                                        </p>
+                                    </div>
+                                    <EjercicioInteractivo ejercicioId="nuevo-ejercicio-calculadora" groupId={groupId} />
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <p className="text-xs text-muted-foreground">Cada guía tiene su propio tutor especializado.</p>
                             </CardFooter>
                         </AccordionContent>
                     </Card>
