@@ -71,10 +71,15 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     // El historial completo, incluyendo el último mensaje del usuario, ya viene en 'history'.
     const conversationHistory = history || [];
     
+    // Separamos el historial del último mensaje para pasarlo como prompt
+    const lastMessage = conversationHistory.pop();
+    const promptContent = lastMessage ? lastMessage.content : [];
+
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
       history: conversationHistory,
+      prompt: promptContent,
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
