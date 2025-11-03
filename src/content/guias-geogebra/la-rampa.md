@@ -15,12 +15,12 @@ Considerando la ilustración, completa la siguiente tabla con las diferentes med
 
 | Distancia horizontal (D) en cm | Diferencia de nivel en cm | Pendiente en % | Pendiente en decimal |
 | :--- | :--- | :--- | :--- |
-| 100 | 12 | 12% | 0.12 |
-| 150 | 18 | 12% | 0.12 |
-| 50 | 6 | 12% | 0.12 |
-| 200 | 16 | 8% | 0.08 |
-| 300 | 24 | 8% | 0.08 |
-| 180 | 14.4 | 8% | 0.08 |
+| 100 | | 12% | |
+| 150 | | 12% | |
+| 50 | | 12% | |
+| 200 | | 8% | |
+| 300 | | 8% | |
+| 180 | | 8% | |
 
 ---
 
@@ -59,9 +59,9 @@ Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y lo
 
 | Pendiente de la rampa | Ángulo de inclinación (α) | sen(α) | cos(α) | tan(α) | N/H | N/D | D/H |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **12%** | 6.84° | 0.1191 | 0.9929 | 0.1200 | 0.1191 | 0.1200 | 0.9929 |
-| **8%** | 4.57° | 0.0797 | 0.9968 | 0.0800 | 0.0797 | 0.0800 | 0.9968 |
-| **6%** | 3.43° | 0.0599 | 0.9982 | 0.0600 | 0.0599 | 0.0600 | 0.9982 |
+| **12%** | | | | | | | |
+| **8%** | | | | | | | |
+| **6%** | | | | | | | |
 
 b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
 
@@ -76,3 +76,4 @@ b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál d
 c. Considerando que la diferencia de nivel deseada para la rampa mencionada en la pregunta anterior es de 25 cm, ¿cuál debería ser la distancia horizontal que la rampa debe recorrer?
 
 ![Cálculo de ángulo a partir de razones trigonométricas en una calculadora científica.](/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png)
+
