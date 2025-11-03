@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Loader2, Check, Bot, Calculator, FileText, Info } from 'lucide-react';
 import Link from 'next/link';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
@@ -17,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 
 // Este componente contendrá los dos botones de ayuda
@@ -239,13 +239,53 @@ interface EjercicioInteractivoProps {
 
 
 export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInteractivoProps) {
+  const [loadedContext, setLoadedContext] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadContext = async () => {
+      setIsLoading(true);
+      if (contextFileNames.length > 0) {
+        try {
+          let combinedContent = '';
+          for (const file of contextFileNames) {
+            const result = await getGuiaEjercicio(file);
+            if ('content' in result) {
+              combinedContent += `--- INICIO GUÍA: ${file}.md ---\n${result.content}\n--- FIN GUÍA: ${file}.md ---\n\n`;
+            }
+          }
+          setLoadedContext(combinedContent);
+        } catch (error) {
+          console.error("Error cargando el contexto del ejercicio:", error);
+          setLoadedContext(''); // Poner un string vacío para evitar errores
+        }
+      } else {
+        setLoadedContext('');
+      }
+      setIsLoading(false);
+    };
+
+    loadContext();
+  }, [contextFileNames]);
+
+
+  if (isLoading) {
+    return (
+      <div className="border-t pt-4 mt-4 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <span className="ml-2 text-muted-foreground">Cargando tutor...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="border-t pt-4 mt-4">
+      {loadedContext !== null && (
         <TutorTeoricoChat 
-            contextFileNames={contextFileNames}
-            groupId={groupId} 
+          initialContext={loadedContext}
+          groupId={groupId} 
         />
+      )}
     </div>
   );
 }

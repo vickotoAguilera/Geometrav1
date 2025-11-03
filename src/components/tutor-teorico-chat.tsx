@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -24,7 +23,7 @@ interface GenkitMessage {
 }
 
 interface TutorTeoricoChatProps {
-  contextFileNames: string[];
+  initialContext: string;
   groupId: string;
 }
 
@@ -53,7 +52,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ initialContext, groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -67,7 +66,7 @@ export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoric
 
   // Load history from localStorage and initialize conversation
    useEffect(() => {
-    if (initializedRef.current) return;
+    if (initializedRef.current || initialContext === null) return;
     initializedRef.current = true;
     setIsReady(false);
 
@@ -81,22 +80,14 @@ export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoric
             return;
         }
 
-        if (contextFileNames.length > 0) {
+        if (initialContext) {
             const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
             setMessages([assistantPlaceholder]);
             
             try {
-                let combinedContent = '';
-                for (const file of contextFileNames) {
-                    const result = await getGuiaEjercicio(file);
-                    if ('content' in result) {
-                        combinedContent += `--- INICIO GUÍA: ${file}.md ---\n${result.content}\n--- FIN GUÍA: ${file}.md ---\n\n`;
-                    }
-                }
-                
                 const { response } = await teoriaCalculadoraAssistant({
                     history: [],
-                    contextoEjercicio: combinedContent
+                    contextoEjercicio: initialContext
                 });
 
                 setMessages(prev => [...prev.slice(0, -1), { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response }]);
@@ -111,7 +102,7 @@ export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoric
 
     initializeAndFetch();
 
-  }, [chatStorageKey, contextFileNames, toast]);
+  }, [chatStorageKey, initialContext, toast]);
 
 
   // Save conversation to localStorage
@@ -140,7 +131,7 @@ export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoric
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || contextFileNames.length === 0) return;
+    if (!input.trim() || isPending || !initialContext) return;
 
     const currentInput = input;
     setInput('');
@@ -226,10 +217,10 @@ export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoric
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={contextFileNames.length > 0 ? "Pregúntale al tutor..." : "Activa una actividad para empezar"}
-            disabled={isPending || !isReady || contextFileNames.length === 0}
+            placeholder={initialContext ? "Pregúntale al tutor..." : "Cargando contexto..."}
+            disabled={isPending || !isReady || !initialContext}
           />
-          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || contextFileNames.length === 0}>
+          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || !initialContext}>
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
         </form>
