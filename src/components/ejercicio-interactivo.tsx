@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BookText, CirclePlay, Loader2, Check, Bot, Calculator } from 'lucide-react';
+import { Loader2, Check, Bot, Calculator, FileText, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
@@ -21,31 +21,26 @@ import {
 
 
 // Este componente contendrá los dos botones de ayuda
-export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string; groupId: string; }) {
-  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeoricoOpen }: { ejercicioId: string; groupId: string; onTeoricoToggle: () => void; isTeoricoOpen: boolean; }) {
 
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
-        <Accordion type="single" collapsible value={isTeoricoOpen ? "item-1" : ""} onValueChange={(value) => setIsTeoricoOpen(!!value)}>
-            <AccordionItem value="item-1" className="border-none">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <AccordionTrigger className="p-0 hover:no-underline">
-                             <div className="h-9 w-9 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
-                                <Calculator className="h-5 w-5"/>
-                             </div>
-                        </AccordionTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Ayuda con el Tutor Teórico</p>
-                    </TooltipContent>
-                </Tooltip>
-                 <AccordionContent className="mt-4">
-                    <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} />
-                </AccordionContent>
-            </AccordionItem>
-        </Accordion>
+        <Tooltip>
+          <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9"
+                onClick={onTeoricoToggle}
+              >
+                  <Calculator className="h-5 w-5"/>
+              </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+              <p>Ayuda con el Tutor Teórico</p>
+          </TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -67,7 +62,7 @@ export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string;
 
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
-export const TablaActividad1 = () => {
+export const TablaActividad1 = ({ onVerify }: { onVerify: (results: (boolean | null)[]) => void }) => {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
@@ -81,6 +76,7 @@ export const TablaActividad1 = () => {
     const nuevosResultados = [...resultados];
     nuevosResultados[index] = null;
     setResultados(nuevosResultados);
+     onVerify(nuevosResultados);
   };
 
   const handleVerificar = () => {
@@ -91,7 +87,13 @@ export const TablaActividad1 = () => {
     })
       .then((res) => {
         setResultados(res.resultados);
-        toast({ title: 'Respuestas verificadas', description: 'Revisa los colores para ver los resultados.' });
+        onVerify(res.resultados);
+        const correctas = res.resultados.filter(r => r === true).length;
+        if(correctas === res.resultados.length){
+            toast({ title: '¡Tabla Correcta!', description: 'Todos los valores son correctos. ¡Excelente trabajo!' });
+        } else {
+            toast({ title: 'Respuestas verificadas', description: 'Algunos valores son incorrectos. El tutor puede ayudarte a revisarlos.' });
+        }
       })
       .catch((err) => {
         toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla.' });
@@ -138,7 +140,7 @@ export const TablaActividad1 = () => {
   );
 };
 
-export const TablaActividad4 = () => {
+export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | null)[]) => void }) => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
@@ -151,6 +153,7 @@ export const TablaActividad4 = () => {
         const nuevosResultados = [...resultados];
         nuevosResultados[index] = null;
         setResultados(nuevosResultados);
+        onVerify(nuevosResultados);
     };
 
     const handleVerificar = () => {
@@ -160,7 +163,13 @@ export const TablaActividad4 = () => {
             respuestasUsuario: respuestas,
         }).then(res => {
             setResultados(res.resultados);
-            toast({ title: 'Tabla 4 verificada', description: 'Revisa los colores para ver los resultados.' });
+            onVerify(res.resultados);
+            const correctas = res.resultados.filter(r => r === true).length;
+            if(correctas === res.resultados.length){
+                toast({ title: '¡Tabla Correcta!', description: 'Todos los valores son correctos. ¡Excelente trabajo!' });
+            } else {
+                toast({ title: 'Respuestas verificadas', description: 'Algunos valores son incorrectos. El tutor puede ayudarte a revisarlos.' });
+            }
         }).catch(err => {
             toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla 4.' });
         }).finally(() => setIsPending(false));
@@ -229,34 +238,71 @@ interface EjercicioInteractivoProps {
   groupId: string;
 }
 
-// Este componente ahora es más general y ya no tiene el campo de input ni los botones grandes.
-// Su propósito principal es usar el Accordion para el Tutor Teórico.
+// Este componente ahora se enfoca en gestionar el estado del chat teórico
+// y de los archivos de contexto.
 export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
+  const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
+  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
   
+  const handleTeoricoToggle = () => {
+    setIsTeoricoOpen(prev => !prev);
+    // Añadimos el contexto del ejercicio actual si no está ya
+    if (!activeContextFiles.includes(ejercicioId)) {
+        setActiveContextFiles(prev => [...prev, ejercicioId]);
+    }
+  };
+
+  const handleResultsT1 = (results: (boolean|null)[]) => {
+     // Si hay errores, abrir el chat y enfocarlo.
+     if(results.some(r => r === false)) {
+        if(!isTeoricoOpen) setIsTeoricoOpen(true);
+        if (!activeContextFiles.includes('actividad-1-rampa')) {
+            setActiveContextFiles(prev => [...prev, 'actividad-1-rampa']);
+        }
+     }
+  }
+
+  const handleResultsT4 = (results: (boolean|null)[]) => {
+     if(results.some(r => r === false)) {
+        if(!isTeoricoOpen) setIsTeoricoOpen(true);
+        if (!activeContextFiles.includes('actividad-4-rampa')) {
+            setActiveContextFiles(prev => [...prev, 'actividad-4-rampa']);
+        }
+     }
+  }
+
   return (
-    <div className="p-4 border rounded-lg bg-secondary/50 space-y-6">
-      
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="explicacion-teorica" className="border-none">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <AccordionTrigger className="flex-1 w-full">
-                    <div className="py-2 px-4 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground transition-colors w-full flex justify-center items-center gap-2 font-semibold">
-                         <BookText className="mr-2 h-4 w-4" />
-                         Consultar al Tutor Teórico (General)
-                    </div>
-                </AccordionTrigger>
-                <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref className="flex-1 w-full">
-                    <div className="py-2 px-4 rounded-md border bg-primary text-primary-foreground hover:bg-primary/90 transition-colors w-full flex justify-center items-center gap-2 font-semibold">
-                        <CirclePlay className="mr-2 h-4 w-4" />
-                        Resolver con Tutor de GeoGebra (General)
-                    </div>
-                </Link>
+    <div className="p-4 border rounded-lg bg-secondary/30 space-y-6">
+       <AyudaContextual 
+            ejercicioId={ejercicioId} 
+            groupId={groupId} 
+            onTeoricoToggle={handleTeoricoToggle} 
+            isTeoricoOpen={isTeoricoOpen} 
+        />
+
+        {isTeoricoOpen && (
+            <div className="border-t pt-4">
+                 <Accordion type="single" collapsible defaultValue="item-1">
+                    <AccordionItem value="item-1" className="border-b-0">
+                        <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
+                            Archivos de Contexto Cargados en la IA ({activeContextFiles.length})
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 space-y-1">
+                            {activeContextFiles.map(file => (
+                                <div key={file} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
+                                    <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
+                                    <span className="truncate font-medium text-primary">{file}.md</span>
+                                </div>
+                            ))}
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                <TutorTeoricoChat 
+                    activeContextFiles={activeContextFiles}
+                    groupId={groupId} 
+                />
             </div>
-            <AccordionContent className="mt-4">
-                <TutorTeoricoChat ejercicioId={ejercicioId} groupId={groupId} />
-            </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        )}
     </div>
   );
 }
