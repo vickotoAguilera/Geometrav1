@@ -24,7 +24,7 @@ Para construir el triángulo con vértices `A = (0, 0)`, `B = (4, 0)` y `C = (4,
 - `Polígono(A,B,C)` y presiona Enter.
 - `ÁngulosInteriores(t1)` y presiona Enter.
 
-Observa en la Vista Algebraica que, además de calcularse las medidas de los ángulos, también se han determinado las longitudes de los lados (`a=3`, `b=5`, `c=4`) y el área del triángulo (`t1=6`).
+Observa en la Vista Algebraica que, además de calcularse las medidas de los ángulos interiores del triángulo, también se han determinado las longitudes de los lados (`a=3`, `b=5`, `c=4`) y el área del triángulo (`t1=6`).
 
 ![Resultado de Actividad 2 en GeoGebra](/imagenes-ejercicios/imagenes%20Actividad%20tecnológica%201%20Ángulos%20y%20razones%20trigonométricas/4.png)
 
