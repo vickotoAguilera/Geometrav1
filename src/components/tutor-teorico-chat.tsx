@@ -74,7 +74,9 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
       // Populate already initialized exercises to avoid re-triggering intro prompts
       const initialized = new Set<string>();
       savedMessages.forEach((msg: any) => {
-        if (msg.contextFile) initialized.add(msg.contextFile);
+        // This logic assumes we add a contextFile property to messages
+        // For now, we will re-initialize on every mount, which is inefficient but safe.
+        // A better approach would be to store which files are in context.
       });
       initializedExercisesRef.current = initialized;
     }
@@ -83,38 +85,42 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
   
   // React to new context files being activated
   useEffect(() => {
-    if (!isReady || activeContextFiles.length === 0) return;
+    if (!isReady) return;
 
     const newContextFiles = activeContextFiles.filter(file => !initializedExercisesRef.current.has(file));
-
+    
     if (newContextFiles.length > 0) {
-      const latestFile = newContextFiles[newContextFiles.length - 1];
-      initializedExercisesRef.current.add(latestFile);
+      
+      const fileToInitialize = newContextFiles[0]; // Process one by one
+      initializedExercisesRef.current.add(fileToInitialize);
       
       const autoPrompt = messages.length === 0
-        ? `He activado la guía '${latestFile}'. Por favor, dame la primera instrucción para resolverlo con lápiz y papel.`
-        : `Ahora también he activado la guía '${latestFile}'. ¿Cómo se relaciona con lo que ya hemos discutido?`;
+        ? `He activado la guía '${fileToInitialize}'. Por favor, dame la primera instrucción para resolverlo con lápiz y papel.`
+        : `Ahora también he activado la guía '${fileToInitialize}'. ¿Cómo se relaciona con lo que ya hemos discutido?`;
         
       const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
       const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
 
-      const updatedHistory = [...messages, userMessage];
-      setMessages([...updatedHistory, assistantPlaceholder]);
+      const currentHistory = [...messages, userMessage];
+      setMessages([...currentHistory, assistantPlaceholder]);
       
       startTransition(async () => {
         try {
-          // Fetch content for all active files
-          let fullContext = '';
-          for (const fileId of activeContextFiles) {
-             const result = await getGuiaEjercicio(fileId);
-             if ('content' in result) {
-                 fullContext += `--- INICIO GUÍA: ${fileId}.md ---\n${result.content}\n--- FIN GUÍA: ${fileId}.md ---\n\n`;
-             }
+          const result = await getGuiaEjercicio(fileToInitialize);
+          if ('error' in result) {
+              throw new Error(result.error);
           }
+          
+          const newFileContent = `--- INICIO GUÍA: ${fileToInitialize}.md ---\n${result.content}\n--- FIN GUÍA: ${fileToInitialize}.md ---\n\n`;
 
+          const genkitHistory: GenkitMessage[] = currentHistory.map(m => ({
+            role: m.role,
+            content: [{ text: m.content }],
+          }));
+          
           const { response } = await teoriaCalculadoraAssistant({
-            history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
-            contextoEjercicio: fullContext
+            history: genkitHistory,
+            contextoEjercicio: newFileContent
           });
 
           setMessages(prev => [...prev.slice(0, -1), { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response }]);
@@ -167,14 +173,8 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
     
     startTransition(async () => {
         try {
-            let fullContext = '';
-            for (const fileId of activeContextFiles) {
-                const result = await getGuiaEjercicio(fileId);
-                if ('content' in result) {
-                    fullContext += `--- INICIO GUÍA: ${fileId}.md ---\n${result.content}\n--- FIN GUÍA: ${fileId}.md ---\n\n`;
-                }
-            }
-
+            // We only send the new user message, assuming the AI maintains context via history.
+            // The system prompt of the AI is designed to be cumulative.
             const genkitHistory: GenkitMessage[] = newHistory.map(m => ({
               role: m.role,
               content: [{ text: m.content }],
@@ -182,7 +182,7 @@ export function TutorTeoricoChat({ activeContextFiles, groupId }: TutorTeoricoCh
             
             const { response: aiResponse } = await teoriaCalculadoraAssistant({
               history: genkitHistory,
-              contextoEjercicio: fullContext,
+              contextoEjercicio: "El contexto ya fue proporcionado. Céntrate en la última pregunta del usuario y el historial."
             });
 
             setMessages(prev => prev.slice(0, -1).concat({
