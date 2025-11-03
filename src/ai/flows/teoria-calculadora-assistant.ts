@@ -68,21 +68,13 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     // Construye un prompt de sistema dinámico que siempre incluye el contexto del ejercicio.
     const dynamicSystemPrompt = `${systemPrompt}\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
 
-    // El historial pasado a 'generate' no debe incluir el último mensaje del usuario,
-    // que se pasa por separado en el prompt principal.
-    const conversationHistory = history?.slice(0, -1) || []; 
+    // El historial completo, incluyendo el último mensaje del usuario, ya viene en 'history'.
+    const conversationHistory = history || [];
     
-    // Extrae el contenido del último mensaje del usuario para usarlo como prompt principal.
-    // Si no hay historial, significa que este es el primer mensaje, que está en `contextoEjercicio`.
-    const lastUserMessage = history?.[history.length - 1]?.content[0]?.text || contextoEjercicio;
-    
-    const prompt: Part[] = [{ text: lastUserMessage }];
-     
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: dynamicSystemPrompt,
       history: conversationHistory,
-      prompt: prompt,
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
