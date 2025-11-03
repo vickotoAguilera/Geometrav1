@@ -15,16 +15,7 @@ Para asegurar que las rampas sean accesibles y seguras, la norma vigente en Chil
 
 ### ACTIVIDAD 1 (Actividad generadora)
 
-Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:
-
-| Distancia horizontal (D) expresada en cm | Diferencia de nivel expresada en cm | Pendiente expresada como porcentaje | Pendiente expresada como decimal |
-| :--- | :--- | :--- | :--- |
-| 100 | | 12% | |
-| 150 | | 12% | |
-| 50 | | 12% | |
-| 200 | | 8% | |
-| 300 | | 8% | |
-| 180 | | 8% | |
+Considerando la ilustración, completa la siguiente tabla interactiva para calcular la "Diferencia de nivel" que podría tener una rampa. Presiona "Verificar Tabla" para que la IA corrija tus respuestas.
 
 ---
 
@@ -63,9 +54,10 @@ Aproxima, por redondeo, los valores de los ángulos a dos lugares decimales y lo
 
 | Pendiente de la rampa | Medida del ángulo de inclinación de la rampa (α) en grados | sen(α) | cos(α) | tan(α) | N/H | N/D | D/H |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **12%** | | | | | | | |
-| **8%** | | | | | | | |
-| **6%** | | | | | | | |
+| **12%** | 6.84° | 0.1191 | 0.9929 | 0.1200 | 0.1191 | 0.1200 | 0.9929 |
+| **8%** | 4.57° | 0.0797 | 0.9968 | 0.0800 | 0.0797 | 0.0800 | 0.9968 |
+| **6%** | 3.43° | 0.0599 | 0.9982 | 0.0600 | 0.0599 | 0.0600 | 0.9982 |
+
 
 b. ¿Cómo se relacionan las razones trigonométricas de seno, coseno y tangente con los datos en la tabla?
 

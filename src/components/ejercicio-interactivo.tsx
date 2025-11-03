@@ -4,11 +4,12 @@ import { useState, useEffect, createElement, Fragment } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BookText, CirclePlay, Loader2 } from 'lucide-react';
+import { BookText, CirclePlay, Loader2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
+import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { Card, CardContent } from './ui/card';
 import { MarkdownImage } from './markdown-image';
 import { unified } from 'unified';
@@ -17,6 +18,80 @@ import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeReact from 'rehype-react';
 import { jsx, jsxs } from 'react/jsx-runtime';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
+// Tabla Interactiva para la Actividad 1 de "La Rampa"
+const TablaActividad1 = () => {
+  const { toast } = useToast();
+  const [isPending, startTransition] = useState(false);
+  const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
+  const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(6).fill(null));
+
+  const handleInputChange = (index: number, value: string) => {
+    const nuevasRespuestas = [...respuestas];
+    nuevasRespuestas[index] = value;
+    setRespuestas(nuevasRespuestas);
+    // Limpiar resultado al cambiar la respuesta
+    const nuevosResultados = [...resultados];
+    nuevosResultados[index] = null;
+    setResultados(nuevosResultados);
+  };
+
+  const handleVerificar = () => {
+    startTransition(true);
+    verificarTablaAction({
+      tablaId: 'tabla-actividad-1',
+      respuestasUsuario: respuestas,
+    })
+      .then((res) => {
+        setResultados(res.resultados);
+        toast({ title: 'Respuestas verificadas', description: 'Revisa los colores para ver los resultados.' });
+      })
+      .catch((err) => {
+        toast({ variant: 'destructive', title: 'Error', description: 'No se pudo verificar la tabla.' });
+      })
+      .finally(() => startTransition(false));
+  };
+
+  const celdas = [
+    { label: 'Distancia horizontal (cm)', valorInicial: '100', respuestaIndex: 0 },
+    { label: 'Distancia horizontal (cm)', valorInicial: '150', respuestaIndex: 1 },
+    { label: 'Distancia horizontal (cm)', valorInicial: '50', respuestaIndex: 2 },
+    { label: 'Distancia horizontal (cm)', valorInicial: '200', respuestaIndex: 3 },
+    { label: 'Distancia horizontal (cm)', valorInicial: '300', respuestaIndex: 4 },
+    { label: 'Distancia horizontal (cm)', valorInicial: '180', respuestaIndex: 5 },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {celdas.map((celda, i) => (
+          <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
+            <Label htmlFor={`celda-${i}`}>{celda.label}: <span className="font-bold">{celda.valorInicial}</span></Label>
+            <p className="text-sm text-muted-foreground">Tu respuesta (Diferencia de nivel):</p>
+            <Input
+              id={`celda-${i}`}
+              type="text"
+              placeholder="Escribe el número"
+              value={respuestas[celda.respuestaIndex]}
+              onChange={(e) => handleInputChange(celda.respuestaIndex, e.target.value)}
+              className={cn(
+                'transition-colors',
+                resultados[celda.respuestaIndex] === true && 'bg-green-100 dark:bg-green-900/50 border-green-500',
+                resultados[celda.respuestaIndex] === false && 'bg-red-100 dark:bg-red-900/50 border-red-500'
+              )}
+            />
+          </div>
+        ))}
+      </div>
+       <Button onClick={handleVerificar} disabled={isPending} className="w-full">
+        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+        Verificar Tabla
+      </Button>
+    </div>
+  );
+};
 
 
 interface EjercicioInteractivoProps {
@@ -93,6 +168,8 @@ export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteract
         <Card>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none p-6">
                {guiaContent}
+               {/* Renderizado condicional de la tabla interactiva */}
+               {ejercicioId === 'la-rampa' && <TablaActividad1 />}
             </CardContent>
         </Card>
       )}
