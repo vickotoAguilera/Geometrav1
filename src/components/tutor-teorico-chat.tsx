@@ -64,8 +64,9 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   
   const [isReady, setIsReady] = useState(false);
   const [initialContext, setInitialContext] = useState('');
+  const initializedExercisesRef = useRef<Set<string>>(new Set());
 
-
+  // Carga el contenido de la guía una vez
   useEffect(() => {
     async function loadGuia() {
         const result = await getGuiaEjercicio(ejercicioId);
@@ -79,35 +80,40 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
     loadGuia();
   }, [ejercicioId]);
 
-
-  const loadAndInitialize = async (isReset: boolean = false) => {
-    if (!initialContext) return;
-
+  // Carga el historial desde localStorage al montar el componente
+   useEffect(() => {
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-    let currentHistory: ChatMessage[] = savedMessagesRaw && !isReset ? JSON.parse(savedMessagesRaw) : [];
-    
-    if (currentHistory.length === 0) {
-      setIsReady(false);
-      
-      const newContext = initialContext;
-      if (!newContext || newContext.startsWith('Error')) {
-          toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el contexto de la guía para el tutor.' });
-          setIsReady(true);
-          return;
-      }
-      
-      const autoPrompt = `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`;
+    if (savedMessagesRaw) {
+      const savedMessages = JSON.parse(savedMessagesRaw);
+      setMessages(savedMessages);
+      // Poblar los ejercicios ya inicializados para no repetir el mensaje automático
+      const initialized = new Set(savedMessages.map((m: any) => m.contextFile).filter(Boolean));
+      initializedExercisesRef.current = initialized;
+    }
+    setIsReady(true);
+  }, [chatStorageKey]);
+  
+  // Reacciona cuando el contexto de la guía está listo Y el componente está montado
+  useEffect(() => {
+    if (!isReady || !initialContext || initializedExercisesRef.current.has(ejercicioId)) {
+        return;
+    }
 
-      const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
-      const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
-      
-      const updatedHistory = [userMessage];
-      setMessages([...updatedHistory, assistantPlaceholder]);
-      
-      startTransition(() => {
+    const autoPrompt = messages.length === 0
+      ? `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`
+      : `Ahora también quiero considerar el ejercicio '${ejercicioId}'. ¿En qué se diferencia del anterior?`;
+
+    const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
+    const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
+    
+    const newHistory = [...messages, userMessage];
+    setMessages([...newHistory, assistantPlaceholder]);
+    initializedExercisesRef.current.add(ejercicioId);
+
+    startTransition(() => {
         teoriaCalculadoraAssistant({
-          history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
-          contextoEjercicio: newContext
+          history: newHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
+          contextoEjercicio: initialContext
         })
         .then(({ response }) => {
           const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
@@ -116,22 +122,12 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
         .catch(error => {
           console.error("Error al iniciar chat teórico:", error);
           toast({ variant: "destructive", title: "Error del tutor", description: "No se pudo obtener una respuesta." });
-          setMessages([]);
-        })
-        .finally(() => setIsReady(true));
-      });
-    } else {
-        setMessages(currentHistory);
-        setIsReady(true);
-    }
-  };
-
-  useEffect(() => {
-    if (initialContext) {
-        loadAndInitialize();
-    }
+          setMessages(messages); // Revertir en caso de error
+        });
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, groupId, initialContext]);
+  }, [isReady, initialContext, ejercicioId]);
+
 
   useEffect(() => {
     if (isReady && messages.length > 0) {
@@ -156,8 +152,31 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   
   const handleResetConversation = () => {
     localStorage.removeItem(chatStorageKey);
+    initializedExercisesRef.current.clear();
     setMessages([]);
-    loadAndInitialize(true);
+    // Esto provocará que el useEffect de inicialización se vuelva a ejecutar
+    if (initialContext) {
+        initializedExercisesRef.current.add(ejercicioId); // Añadimos el actual para evitar bucle
+        const autoPrompt = `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`;
+        const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
+        const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
+        setMessages([userMessage, assistantPlaceholder]);
+        
+         startTransition(() => {
+            teoriaCalculadoraAssistant({
+            history: [userMessage].map(m => ({ role: m.role, content: [{ text: m.content }] })),
+            contextoEjercicio: initialContext
+            })
+            .then(({ response }) => {
+            const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
+            setMessages(prev => [...prev.slice(0, -1), finalMessage]);
+            })
+            .catch(error => {
+            console.error("Error al reiniciar chat teórico:", error);
+            setMessages([]);
+            });
+        });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
