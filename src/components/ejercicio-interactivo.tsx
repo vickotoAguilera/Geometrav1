@@ -234,17 +234,16 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
 
 interface EjercicioInteractivoProps {
   groupId: string;
-  contextFiles: string[];
+  contextFileNames: string[];
 }
 
 
-export function EjercicioInteractivo({ groupId, contextFiles }: EjercicioInteractivoProps) {
+export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInteractivoProps) {
 
   return (
     <div className="border-t pt-4 mt-4">
-        {/* The info box for active files is removed to simplify the UI as requested */}
         <TutorTeoricoChat 
-            contextFiles={contextFiles}
+            contextFileNames={contextFileNames}
             groupId={groupId} 
         />
     </div>

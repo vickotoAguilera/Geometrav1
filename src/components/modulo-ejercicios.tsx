@@ -22,49 +22,48 @@ interface EjercicioConceptual {
     id: string;
     pregunta: React.ReactNode;
     respuestaCorrecta: string;
-    contextFile: string;
 }
 
 const ejerciciosPlazaSkate: EjercicioConceptual[] = [
-    { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40', contextFile: 'plaza-skate/tutor-geogebra/actividad' },
-    { id: 'conversion-radianes', pregunta: '**Ejercicio 2:** Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? Explica cómo se calcula y recuerda que `180° = π radianes`.', respuestaCorrecta: '2*pi/9', contextFile: 'conversion-radianes/tutor-geogebra/actividad' },
+    { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40' },
+    { id: 'conversion-radianes', pregunta: '**Ejercicio 2:** Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? Explica cómo se calcula y recuerda que `180° = π radianes`.', respuestaCorrecta: '2*pi/9' },
 ];
 
 const ejerciciosLaRampa: EjercicioConceptual[] = [
-    { id: 'la-rampa-act-2', pregunta: 'Describe tus conclusiones sobre los triángulos que representan las rampas (tipo, semejanzas, diferencias).', respuestaCorrecta: 'Son triángulos rectángulos. Los que tienen misma pendiente son semejantes entre sí. Se diferencian en el tamaño de sus lados.', contextFile: 'la-rampa/tutor-geogebra/actividad' },
-    { id: 'la-rampa-act-3', pregunta: '¿Cuál es el ángulo para la pendiente del 12% y para la del 8%? (aprox. a dos decimales)', respuestaCorrecta: '6.84, 4.57', contextFile: 'la-rampa/tutor-geogebra/actividad' },
-    { id: 'la-rampa-act-5a', pregunta: '**a.** ¿Qué comandos de GeoGebra y funciones de tu calculadora te permiten encontrar el ángulo conociendo los lados?', respuestaCorrecta: 'atand', contextFile: 'la-rampa/tutor-calculadora/la-rampa-calculadora-consolidado' },
-    { id: 'la-rampa-act-5b', pregunta: '**b.** Para un ángulo de 4°, ¿cuál debe ser la pendiente porcentual aproximada? (Recuerda: `pendiente = tan(ángulo)`)', respuestaCorrecta: '7%', contextFile: 'la-rampa/tutor-calculadora/la-rampa-calculadora-consolidado' },
-    { id: 'la-rampa-act-5c', pregunta: '**c.** Si la diferencia de nivel es de 25 cm con un ángulo de 4°, ¿cuál es la distancia horizontal (aprox. a un decimal)? (Pista: `D = N / tan(α)`)', respuestaCorrecta: '357.5', contextFile: 'la-rampa/tutor-calculadora/la-rampa-calculadora-consolidado' }
+    { id: 'la-rampa-act-2', pregunta: 'Describe tus conclusiones sobre los triángulos que representan las rampas (tipo, semejanzas, diferencias).', respuestaCorrecta: 'Son triángulos rectángulos. Los que tienen misma pendiente son semejantes entre sí. Se diferencian en el tamaño de sus lados.'},
+    { id: 'la-rampa-act-3', pregunta: '¿Cuál es el ángulo para la pendiente del 12% y para la del 8%? (aprox. a dos decimales)', respuestaCorrecta: '6.84, 4.57'},
+    { id: 'la-rampa-act-5a', pregunta: '**a.** ¿Qué comandos de GeoGebra y funciones de tu calculadora te permiten encontrar el ángulo conociendo los lados?', respuestaCorrecta: 'atand'},
+    { id: 'la-rampa-act-5b', pregunta: '**b.** Para un ángulo de 4°, ¿cuál debe ser la pendiente porcentual aproximada? (Recuerda: `pendiente = tan(ángulo)`)', respuestaCorrecta: '7%'},
+    { id: 'la-rampa-act-5c', pregunta: '**c.** Si la diferencia de nivel es de 25 cm con un ángulo de 4°, ¿cuál es la distancia horizontal (aprox. a un decimal)? (Pista: `D = N / tan(α)`)', respuestaCorrecta: '357.5'}
 ];
 
 const ejerciciosModulo1_2: EjercicioConceptual[] = [
-    { id: 'act-tec-2', pregunta: '**Actividad 2:** Construye un triángulo con vértices A=(0,0), B=(4,0) y C=(4,3) usando `Polígono(A,B,C)`. Luego, usa `ÁngulosInteriores(t1)`. Escribe los tres ángulos (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '36.87, 53.13, 90', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-3', pregunta: '**Actividad 3:** Usando `Ángulo()`, convierte `3pi/2`, `pi/3` y `1` rad a grados. Escribe los resultados (aprox. a un decimal) separados por comas.', respuestaCorrecta: '270, 60, 57.3', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-4', pregunta: '**Actividad 4:** Calcula `sin(30°)`, `cos(30°)` y `tan(30°)`. Escribe los resultados (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '0.5, 0.87, 0.58', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-5', pregunta: '**Actividad 5 (GeoGebra):** Calcula `sin`, `cos` y `tan` para `30rad`.', respuestaCorrecta: '-0.99, 0.15, -6.41', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-6', pregunta: '**Actividad 6 (GeoGebra):** Calcula `sin`, `cos` y `tan` para `50g` (gradianes). (Recuerda: convertir a grados `0.9 * 50°`)', respuestaCorrecta: '0.71, 0.71, 1', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-7', pregunta: '**Actividad 7 (GeoGebra):** Usando `asind(0.5)`, `acosd(0.5)` y `atand(0.5)`, ¿qué ángulos en grados obtienes?', respuestaCorrecta: '30, 60, 26.57', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-8', pregunta: '**Actividad 8 (GeoGebra):** Convierte a radianes los ángulos de la actividad 7. (Pista: `(π/180) * angulo_en_grados`)', respuestaCorrecta: '0.52, 1.05, 0.46', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-9', pregunta: '**Actividad 9 (GeoGebra):** Convierte a gradianes los ángulos de la actividad 7. (Pista: `(100/90) * angulo_en_grados`)', respuestaCorrecta: '33.33, 66.67, 29.52', contextFile: 'angulos-y-razones/tutor-geogebra/actividad' },
-    { id: 'act-tec-10', pregunta: '**Actividad 10 (Calculadora - DEG):** ¿Cuál es el valor de `sin(30°)`?', respuestaCorrecta: '0.5', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-11', pregunta: '**Actividad 11 (Calculadora - DEG):** ¿`cos(30°)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.8660', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-12', pregunta: '**Actividad 12 (Calculadora - DEG):** ¿`tan(30°)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.5774', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-13', pregunta: '**Actividad 13 (Calculadora - DEG):** ¿Ángulo cuyo seno es 0.5?', respuestaCorrecta: '30', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-14', pregunta: '**Actividad 14 (Calculadora - DEG):** ¿Ángulo cuyo coseno es 0.5?', respuestaCorrecta: '60', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-15', pregunta: '**Actividad 15 (Calculadora - DEG):** ¿Ángulo cuya tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '26.57', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-16', pregunta: '**Actividad 16 (Calculadora - RAD):** ¿`sin(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '-0.9880', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-17', pregunta: '**Actividad 17 (Calculadora - RAD):** ¿`cos(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.1543', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-18', pregunta: '**Actividad 18 (Calculadora - RAD):** ¿`tan(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '-6.4053', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-19', pregunta: '**Actividad 19 (Calculadora - RAD):** ¿Ángulo cuyo seno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '0.52', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-20', pregunta: '**Actividad 20 (Calculadora - RAD):** ¿Ángulo cuyo coseno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '1.05', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-21', pregunta: '**Actividad 21 (Calculadora - RAD):** ¿Ángulo cuyo tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '0.46', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-22', pregunta: '**Actividad 22 (Calculadora - GRA):** ¿`sin(50g)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.7071', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-23', pregunta: '**Actividad 23 (Calculadora - GRA):** ¿`cos(50g)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.7071', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-24', pregunta: '**Actividad 24 (Calculadora - GRA):** ¿`tan(50g)`?', respuestaCorrecta: '1', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-25', pregunta: '**Actividad 25 (Calculadora - GRA):** ¿Ángulo cuyo seno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '33.33', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-26', pregunta: '**Actividad 26 (Calculadora - GRA):** ¿Ángulo cuyo coseno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '66.67', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
-    { id: 'act-tec-27', pregunta: '**Actividad 27 (Calculadora - GRA):** ¿Ángulo cuya tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '29.52', contextFile: 'angulos-y-razones/tutor-calculadora/actividad' },
+    { id: 'act-tec-2', pregunta: '**Actividad 2:** Construye un triángulo con vértices A=(0,0), B=(4,0) y C=(4,3) usando `Polígono(A,B,C)`. Luego, usa `ÁngulosInteriores(t1)`. Escribe los tres ángulos (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '36.87, 53.13, 90' },
+    { id: 'act-tec-3', pregunta: '**Actividad 3:** Usando `Ángulo()`, convierte `3pi/2`, `pi/3` y `1` rad a grados. Escribe los resultados (aprox. a un decimal) separados por comas.', respuestaCorrecta: '270, 60, 57.3' },
+    { id: 'act-tec-4', pregunta: '**Actividad 4:** Calcula `sin(30°)`, `cos(30°)` y `tan(30°)`. Escribe los resultados (aprox. a dos decimales) separados por comas.', respuestaCorrecta: '0.5, 0.87, 0.58' },
+    { id: 'act-tec-5', pregunta: '**Actividad 5 (GeoGebra):** Calcula `sin`, `cos` y `tan` para `30rad`.', respuestaCorrecta: '-0.99, 0.15, -6.41' },
+    { id: 'act-tec-6', pregunta: '**Actividad 6 (GeoGebra):** Calcula `sin`, `cos` y `tan` para `50g` (gradianes). (Recuerda: convertir a grados `0.9 * 50°`)', respuestaCorrecta: '0.71, 0.71, 1' },
+    { id: 'act-tec-7', pregunta: '**Actividad 7 (GeoGebra):** Usando `asind(0.5)`, `acosd(0.5)` y `atand(0.5)`, ¿qué ángulos en grados obtienes?', respuestaCorrecta: '30, 60, 26.57' },
+    { id: 'act-tec-8', pregunta: '**Actividad 8 (GeoGebra):** Convierte a radianes los ángulos de la actividad 7. (Pista: `(π/180) * angulo_en_grados`)', respuestaCorrecta: '0.52, 1.05, 0.46' },
+    { id: 'act-tec-9', pregunta: '**Actividad 9 (GeoGebra):** Convierte a gradianes los ángulos de la actividad 7. (Pista: `(100/90) * angulo_en_grados`)', respuestaCorrecta: '33.33, 66.67, 29.52' },
+    { id: 'act-tec-10', pregunta: '**Actividad 10 (Calculadora - DEG):** ¿Cuál es el valor de `sin(30°)`?', respuestaCorrecta: '0.5' },
+    { id: 'act-tec-11', pregunta: '**Actividad 11 (Calculadora - DEG):** ¿`cos(30°)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.8660' },
+    { id: 'act-tec-12', pregunta: '**Actividad 12 (Calculadora - DEG):** ¿`tan(30°)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.5774' },
+    { id: 'act-tec-13', pregunta: '**Actividad 13 (Calculadora - DEG):** ¿Ángulo cuyo seno es 0.5?', respuestaCorrecta: '30' },
+    { id: 'act-tec-14', pregunta: '**Actividad 14 (Calculadora - DEG):** ¿Ángulo cuyo coseno es 0.5?', respuestaCorrecta: '60' },
+    { id: 'act-tec-15', pregunta: '**Actividad 15 (Calculadora - DEG):** ¿Ángulo cuyo tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '26.57' },
+    { id: 'act-tec-16', pregunta: '**Actividad 16 (Calculadora - RAD):** ¿`sin(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '-0.9880' },
+    { id: 'act-tec-17', pregunta: '**Actividad 17 (Calculadora - RAD):** ¿`cos(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.1543' },
+    { id: 'act-tec-18', pregunta: '**Actividad 18 (Calculadora - RAD):** ¿`tan(30 rad)`? (aprox. a 4 decimales)', respuestaCorrecta: '-6.4053' },
+    { id: 'act-tec-19', pregunta: '**Actividad 19 (Calculadora - RAD):** ¿Ángulo cuyo seno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '0.52' },
+    { id: 'act-tec-20', pregunta: '**Actividad 20 (Calculadora - RAD):** ¿Ángulo cuyo coseno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '1.05' },
+    { id: 'act-tec-21', pregunta: '**Actividad 21 (Calculadora - RAD):** ¿Ángulo cuyo tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '0.46' },
+    { id: 'act-tec-22', pregunta: '**Actividad 22 (Calculadora - GRA):** ¿`sin(50g)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.7071' },
+    { id: 'act-tec-23', pregunta: '**Actividad 23 (Calculadora - GRA):** ¿`cos(50g)`? (aprox. a 4 decimales)', respuestaCorrecta: '0.7071' },
+    { id: 'act-tec-24', pregunta: '**Actividad 24 (Calculadora - GRA):** ¿`tan(50g)`?', respuestaCorrecta: '1' },
+    { id: 'act-tec-25', pregunta: '**Actividad 25 (Calculadora - GRA):** ¿Ángulo cuyo seno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '33.33' },
+    { id: 'act-tec-26', pregunta: '**Actividad 26 (Calculadora - GRA):** ¿Ángulo cuyo coseno es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '66.67' },
+    { id: 'act-tec-27', pregunta: '**Actividad 27 (Calculadora - GRA):** ¿Ángulo cuyo tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '29.52' },
 ];
 
 const ButtonVerificarConceptual = ({ ejercicio }: { ejercicio: EjercicioConceptual; }) => {
@@ -135,20 +134,11 @@ export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-3');
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
     
-    const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
-
-    const handleTeoricoToggle = (groupId: string, initialFiles: string[]) => {
-        setActiveTeorico(prev => {
-            const isOpeningForFirstTime = prev.groupId !== groupId;
-            if (isOpeningForFirstTime) {
-                // For simplified logic, we always set the context to the module's consolidated file
-                 setActiveContextFiles(initialFiles);
-            }
-            return {
-                isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-                groupId: groupId
-            }
-        });
+    const handleTeoricoToggle = (groupId: string) => {
+        setActiveTeorico(prev => ({
+            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+            groupId: groupId,
+        }));
     };
     
     return (
@@ -178,7 +168,7 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
-                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica', ['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad'])}
+                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                         />
                                     </div>
@@ -187,7 +177,7 @@ export function ModuloEjercicios() {
                                        <EjercicioInteractivo 
                                             key="trigonometria-basica"
                                             groupId="trigonometria-basica"
-                                            activeContextFiles={activeContextFiles}
+                                            contextFileNames={['plaza-skate/tutor-geogebra/actividad', 'conversion-radianes/tutor-geogebra/actividad']}
                                        />
                                     )}
 
@@ -246,7 +236,7 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="la-rampa"
                                             groupId="la-rampa"
-                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa', ['la-rampa/tutor-geogebra/actividad', 'la-rampa/tutor-calculadora/la-rampa-calculadora-consolidado'])}
+                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa')}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa'}
                                         />
                                     </div>
@@ -254,7 +244,7 @@ export function ModuloEjercicios() {
                                        <EjercicioInteractivo 
                                             key="la-rampa"
                                             groupId="la-rampa"
-                                            activeContextFiles={activeContextFiles}
+                                            contextFileNames={['la-rampa/tutor-calculadora/la-rampa-calculadora-consolidado']}
                                        />
                                     )}
                                 </div>
@@ -304,7 +294,7 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="angulos-y-razones"
                                             groupId="angulos-y-razones"
-                                            onTeoricoToggle={() => handleTeoricoToggle('angulos-y-razones', ['angulos-y-razones/tutor-geogebra/actividad', 'angulos-y-razones/tutor-calculadora/actividad'])}
+                                            onTeoricoToggle={() => handleTeoricoToggle('angulos-y-razones')}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'angulos-y-razones'}
                                         />
                                     </div>
@@ -313,7 +303,7 @@ export function ModuloEjercicios() {
                                        <EjercicioInteractivo 
                                             key="angulos-y-razones"
                                             groupId="angulos-y-razones"
-                                            activeContextFiles={activeContextFiles}
+                                            contextFileNames={['angulos-y-razones/tutor-geogebra/actividad', 'angulos-y-razones/tutor-calculadora/actividad']}
                                        />
                                     )}
 

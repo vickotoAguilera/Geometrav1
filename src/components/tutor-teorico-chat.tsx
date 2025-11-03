@@ -24,7 +24,7 @@ interface GenkitMessage {
 }
 
 interface TutorTeoricoChatProps {
-  contextFiles: string[];
+  contextFileNames: string[];
   groupId: string;
 }
 
@@ -53,7 +53,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ contextFileNames = [], groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -81,13 +81,13 @@ export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoCha
             return;
         }
 
-        if (contextFiles.length > 0) {
+        if (contextFileNames.length > 0) {
             const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
             setMessages([assistantPlaceholder]);
             
             try {
                 let combinedContent = '';
-                for (const file of contextFiles) {
+                for (const file of contextFileNames) {
                     const result = await getGuiaEjercicio(file);
                     if ('content' in result) {
                         combinedContent += `--- INICIO GUÍA: ${file}.md ---\n${result.content}\n--- FIN GUÍA: ${file}.md ---\n\n`;
@@ -111,7 +111,7 @@ export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoCha
 
     initializeAndFetch();
 
-  }, [chatStorageKey, contextFiles, toast]);
+  }, [chatStorageKey, contextFileNames, toast]);
 
 
   // Save conversation to localStorage
@@ -140,7 +140,7 @@ export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoCha
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isPending || contextFiles.length === 0) return;
+    if (!input.trim() || isPending || contextFileNames.length === 0) return;
 
     const currentInput = input;
     setInput('');
@@ -154,7 +154,7 @@ export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoCha
     startTransition(async () => {
         try {
             const genkitHistory: GenkitMessage[] = newHistory.map(m => ({
-              role: m.role,
+              role: m.role === 'user' ? 'user' : 'model',
               content: [{ text: m.content }],
             }));
             
@@ -226,10 +226,10 @@ export function TutorTeoricoChat({ contextFiles = [], groupId }: TutorTeoricoCha
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={contextFiles.length > 0 ? "Pregúntale al tutor..." : "Activa una actividad para empezar"}
-            disabled={isPending || !isReady || contextFiles.length === 0}
+            placeholder={contextFileNames.length > 0 ? "Pregúntale al tutor..." : "Activa una actividad para empezar"}
+            disabled={isPending || !isReady || contextFileNames.length === 0}
           />
-          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || contextFiles.length === 0}>
+          <Button type="submit" size="icon" disabled={isPending || !input.trim() || !isReady || contextFileNames.length === 0}>
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
         </form>
