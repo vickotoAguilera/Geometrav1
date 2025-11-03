@@ -62,18 +62,36 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
   async (input) => {
     const { history, contextoEjercicio } = input;
     
-    // Construye un prompt de sistema dinámico que siempre incluye el contexto del ejercicio.
     let dynamicSystemPrompt = systemPrompt;
+    let fullHistory = history || [];
+
+    // Si es el primer turno y hay contexto, lo añadimos como el primer mensaje del "usuario".
     if (contextoEjercicio) {
-      dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
+      if (fullHistory.length === 0) {
+        // Inicia la conversación con el contexto
+        fullHistory.push({ role: 'user', content: [{ text: `He activado el siguiente material. Por favor, preséntate y guíame como se indica en tus instrucciones de sistema. CONTEXTO:\n${contextoEjercicio}` }] });
+      } else {
+        // Para turnos posteriores, el contexto se añade al prompt de sistema para que no se pierda.
+        dynamicSystemPrompt += `\n\nMATERIAL DE REFERENCIA (ÚSALO PARA ENTENDER EL PROBLEMA, PERO NO LO COPIES):\n${contextoEjercicio}`;
+      }
     }
 
-    // El historial completo, incluyendo el último mensaje del usuario, ya viene en 'history'.
-    const conversationHistory = history || [];
-    
     // Separamos el historial del último mensaje para pasarlo como prompt
-    const lastMessage = conversationHistory.pop();
+    const conversationHistory = fullHistory.slice(0, -1);
+    const lastMessage = fullHistory[fullHistory.length - 1];
     const promptContent = lastMessage ? lastMessage.content : [];
+    
+    // Validar que el prompt no esté vacío
+    if (!promptContent.length || (promptContent.length === 1 && 'text' in promptContent[0] && !promptContent[0].text.trim())) {
+        // Si el prompt está vacío, y hay un historial, probablemente sea un error.
+        // Por seguridad, podemos devolver una respuesta por defecto o lanzar un error claro.
+        if(conversationHistory.length > 0) {
+            return { response: "No he recibido tu pregunta. ¿Puedes intentarlo de nuevo?" };
+        }
+        // Si no hay nada, es un error de flujo.
+         throw new Error("Se intentó llamar a la IA sin ninguna pregunta o contexto inicial.");
+    }
+
 
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
@@ -85,6 +103,10 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
       },
     });
 
-    return output!;
+    if (!output) {
+      throw new Error('La IA no pudo generar una respuesta.');
+    }
+
+    return output;
   }
 );
