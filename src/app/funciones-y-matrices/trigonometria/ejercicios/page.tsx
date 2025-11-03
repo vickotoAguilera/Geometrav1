@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
-import { EjercicioInteractivo, TablaActividad1 } from "@/components/ejercicio-interactivo";
+import { EjercicioInteractivo, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
 import { Separator } from "@/components/ui/separator";
 import { MarkdownImage } from "@/components/markdown-image";
 
@@ -152,6 +152,18 @@ export default function EjerciciosTrigonometriaPage() {
                                     <h3 className="text-lg font-semibold">Actividad 1 (Actividad generadora)</h3>
                                     <p className="text-muted-foreground">Considerando la ilustración, completa la siguiente tabla con las diferentes medidas que podría tener una rampa:</p>
                                     <TablaActividad1 />
+
+                                    <Separator className="my-6" />
+                                    <h3 className="text-lg font-semibold">ACTIVIDAD 2</h3>
+                                    <p className="text-muted-foreground">
+                                        Utiliza GeoGebra para dibujar las rampas de la tabla anterior utilizando el comando Polígono. Podría resultar conveniente utilizar el punto de coordenadas (0, 0) en el plano como punto de partida y el semieje positivo de las abscisas, para representar la distancia horizontal de cada rampa. Luego responde las siguientes preguntas:
+                                    </p>
+                                    <ul className="list-disc list-inside text-muted-foreground">
+                                        <li>¿Qué tipo de triángulo representa las rampas dibujadas?</li>
+                                        <li>¿Qué semejanzas observas entre las rampas dibujadas?</li>
+                                        <li>¿Qué diferencias observas entre las rampas dibujadas?</li>
+                                    </ul>
+                                    <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/2.png" alt="Representación de una rampa como un triángulo rectángulo en GeoGebra." />
                                 </div>
                              </CardContent>
                              <CardFooter>
