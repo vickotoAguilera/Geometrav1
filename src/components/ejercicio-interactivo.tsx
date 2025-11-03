@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -236,73 +236,42 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
 interface EjercicioInteractivoProps {
   ejercicioId: string;
   groupId: string;
+  initialContextFiles: string[];
 }
 
-// Este componente ahora se enfoca en gestionar el estado del chat teórico
-// y de los archivos de contexto.
-export function EjercicioInteractivo({ ejercicioId, groupId }: EjercicioInteractivoProps) {
-  const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
-  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
-  
-  const handleTeoricoToggle = () => {
-    setIsTeoricoOpen(prev => !prev);
-    // Añadimos el contexto del ejercicio actual si no está ya
+
+export function EjercicioInteractivo({ ejercicioId, groupId, initialContextFiles }: EjercicioInteractivoProps) {
+  const [activeContextFiles, setActiveContextFiles] = useState<string[]>(initialContextFiles);
+
+  useEffect(() => {
+    // Si un nuevo ejercicioId se pasa, se añade al contexto
     if (!activeContextFiles.includes(ejercicioId)) {
         setActiveContextFiles(prev => [...prev, ejercicioId]);
     }
-  };
+  }, [ejercicioId, activeContextFiles]);
 
-  const handleResultsT1 = (results: (boolean|null)[]) => {
-     // Si hay errores, abrir el chat y enfocarlo.
-     if(results.some(r => r === false)) {
-        if(!isTeoricoOpen) setIsTeoricoOpen(true);
-        if (!activeContextFiles.includes('actividad-1-rampa')) {
-            setActiveContextFiles(prev => [...prev, 'actividad-1-rampa']);
-        }
-     }
-  }
-
-  const handleResultsT4 = (results: (boolean|null)[]) => {
-     if(results.some(r => r === false)) {
-        if(!isTeoricoOpen) setIsTeoricoOpen(true);
-        if (!activeContextFiles.includes('actividad-4-rampa')) {
-            setActiveContextFiles(prev => [...prev, 'actividad-4-rampa']);
-        }
-     }
-  }
 
   return (
-    <div className="p-4 border rounded-lg bg-secondary/30 space-y-6">
-       <AyudaContextual 
-            ejercicioId={ejercicioId} 
+    <div className="border-t pt-4 mt-4">
+        <Accordion type="single" collapsible defaultValue="item-1">
+        <AccordionItem value="item-1" className="border-b-0">
+            <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
+                Archivos de Contexto Cargados en la IA ({activeContextFiles.length})
+            </AccordionTrigger>
+            <AccordionContent className="pt-2 space-y-1">
+                {activeContextFiles.map(file => (
+                    <div key={file} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
+                        <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
+                        <span className="truncate font-medium text-primary">{file}.md</span>
+                    </div>
+                ))}
+            </AccordionContent>
+        </AccordionItem>
+        </Accordion>
+        <TutorTeoricoChat 
+            activeContextFiles={activeContextFiles}
             groupId={groupId} 
-            onTeoricoToggle={handleTeoricoToggle} 
-            isTeoricoOpen={isTeoricoOpen} 
         />
-
-        {isTeoricoOpen && (
-            <div className="border-t pt-4">
-                 <Accordion type="single" collapsible defaultValue="item-1">
-                    <AccordionItem value="item-1" className="border-b-0">
-                        <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
-                            Archivos de Contexto Cargados en la IA ({activeContextFiles.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 space-y-1">
-                            {activeContextFiles.map(file => (
-                                <div key={file} className="flex items-center p-2 rounded-md bg-muted/50 text-sm">
-                                    <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-primary" />
-                                    <span className="truncate font-medium text-primary">{file}.md</span>
-                                </div>
-                            ))}
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-                <TutorTeoricoChat 
-                    activeContextFiles={activeContextFiles}
-                    groupId={groupId} 
-                />
-            </div>
-        )}
     </div>
   );
 }
