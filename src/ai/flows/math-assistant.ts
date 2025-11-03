@@ -11,7 +11,6 @@ import {ai} from '@/ai/genkit';
 import {Part} from 'genkit';
 import {z} from 'genkit';
 import mammoth from 'mammoth';
-import pdf from 'pdf-parse/lib/pdf-parse.js';
 
 
 const MessageSchema = z.object({
@@ -57,7 +56,7 @@ const mathAssistantFlow = ai.defineFlow(
         prompt.push({ media: { url: input.imageQueryDataUri } });
     }
 
-    // 2. Handle active context files (PDF, DOCX)
+    // 2. Handle active context files (DOCX only)
     if (input.activeContextFiles && input.activeContextFiles.length > 0) {
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
@@ -65,12 +64,13 @@ const mathAssistantFlow = ai.defineFlow(
           const base64Data = file.fileDataUri.substring(file.fileDataUri.indexOf(',') + 1);
           const buffer = Buffer.from(base64Data, 'base64');
           let textContent = '';
-          if (file.fileName.endsWith('.pdf')) {
-              const data = await pdf(buffer);
-              textContent = data.text;
-          } else if (file.fileName.endsWith('.docx')) {
+          
+          if (file.fileName.endsWith('.docx')) {
               const result = await mammoth.extractRawText({ buffer });
               textContent = result.value;
+          } else if (file.fileName.endsWith('.pdf')) {
+              // PDF processing is removed due to bundling issues.
+              textContent = `[El procesamiento del archivo PDF '${file.fileName}' no está disponible en este momento.]`;
           }
           
           const imagePlaceholderRegex = /\[IMAGEN:.+?\]/gi;
