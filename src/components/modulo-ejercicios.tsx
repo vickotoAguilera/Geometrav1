@@ -8,12 +8,13 @@ import { Label } from '@/components/ui/label';
 import { AyudaContextual, EjercicioInteractivo, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
 import { TeoremaAnguloCentralSVG } from './TeoremaAnguloCentralSVG';
 import { Button } from './ui/button';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { verificarRespuestaAction } from '@/app/verificador-respuestas-actions';
 import { cn } from '@/lib/utils';
 import { MarkdownImage } from './markdown-image';
+import { Textarea } from './ui/textarea';
 
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
@@ -89,7 +90,6 @@ export function ModuloEjercicios() {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
-                {/* Módulo 1.0 y 1.1 unificados */}
                 <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold">Módulo 1.0: Teorema del Ángulo Central (Plaza de Skate)</AccordionTrigger>
                     <AccordionContent>
@@ -128,7 +128,7 @@ export function ModuloEjercicios() {
                                     <Separator />
 
                                     <div className="space-y-4">
-                                        <p className="text-muted-foreground max-w-prose">
+                                         <p className="text-muted-foreground max-w-prose">
                                             Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes. Utiliza `pi` o `π` en tu respuesta para que sea exacta.
                                         </p>
                                         
@@ -180,7 +180,7 @@ export function ModuloEjercicios() {
                         </Card>
                     </AccordionContent>
                 </AccordionItem>
-                {/* Módulo 1.1 */}
+                
                 <AccordionItem value="item-2">
                     <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Situación de Modelación 1 (La Rampa)</AccordionTrigger>
                     <AccordionContent>
@@ -201,7 +201,14 @@ export function ModuloEjercicios() {
                                     <Separator/>
 
                                     <h3 className="font-semibold text-lg">Actividad 2 y 3</h3>
-                                    <p className="text-muted-foreground">Usa GeoGebra para dibujar las rampas de la tabla anterior y medir sus ángulos. Esto te ayudará a entender la relación entre pendiente y ángulo. ¿Qué tipo de triángulo representan? ¿Qué semejanzas y diferencias observas? ¿Cuál es el ángulo para una pendiente del 12%? ¿Y del 8%?</p>
+                                    <p className="text-muted-foreground">Usa GeoGebra para dibujar y medir las rampas. Luego, anota tus conclusiones: ¿Qué tipo de triángulo representan? ¿Qué semejanzas y diferencias observas? ¿Qué ángulos corresponden a las pendientes del 12% y 8%?</p>
+                                    <Textarea placeholder="Escribe aquí tus conclusiones de las actividades 2 y 3..." className="mt-2"/>
+                                     <div className="flex justify-end">
+                                        <Button variant="secondary" size="sm" onClick={() => toast({title: "Función no implementada", description: "La verificación para esta pregunta abierta se conectará pronto."})}>
+                                            <Send className="mr-2 h-4 w-4"/>
+                                            Discutir con la IA
+                                        </Button>
+                                    </div>
                                     <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/3.png" alt="Medición de ángulos en GeoGebra" />
 
                                     <Separator/>
@@ -213,22 +220,42 @@ export function ModuloEjercicios() {
                                     <Separator/>
                                     
                                     <h3 className="font-semibold text-lg">Actividad 5 (Cierre)</h3>
-                                    <p className="text-muted-foreground">Ahora reflexiona sobre lo aprendido: ¿Qué herramientas de GeoGebra o tu calculadora te permiten obtener un ángulo a partir de sus lados? Si quisieras una rampa con 4° de inclinación, ¿qué pendiente debería tener? Y si la altura debe ser de 25 cm, ¿cuál sería la distancia horizontal?</p>
+                                    <p className="text-muted-foreground">Ahora reflexiona sobre lo aprendido:</p>
+                                    <div className="space-y-4 mt-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act5-q1">a. ¿Qué herramientas te permiten obtener un ángulo a partir de sus lados?</Label>
+                                            <Textarea id="act5-q1" placeholder="Describe los comandos o funciones..."/>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act5-q2">b. Para 4° de inclinación, ¿qué pendiente debería tener la rampa?</Label>
+                                            <Input id="act5-q2" placeholder="Escribe el porcentaje..."/>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="act5-q3">c. Si la altura es 25 cm, ¿cuál sería la distancia horizontal para esa rampa de 4°?</Label>
+                                            <Input id="act5-q3" placeholder="Escribe la distancia en cm..."/>
+                                        </div>
+                                         <div className="flex justify-end">
+                                             <Button variant="secondary" size="sm" onClick={() => toast({title: "Función no implementada", description: "La verificación para esta pregunta abierta se conectará pronto."})}>
+                                                <Send className="mr-2 h-4 w-4"/>
+                                                Verificar y discutir con la IA
+                                            </Button>
+                                        </div>
+                                    </div>
                                     <MarkdownImage src="/imagenes-ejercicios/Situación de modelación 1 La rampa/5.png" alt="Calculadora científica" />
 
                                     <Separator />
                                     
                                     <div className="flex justify-end pt-4">
                                         <AyudaContextual
-                                            ejercicioId="la-rampa-actividad-1"
+                                            ejercicioId="la-rampa"
                                             groupId="la-rampa"
-                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-1')}
+                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa')}
                                             isTeoricoOpen={isTeoricoOpen}
                                         />
                                     </div>
                                     {isTeoricoOpen && (
                                        <EjercicioInteractivo 
-                                            ejercicioId="la-rampa-actividad-1"
+                                            ejercicioId="la-rampa"
                                             groupId="la-rampa"
                                             initialContextFiles={activeContextFiles}
                                        />
