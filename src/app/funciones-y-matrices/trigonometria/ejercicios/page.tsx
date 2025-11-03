@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sigma, Calculator, MonitorPlay, Accessibility } from "lucide-react";
-import { EjercicioInteractivo, TablaActividad1, TablaActividad4 } from "@/components/ejercicio-interactivo";
+import { EjercicioInteractivo } from "@/components/ejercicio-interactivo";
 import { Separator } from "@/components/ui/separator";
 
 const CentralAngleTheoremVisual = () => (
@@ -110,7 +110,7 @@ export default function EjerciciosTrigonometriaPage() {
                                         <div className="p-4 border rounded-lg bg-background flex flex-col">
                                             <h4 className="font-semibold flex items-center gap-2"><Sigma/>Ejercicio B: Conversión a Radianes</h4>
                                             <p className="mt-2 text-muted-foreground flex-1">
-                                                Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que **π radianes son equivalentes a 180°**?
+                                                Si el programa de la cámara sólo permitiera ingresar las medidas de los ángulos en radianes para realizar los giros, ¿cuál sería la expresión algebraica para convertir el ángulo de giro (en grados) a radianes, considerando que <strong>π radianes son equivalentes a 180°</strong>?
                                             </p>
                                         </div>
                                         <RadianConversionVisual />
@@ -160,42 +160,6 @@ export default function EjerciciosTrigonometriaPage() {
                             <CardFooter>
                                 <p className="text-xs text-muted-foreground">Cada guía tiene su propio tutor especializado.</p>
                             </CardFooter>
-                        </AccordionContent>
-                    </Card>
-                </AccordionItem>
-                 <AccordionItem value="item-1.2">
-                    <Card>
-                        <AccordionTrigger className="p-6">
-                            <div className="flex flex-col items-start text-left">
-                                <CardTitle>Módulo 1.2: Situación de Modelación - La Rampa</CardTitle>
-                                <CardDescription className="mt-2">
-                                    Aplica conceptos de trigonometría en un contexto real de accesibilidad y diseño.
-                                </CardDescription>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="p-6 space-y-8">
-                            {/* Sección de la Guía Teórica */}
-                            <div>
-                                <h3 className="text-xl font-semibold mb-4 border-b pb-2">Guía Teórica y Visual</h3>
-                                <EjercicioInteractivo ejercicioId="la-rampa" groupId="situacion-modelacion-rampa" />
-                            </div>
-
-                            <Separator />
-
-                            {/* Sección de Actividades Interactivas */}
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-xl font-semibold mb-4 border-b pb-2">Actividad 1 (Interactiva)</h3>
-                                    <p className="text-sm text-muted-foreground mb-4">Considerando la ilustración de la guía, completa la siguiente tabla con las diferentes medidas que podría tener una rampa y verifica tus respuestas.</p>
-                                    <TablaActividad1 />
-                                </div>
-
-                                <div>
-                                    <h3 className="text-xl font-semibold mb-4 border-b pb-2">Actividad 4 (Interactiva)</h3>
-                                    <p className="text-sm text-muted-foreground mb-4">Completa la tabla siguiente usando GeoGebra o tu calculadora y luego verifica tus respuestas.</p>
-                                    <TablaActividad4 />
-                                </div>
-                            </div>
                         </AccordionContent>
                     </Card>
                 </AccordionItem>
