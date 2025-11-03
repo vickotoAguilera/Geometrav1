@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -102,22 +102,26 @@ const ButtonVerificarConceptual = ({
 export function ModuloEjercicios() {
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
-
-    // Estados para Módulo 1.0
+    
+    // Estados para Módulo 1.0 (Plaza Skate)
     const [respuestaSkate, setRespuestaSkate] = useState('');
     const [resultadoSkate, setResultadoSkate] = useState<boolean | null>(null);
     const [respuestaRadianes, setRespuestaRadianes] = useState('');
     const [resultadoRadianes, setResultadoRadianes] = useState<boolean | null>(null);
+    const contextFilesModulo1_0 = ['plaza-skate'];
 
-    // Estados para Módulo 1.1 - Actividad 2
+    // Estados para Módulo 1.1 (La Rampa)
+    const [activeContextFilesRampa, setActiveContextFilesRampa] = useState<string[]>([]);
+    
+    // Actividad 2
     const [respAct2a, setRespAct2a] = useState('');
     const [resAct2a, setResAct2a] = useState<boolean | null>(null);
     const [respAct2b, setRespAct2b] = useState('');
     const [resAct2b, setResAct2b] = useState<boolean | null>(null);
     const [respAct2c, setRespAct2c] = useState('');
     const [resAct2c, setResAct2c] = useState<boolean | null>(null);
-
-    // Estados para Módulo 1.1 - Actividad 3
+    
+    // Actividad 3
     const [respAct3a, setRespAct3a] = useState('');
     const [resAct3a, setResAct3a] = useState<boolean | null>(null);
     const [respAct3b, setRespAct3b] = useState('');
@@ -125,7 +129,7 @@ export function ModuloEjercicios() {
     const [respAct3c, setRespAct3c] = useState('');
     const [resAct3c, setResAct3c] = useState<boolean | null>(null);
 
-    // Estados para Módulo 1.1 - Actividad 5
+    // Actividad 5
     const [respAct5a, setRespAct5a] = useState('');
     const [resAct5a, setResAct5a] = useState<boolean | null>(null);
     const [respAct5b, setRespAct5b] = useState('');
@@ -133,18 +137,20 @@ export function ModuloEjercicios() {
     const [respAct5c, setRespAct5c] = useState('');
     const [resAct5c, setResAct5c] = useState<boolean | null>(null);
     
-    
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => ({
-            // Si el grupo es el mismo, se alterna. Si es diferente, se abre.
             isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
             groupId: groupId
         }));
     };
-    
-    const contextFilesModulo1_0 = ['plaza-skate'];
-    const contextFilesModulo1_1 = ['la-rampa-actividad-1', 'la-rampa-actividad-2', 'la-rampa-actividad-3', 'la-rampa-actividad-4', 'la-rampa-actividad-5'];
 
+    const handleRampaContext = (actividadId: string) => {
+        // Acumula contexto para el módulo de la rampa
+        if (!activeContextFilesRampa.includes(actividadId)) {
+            setActiveContextFilesRampa(prev => [...prev, actividadId]);
+        }
+    }
+    
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
@@ -154,29 +160,21 @@ export function ModuloEjercicios() {
                         <Card>
                             <CardContent className="pt-6">
                                 <div className="space-y-6">
-                                    <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                                     <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                         <div className="flex-1 space-y-4">
                                             <p className="text-muted-foreground max-w-prose">
                                                 En el parque de una ciudad hay instaladas cámaras de vigilancia. Una de ellas, ubicada en el punto B de una plaza circular, enfoca con un ángulo de 20° (ángulo inscrito) un objeto sospechoso en el punto C. El encargado de seguridad necesita dirigir la cámara principal, ubicada en el centro O, hacia el mismo objeto. Para ello, necesita saber cuál es la medida del ángulo central (α) que debe formar la cámara principal.
                                             </p>
                                              <div className="space-y-2 pt-4">
-                                                <Label htmlFor="respuesta-skate">Tu respuesta (medida del ángulo α en grados):</Label>
-                                                <div className="flex gap-2">
-                                                    <Input 
-                                                        id="respuesta-skate" 
-                                                        placeholder="Escribe la medida del ángulo..."
-                                                        value={respuestaSkate}
-                                                        onChange={(e) => { setRespuestaSkate(e.target.value); setResultadoSkate(null); }}
-                                                        className={cn('transition-colors', resultadoSkate === true && 'border-green-500 focus-visible:ring-green-500', resultadoSkate === false && 'border-red-500 focus-visible:ring-red-500')}
-                                                    />
-                                                     <ButtonVerificarConceptual
-                                                        respuesta={respuestaSkate}
-                                                        preguntaId="angulo-central"
-                                                        respuestaCorrecta="40"
-                                                        onResult={setResultadoSkate}
-                                                        onRespuestaChange={setRespuestaSkate}
-                                                     >Verificar</ButtonVerificarConceptual>
-                                                </div>
+                                                 <ButtonVerificarConceptual
+                                                    respuesta={respuestaSkate}
+                                                    preguntaId="angulo-central"
+                                                    respuestaCorrecta="40"
+                                                    onResult={setResultadoSkate}
+                                                    onRespuestaChange={setRespuestaSkate}
+                                                 >
+                                                    Tu respuesta (medida del ángulo α en grados):
+                                                 </ButtonVerificarConceptual>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-center gap-4 text-center">
@@ -196,23 +194,15 @@ export function ModuloEjercicios() {
                                         </div>
 
                                         <div className="space-y-2 pt-4">
-                                            <Label htmlFor="respuesta-radianes">Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes (usa 'pi' si es necesario):</Label>
-                                            <div className="flex gap-2">
-                                                <Input 
-                                                    id="respuesta-radianes" 
-                                                    placeholder="Escribe tu respuesta en radianes..."
-                                                    value={respuestaRadianes}
-                                                    onChange={(e) => { setRespuestaRadianes(e.target.value); setResultadoRadianes(null); }}
-                                                    className={cn('transition-colors', resultadoRadianes === true && 'border-green-500 focus-visible:ring-green-500', resultadoRadianes === false && 'border-red-500 focus-visible:ring-red-500')}
-                                                />
-                                                 <ButtonVerificarConceptual
-                                                    respuesta={respuestaRadianes}
-                                                    preguntaId="conversion-radianes"
-                                                    respuestaCorrecta="2*pi/9"
-                                                    onResult={setResultadoRadianes}
-                                                    onRespuestaChange={setRespuestaRadianes}
-                                                >Verificar</ButtonVerificarConceptual>
-                                            </div>
+                                             <ButtonVerificarConceptual
+                                                respuesta={respuestaRadianes}
+                                                preguntaId="conversion-radianes"
+                                                respuestaCorrecta="2*pi/9"
+                                                onResult={setResultadoRadianes}
+                                                onRespuestaChange={setRespuestaRadianes}
+                                            >
+                                                Ahora, convierte el ángulo central que calculaste en el ejercicio anterior a radianes (usa 'pi' si es necesario):
+                                            </ButtonVerificarConceptual>
                                         </div>
                                     </div>
 
@@ -222,7 +212,10 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="plaza-skate"
                                             groupId="trigonometria-basica"
-                                            onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
+                                            onTeoricoToggle={() => {
+                                                handleTeoricoToggle('trigonometria-basica');
+                                                if(!activeContextFilesRampa.includes('plaza-skate')) setActiveContextFilesRampa(['plaza-skate']);
+                                            }}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                         />
                                     </div>
@@ -261,10 +254,10 @@ export function ModuloEjercicios() {
                                      <div className="space-y-4">
                                         <h3 className="font-semibold text-lg">Actividad 2</h3>
                                         <div className="space-y-4">
-                                            <ButtonVerificarConceptual respuesta={respAct2a} preguntaId="tipo-triangulo-rampa" respuestaCorrecta="triángulo rectángulo" onResult={setResAct2a} onRespuestaChange={setRespAct2a}>
+                                             <ButtonVerificarConceptual respuesta={respAct2a} preguntaId="tipo-triangulo-rampa" respuestaCorrecta="triángulo rectángulo" onResult={setResAct2a} onRespuestaChange={setRespAct2a}>
                                                 a. ¿Qué tipo de triángulo representan las rampas dibujadas?
                                             </ButtonVerificarConceptual>
-                                            <ButtonVerificarConceptual respuesta={respAct2b} preguntaId="semejanzas-rampa" respuestaCorrecta="misma pendiente implica mismos ángulos" onResult={setResAct2b} onRespuestaChange={setRespAct2b}>
+                                             <ButtonVerificarConceptual respuesta={respAct2b} preguntaId="semejanzas-rampa" respuestaCorrecta="misma pendiente implica mismos ángulos" onResult={setResAct2b} onRespuestaChange={setRespAct2b}>
                                                 b. ¿Qué semejanzas observas entre las rampas dibujadas?
                                             </ButtonVerificarConceptual>
                                              <ButtonVerificarConceptual respuesta={respAct2c} preguntaId="diferencias-rampa" respuestaCorrecta="diferente pendiente implica diferente inclinación" onResult={setResAct2c} onRespuestaChange={setRespAct2c}>
@@ -279,13 +272,13 @@ export function ModuloEjercicios() {
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-lg">Actividad 3</h3>
                                         <div className="space-y-4">
-                                            <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a} onRespuestaChange={setRespAct3a}>
+                                             <ButtonVerificarConceptual respuesta={respAct3a} preguntaId="angulo-12-porciento" respuestaCorrecta="6.84" onResult={setResAct3a} onRespuestaChange={setRespAct3a}>
                                                a. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 12%? (grados)
                                             </ButtonVerificarConceptual>
                                              <ButtonVerificarConceptual respuesta={respAct3b} preguntaId="angulo-8-porciento" respuestaCorrecta="4.57" onResult={setResAct3b} onRespuestaChange={setRespAct3b}>
                                                b. ¿Cuál es la medida del ángulo de inclinación de las rampas con una pendiente del 8%? (grados)
                                             </ButtonVerificarConceptual>
-                                            <ButtonVerificarConceptual respuesta={respAct3c} preguntaId="angulo-6-porciento" respuestaCorrecta="3.43" onResult={setResAct3c} onRespuestaChange={setRespAct3c}>
+                                             <ButtonVerificarConceptual respuesta={respAct3c} preguntaId="angulo-6-porciento" respuestaCorrecta="3.43" onResult={setResAct3c} onRespuestaChange={setRespAct3c}>
                                                c. ¿Cuál debería ser la medida del ángulo de inclinación de una rampa cuya pendiente sea del 6%? (grados)
                                             </ButtonVerificarConceptual>
                                         </div>
@@ -306,7 +299,7 @@ export function ModuloEjercicios() {
                                             <ButtonVerificarConceptual respuesta={respAct5a} preguntaId="comandos-inversos" respuestaCorrecta="acosd, asind, atand" onResult={setResAct5a} onRespuestaChange={setRespAct5a}>
                                                a. ¿Qué comandos de GeoGebra y qué funciones de tu calculadora te permiten determinar el ángulo de un triángulo rectángulo conociendo sus lados, sin necesidad de representarlo gráficamente?
                                             </ButtonVerificarConceptual>
-                                            <ButtonVerificarConceptual respuesta={respAct5b} preguntaId="pendiente-4-grados" respuestaCorrecta="7%" onResult={setResAct5b} onRespuestaChange={setRespAct5b}>
+                                             <ButtonVerificarConceptual respuesta={respAct5b} preguntaId="pendiente-4-grados" respuestaCorrecta="7%" onResult={setResAct5b} onRespuestaChange={setRespAct5b}>
                                                b. Si se desea que el ángulo de inclinación de una rampa sea de 4°, ¿cuál debería ser el porcentaje aproximado de su pendiente?
                                             </ButtonVerificarConceptual>
                                              <ButtonVerificarConceptual respuesta={respAct5c} preguntaId="distancia-rampa-4-grados" respuestaCorrecta="357.5" onResult={setResAct5c} onRespuestaChange={setRespAct5c}>
@@ -322,7 +315,10 @@ export function ModuloEjercicios() {
                                         <AyudaContextual
                                             ejercicioId="la-rampa"
                                             groupId="la-rampa"
-                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa')}
+                                            onTeoricoToggle={() => {
+                                                handleTeoricoToggle('la-rampa');
+                                                handleRampaContext('la-rampa-actividad-1');
+                                            }}
                                             isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'la-rampa'}
                                         />
                                     </div>
@@ -330,7 +326,7 @@ export function ModuloEjercicios() {
                                        <EjercicioInteractivo 
                                             key="la-rampa"
                                             groupId="la-rampa"
-                                            initialContextFiles={contextFilesModulo1_1}
+                                            initialContextFiles={activeContextFilesRampa}
                                        />
                                     )}
                                 </div>

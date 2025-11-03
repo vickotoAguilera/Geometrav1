@@ -240,10 +240,8 @@ interface EjercicioInteractivoProps {
 
 
 export function EjercicioInteractivo({ groupId, initialContextFiles }: EjercicioInteractivoProps) {
-  const [activeContextFiles, setActiveContextFiles] = useState<string[]>(initialContextFiles);
-
-  // This effect ensures that if the component is re-rendered with new initial files (new module),
-  // the context is reset to only those new files.
+  const [activeContextFiles, setActiveContextFiles] = useState<string[]>([]);
+  
   useEffect(() => {
     setActiveContextFiles(initialContextFiles);
   }, [initialContextFiles]);
