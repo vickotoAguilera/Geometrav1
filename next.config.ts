@@ -30,13 +30,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
-    // This is to help with the pdf-parse library
-    if (isServer) {
-        config.externals.push('pdf-parse');
-    }
-    return config;
-  }
 };
 
 export default nextConfig;
