@@ -101,7 +101,8 @@ export default function AngulosYRazonesPage() {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <div className="max-w-4xl mx-auto space-y-8">
+                    {/* Tarjeta para la Parte 1: GeoGebra */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Parte 1: Guía Interactiva de GeoGebra</CardTitle>
@@ -125,6 +126,8 @@ export default function AngulosYRazonesPage() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Tarjeta para la Parte 2: Calculadora */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Parte 2: Guía de Calculadora Científica</CardTitle>
