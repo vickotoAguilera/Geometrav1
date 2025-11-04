@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Check, Bot, Calculator, X } from 'lucide-react';
@@ -43,7 +43,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/applet-contextual?ejercicio=plaza-skate/tutor-geogebra/consolidado&grupo=${groupId}`} passHref>
+            <Link href={`/applet-contextual?ejercicio=${ejercicioId}/tutor-geogebra/consolidado&grupo=${groupId}`} passHref>
                 <Button variant="outline" size="icon" className="h-9 w-9">
                     <Bot className="h-5 w-5" />
                 </Button>
@@ -61,7 +61,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
 
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
-export const TablaActividad1 = ({ onVerify }: { onVerify: (results: (boolean | null)[]) => void }) => {
+export const TablaActividad1 = () => {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
@@ -75,7 +75,6 @@ export const TablaActividad1 = ({ onVerify }: { onVerify: (results: (boolean | n
     const nuevosResultados = [...resultados];
     nuevosResultados[index] = null;
     setResultados(nuevosResultados);
-     onVerify(nuevosResultados);
   };
 
   const handleVerificar = () => {
@@ -86,7 +85,6 @@ export const TablaActividad1 = ({ onVerify }: { onVerify: (results: (boolean | n
     })
       .then((res) => {
         setResultados(res.resultados);
-        onVerify(res.resultados);
         const correctas = res.resultados.filter(r => r === true).length;
         if(correctas === res.resultados.length){
             toast({ title: '¡Tabla Correcta!', description: 'Todos los valores son correctos. ¡Excelente trabajo!' });
@@ -139,7 +137,7 @@ export const TablaActividad1 = ({ onVerify }: { onVerify: (results: (boolean | n
   );
 };
 
-export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | null)[]) => void }) => {
+export const TablaActividad4 = () => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
@@ -152,7 +150,6 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
         const nuevosResultados = [...resultados];
         nuevosResultados[index] = null;
         setResultados(nuevosResultados);
-        onVerify(nuevosResultados);
     };
 
     const handleVerificar = () => {
@@ -162,7 +159,6 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
             respuestasUsuario: respuestas,
         }).then(res => {
             setResultados(res.resultados);
-            onVerify(res.resultados);
             const correctas = res.resultados.filter(r => r === true).length;
             if(correctas === res.resultados.length){
                 toast({ title: '¡Tabla Correcta!', description: 'Todos los valores son correctos. ¡Excelente trabajo!' });

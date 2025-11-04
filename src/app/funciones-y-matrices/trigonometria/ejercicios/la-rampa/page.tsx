@@ -5,18 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { AyudaContextual, EjercicioInteractivo, TablaActividad1, TablaActividad4 } from '@/components/ejercicio-interactivo';
 import { useState } from 'react';
 import Image from 'next/image';
-import { LaRampaSVG } from '@/components/LaRampaSVG';
-import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
-
-const ejerciciosRampa = [
-    { id: 'calculo-altura', pregunta: '**Ejercicio 1:** ¿Cuál es la altura (N) de la rampa?', respuestaCorrecta: '2.1' },
-    { id: 'calculo-hipotenusa', pregunta: '**Ejercicio 2:** ¿Cuál es la longitud de la superficie inclinada (H) de la rampa?', respuestaCorrecta: '10.2' },
-];
 
 export default function PaginaLaRampa() {
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
-    const [resultadosActividad1, setResultadosActividad1] = useState<(boolean | null)[]>([]);
-    const [resultadosActividad4, setResultadosActividad4] = useState<(boolean | null)[]>([]);
 
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => ({
@@ -51,11 +42,11 @@ export default function PaginaLaRampa() {
                             
                             <h3 className="text-lg font-semibold mt-8 mb-4">Actividad 1: Cálculo de Diferencia de Nivel</h3>
                             <p className="text-muted-foreground mb-4 text-sm">Completa la siguiente tabla calculando la "Diferencia de nivel" para cada rampa según su pendiente y distancia horizontal.</p>
-                            <TablaActividad1 onVerify={setResultadosActividad1} />
+                            <TablaActividad1 />
 
                             <h3 className="text-lg font-semibold mt-8 mb-4">Actividad 4: Razones Trigonométricas</h3>
                              <p className="text-muted-foreground mb-4 text-sm">Completa la tabla calculando el ángulo y las razones trigonométricas correspondientes a cada pendiente.</p>
-                            <TablaActividad4 onVerify={setResultadosActividad4} />
+                            <TablaActividad4 />
 
                             <div className="flex justify-end pt-4 mt-6">
                                 <AyudaContextual
@@ -75,29 +66,6 @@ export default function PaginaLaRampa() {
 
                         </CardContent>
                     </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Problema Central</CardTitle>
-                             <CardDescription>Usa los conceptos aprendidos para resolver el siguiente problema.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="prose prose-invert max-w-none mb-6">
-                                <p>Se necesita construir una rampa de acceso. Se sabe que la distancia horizontal (D) que cubrirá es de 10 metros y el ángulo de inclinación (`α`) debe ser de 12°. Tu misión es calcular la altura o diferencia de nivel (N) y la longitud de la superficie inclinada de la rampa (H).</p>
-                                <LaRampaSVG className="w-full max-w-lg mx-auto my-4" />
-                            </div>
-                            
-                            <div className="space-y-4">
-                                {ejerciciosRampa.map((ej) => (
-                                    <ButtonVerificarConceptual 
-                                        key={ej.id} 
-                                        ejercicio={ej}
-                                    />
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
                 </div>
             </main>
         </div>
