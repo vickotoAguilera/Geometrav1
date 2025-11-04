@@ -70,13 +70,13 @@ export function AyudaContextual({
   );
 }
 
-interface TablaInter RampaProps {
+interface TablaInterRampaProps {
   onTeoricoToggle: () => void;
   isTeoricoOpen: boolean;
 }
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
-export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInter RampaProps) => {
+export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRampaProps) => {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
@@ -182,7 +182,7 @@ export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInter R
   );
 };
 
-export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInter RampaProps) => {
+export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRampaProps) => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
