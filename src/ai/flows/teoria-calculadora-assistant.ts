@@ -61,7 +61,7 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     const { history, contextoEjercicio } = input;
     
     // Construye el prompt para el modelo.
-    // El contexto se combina con la última pregunta del usuario.
+    // El contexto del ejercicio se combina con la última pregunta del usuario.
     const lastUserMessage = history?.[history.length - 1]?.content[0]?.text || '';
     const promptText = `CONTEXTO DEL EJERCICIO ACTUAL:\n${contextoEjercicio}\n\nPREGUNTA DEL USUARIO: ${lastUserMessage}`;
 
