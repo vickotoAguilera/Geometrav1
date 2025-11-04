@@ -6,9 +6,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from 'react';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Button } from '@/components/ui/button';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import Link from 'next/link';
 
 
 const ejerciciosPlazaSkate = [
@@ -34,7 +35,7 @@ export default function NuevaPaginaEjercicios() {
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-foreground">Ejercicios Interactivos de Trigonometría</h1>
                     <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                        Resuelve los siguientes ejercicios. Podrás verificar tus respuestas con la IA.
+                        Resuelve los siguientes ejercicios. Podrás verificar tus respuestas con la IA y pedir ayuda a los tutores especializados.
                     </p>
                 </div>
 
@@ -68,7 +69,6 @@ export default function NuevaPaginaEjercicios() {
                                                     ejercicioId="plaza-skate"
                                                     groupId="trigonometria-basica"
                                                     onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
-                                                    isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
                                             </div>
                                              {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
@@ -79,6 +79,26 @@ export default function NuevaPaginaEjercicios() {
                                                />
                                             )}
                                         </div>
+                                    </CardContent>
+                                </Card>
+                            </AccordionContent>
+                        </AccordionItem>
+                        
+                         <AccordionItem value="item-2">
+                            <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Aplicación de Razones Trigonométricas (La Rampa)</AccordionTrigger>
+                            <AccordionContent>
+                               <Card>
+                                    <CardHeader>
+                                        <CardTitle>Ir al Ejercicio</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-muted-foreground mb-4">Este módulo te guiará en el uso de Seno, Coseno y Tangente para resolver un problema práctico sobre rampas de acceso.</p>
+                                        <Link href="/funciones-y-matrices/trigonometria/ejercicios/la-rampa" passHref>
+                                            <Button className="w-full">
+                                                Ir al Módulo 1.1
+                                                <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Button>
+                                        </Link>
                                     </CardContent>
                                 </Card>
                             </AccordionContent>
