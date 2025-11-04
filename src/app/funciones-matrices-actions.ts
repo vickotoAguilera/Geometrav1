@@ -12,19 +12,19 @@ import {
     type TeoriaCalculadoraAssistantInput, 
     type TeoriaCalculadoraAssistantOutput 
 } from '@/ai/flows/teoria-calculadora-assistant';
+import fs from 'fs';
+import path from 'path';
 
 
 import * as LaRampaTutorCalculadora from '@/content/guias-geogebra/la-rampa/tutor-calculadora/consolidado';
 import * as LaRampaTutorGeogebra from '@/content/guias-geogebra/la-rampa/tutor-geogebra/consolidado';
-import * as PlazaSkateTutorCalculadora from '@/content/guias-geogebra/plaza-skate/tutor-calculadora/consolidado';
-import * as PlazaSkateTutorGeogebra from '@/content/guias-geogebra/plaza-skate/tutor-geogebra/consolidado';
 import * as LaRampaActividad1 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-1';
 import * as LaRampaActividad2 from '@/content/guias-geogebra/la-rampa/tutor-geogebra/actividad-2';
 import * as LaRampaActividad3 from '@/content/guias-geogebra/la-rampa/tutor-geogebra/actividad-3';
 import * as LaRampaActividad4 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-4';
 import * as LaRampaActividad5 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-5';
-import * as AngulosYRazonesCalculadora from '@/content/guias-geogebra/angulos-y-razones/tutor-calculadora/actividad.md';
-import * as AngulosYRazonesGeogebra from '@/content/guias-geogebra/angulos-y-razones/tutor-geogebra/actividad.md';
+import * as PlazaSkateTutorCalculadora from '@/content/guias-geogebra/plaza-skate/tutor-calculadora/consolidado';
+import * as PlazaSkateTutorGeogebra from '@/content/guias-geogebra/plaza-skate/tutor-geogebra/consolidado';
 
 
 export async function getFuncionesMatricesAiResponse(
@@ -57,10 +57,6 @@ const contextMap: Record<string, { content: string }> = {
     // Módulo Plaza Skate
     'plaza-skate/tutor-calculadora/consolidado': { content: PlazaSkateTutorCalculadora.contexto },
     'plaza-skate/tutor-geogebra/consolidado': { content: PlazaSkateTutorGeogebra.contexto },
-    
-    // Módulo Ángulos y Razones
-    'angulos-y-razones/tutor-calculadora/actividad': { content: AngulosYRazonesCalculadora.default },
-    'angulos-y-razones/tutor-geogebra/actividad': { content: AngulosYRazonesGeogebra.default },
 };
 
 export async function getGuiaEjercicio(ejercicioId: string | string[]): Promise<{ content: string; } | { error: string }> {
@@ -69,12 +65,17 @@ export async function getGuiaEjercicio(ejercicioId: string | string[]): Promise<
     let combinedContent = '';
 
     for (const id of ids) {
-      const data = contextMap[id];
-      if (!data) {
-        return { error: `La guía '${id}' no fue encontrada.` };
+      if (contextMap[id]) {
+         combinedContent += `--- GUÍA: ${id}.ts ---\n${contextMap[id].content}\n\n`;
+      } else {
+        const filePath = path.join(process.cwd(), 'src', 'content', 'guias-geogebra', `${id}.md`);
+        if (fs.existsSync(filePath)) {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          combinedContent += `--- GUÍA: ${id}.md ---\n${fileContent}\n\n`;
+        } else {
+           return { error: `La guía '${id}' no fue encontrada.` };
+        }
       }
-      // Añadimos un encabezado para que la IA sepa qué archivo está leyendo
-      combinedContent += `--- GUÍA: ${id}.ts ---\n${data.content}\n\n`;
     }
     
     return { content: combinedContent };
