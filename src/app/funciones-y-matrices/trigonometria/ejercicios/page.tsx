@@ -60,7 +60,7 @@ export default function NuevaPaginaEjercicios() {
                                                     />
                                                 ))}
                                             </div>
-                                           {/* 
+                                           
                                             <div className="flex justify-end pt-4">
                                                 <AyudaContextual
                                                     ejercicioId="plaza-skate"
@@ -69,7 +69,6 @@ export default function NuevaPaginaEjercicios() {
                                                     isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
                                             </div>
-                                             */}
                                         </div>
                                     </CardContent>
                                 </Card>
