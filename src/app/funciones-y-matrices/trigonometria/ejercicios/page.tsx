@@ -3,7 +3,7 @@
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Construction } from 'lucide-react';
+import { ArrowRight, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { LaRampaSVG } from '@/components/LaRampaSVG';
@@ -62,20 +62,22 @@ export default function PaginaEjerciciosTrigonometria() {
                         </div>
                     </Card>
 
-                    <Card className="flex flex-col bg-muted/50 border-dashed">
+                    <Card className="flex flex-col">
                         <CardHeader>
-                            <CardTitle>Módulo 1.2: Próximamente</CardTitle>
+                            <CardTitle>Módulo 1.2: Ángulos y Razones</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 flex flex-col items-center justify-center">
-                            <Construction className="w-16 h-16 text-muted-foreground/50 mx-auto my-4" />
+                            <Calculator className="w-16 h-16 text-primary/80 mx-auto my-4" />
                              <p className="text-sm text-muted-foreground text-center mt-4">
-                                Nuevos desafíos y ejercicios interactivos estarán disponibles aquí muy pronto.
+                                Familiarízate con ángulos y razones trigonométricas usando GeoGebra y calculadoras.
                             </p>
                         </CardContent>
                          <div className="p-6 pt-0">
-                            <Button className="w-full" disabled>
-                                En construcción
-                            </Button>
+                            <Link href="/funciones-y-matrices/trigonometria/ejercicios/angulos-y-razones" passHref>
+                                <Button className="w-full">
+                                    Iniciar Módulo <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
                         </div>
                     </Card>
 
