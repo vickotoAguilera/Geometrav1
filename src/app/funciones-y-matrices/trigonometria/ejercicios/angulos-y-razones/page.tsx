@@ -2,15 +2,13 @@
 
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { MarkdownImage } from '@/components/markdown-image';
-import { Loader2 } from 'lucide-react';
 import { AyudaContextual } from '@/components/ejercicio-interactivo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
@@ -69,45 +67,28 @@ const ejerciciosCalculadora = [
     { id: 'actividad-19', pregunta: '**Actividad 19:** En modo RAD, ¿qué ángulo obtienes con `sin⁻¹(0.5)`?', respuestaCorrecta: '0.52' },
 ];
 
+const videoCalculadora = `
+### Video de Apoyo
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto; margin-bottom: 1rem; border-radius: 0.5rem;">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+    src="https://www.youtube.com/embed/eFROC2qbNFI" 
+    title="YouTube video player" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
+`;
+
+
 export default function AngulosYRazonesPage() {
-    const [contenidoCalculadora, setContenidoCalculadora] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [activeTeorico, setActiveTeorico] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchContent = async () => {
-            setIsLoading(true);
-            try {
-                const calculadoraRes = await getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad.md');
-                if ('content' in calculadoraRes) {
-                    setContenidoCalculadora(calculadoraRes.content);
-                } else {
-                    console.error("Error al cargar guía de calculadora:", calculadoraRes.error);
-                }
-            } catch (error) {
-                console.error("Error cargando guías:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchContent();
-    }, []);
     
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => (prev === groupId ? null : groupId));
     };
-
-    if (isLoading) {
-        return (
-            <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-1 container mx-auto py-8 px-4 flex items-center justify-center">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                </main>
-            </div>
-        );
-    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -172,7 +153,7 @@ export default function AngulosYRazonesPage() {
                                 <AccordionItem value="video-guia">
                                     <AccordionTrigger>Ver Guía y Video de Apoyo</AccordionTrigger>
                                     <AccordionContent>
-                                        {contenidoCalculadora && <MarkdownRenderer content={contenidoCalculadora} />}
+                                        <MarkdownRenderer content={videoCalculadora} />
                                     </AccordionContent>
                                 </AccordionItem>
                                 {ejerciciosCalculadora.map(ej => (
