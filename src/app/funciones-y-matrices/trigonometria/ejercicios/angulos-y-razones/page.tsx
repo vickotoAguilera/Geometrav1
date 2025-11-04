@@ -49,21 +49,6 @@ const ejerciciosCalculadora = [
     { id: 'actividad-19', pregunta: '**Actividad 19:** En modo RAD, ¿qué ángulo obtienes con `sin⁻¹(0.5)`?', respuestaCorrecta: '0.52' },
 ];
 
-const videoCalculadora = `
-### Video de Apoyo
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto; margin-bottom: 1rem; border-radius: 0.5rem;">
-  <iframe 
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-    src="https://www.youtube.com/embed/eFROC2qbNFI" 
-    title="YouTube video player" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
-</div>
-`;
-
 
 export default function AngulosYRazonesPage() {
     const [activeTeorico, setActiveTeorico] = useState<string | null>(null);
@@ -110,7 +95,7 @@ export default function AngulosYRazonesPage() {
                                                     </DialogTrigger>
                                                     <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
                                                         <GeogebraIntegrado 
-                                                            ejercicioId={`angulos-y-razones/tutor-geogebra/actividad.md`}
+                                                            ejercicioId={`angulos-y-razones/${ej.id}.md`}
                                                             grupoId={`angulos-y-razones-geogebra-${ej.id}`}
                                                             enunciado={enunciadosGeogebra[ej.id]}
                                                         />
@@ -132,12 +117,6 @@ export default function AngulosYRazonesPage() {
                         </CardHeader>
                         <CardContent>
                             <Accordion type="multiple" className="w-full">
-                                <AccordionItem value="video-guia">
-                                    <AccordionTrigger>Ver Guía y Video de Apoyo</AccordionTrigger>
-                                    <AccordionContent>
-                                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>{videoCalculadora}</ReactMarkdown>
-                                    </AccordionContent>
-                                </AccordionItem>
                                 {ejerciciosCalculadora.map(ej => (
                                     <AccordionItem value={ej.id} key={ej.id}>
                                          <AccordionTrigger>
@@ -145,8 +124,8 @@ export default function AngulosYRazonesPage() {
                                         </AccordionTrigger>
                                         <AccordionContent>
                                             <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
-                                             <div className="flex justify-end pt-4 mt-4 border-t">
-                                                 <AyudaContextual
+                                            <div className="flex justify-end pt-4 mt-4 border-t">
+                                                <AyudaContextual
                                                     ejercicioId={ej.id}
                                                     groupId={`angulos-y-razones-calculadora-${ej.id}`}
                                                     onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
