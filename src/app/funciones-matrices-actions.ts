@@ -37,3 +37,5 @@ export async function getGuiaEjercicio(ejercicioId: string): Promise<{ content: 
     return { error: 'No se pudo cargar el contenido de la guía.' };
   }
 }
+
+    

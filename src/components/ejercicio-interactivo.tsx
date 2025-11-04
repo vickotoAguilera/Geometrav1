@@ -44,9 +44,9 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
         <Tooltip>
           <TooltipTrigger asChild>
             <Link href={`/applet-contextual?ejercicio=plaza-skate/tutor-geogebra/consolidado&grupo=${groupId}`} passHref>
-                <div className="h-9 w-9 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                <Button variant="outline" size="icon" className="h-9 w-9">
                     <Bot className="h-5 w-5" />
-                </div>
+                </Button>
             </Link>
           </TooltipTrigger>
           <TooltipContent>
@@ -315,3 +315,5 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
     </div>
   );
 }
+
+    
