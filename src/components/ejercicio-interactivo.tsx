@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Check, Bot, Calculator, X } from 'lucide-react';
@@ -16,7 +16,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Label } from '@/components/ui/label';
 
 // Este componente contendrá los dos botones de ayuda
@@ -28,7 +27,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
         <Tooltip>
           <TooltipTrigger asChild>
               <Button
-                variant="outline"
+                variant={isTeoricoOpen ? 'default' : 'outline'}
                 size="icon"
                 className="h-9 w-9"
                 onClick={onTeoricoToggle}
@@ -66,6 +65,8 @@ export const TablaActividad1 = () => {
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
   const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(6).fill(null));
+  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+
 
   const handleInputChange = (index: number, value: string) => {
     const nuevasRespuestas = [...respuestas];
@@ -134,10 +135,26 @@ export const TablaActividad1 = () => {
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
                 Verificar Tabla 1
             </Button>
-            <Button variant="outline" size="icon" onClick={handleVerificar} disabled={isPending}>
-                <Bot className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={() => setIsTeoricoOpen(prev => !prev)} disabled={isPending}>
+                            <Bot className="h-5 w-5" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Ayuda del Tutor de Tablas</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
        </div>
+       {isTeoricoOpen && (
+          <EjercicioInteractivo 
+            key="tabla-actividad-1"
+            groupId="la-rampa-actividad-1"
+            contextFileName='la-rampa/tutor-calculadora/consolidado' // Asumiendo que este es el contexto correcto
+          />
+       )}
     </div>
   );
 };
@@ -147,6 +164,7 @@ export const TablaActividad4 = () => {
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
     const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(21).fill(null));
+    const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
 
     const handleInputChange = (index: number, value: string) => {
         const nuevasRespuestas = [...respuestas];
@@ -211,33 +229,15 @@ export const TablaActividad4 = () => {
                     <TableBody>
                         <TableRow>
                             <TableCell className="font-semibold">12%</TableCell>
-                            {renderInputCell(0)}
-                            {renderInputCell(1)}
-                            {renderInputCell(2)}
-                            {renderInputCell(3)}
-                            {renderInputCell(4)}
-                            {renderInputCell(5)}
-                            {renderInputCell(6)}
+                            {Array.from({length: 7}).map((_, i) => renderInputCell(i))}
                         </TableRow>
                          <TableRow>
                             <TableCell className="font-semibold">8%</TableCell>
-                            {renderInputCell(7)}
-                            {renderInputCell(8)}
-                            {renderInputCell(9)}
-                            {renderInputCell(10)}
-                            {renderInputCell(11)}
-                            {renderInputCell(12)}
-                            {renderInputCell(13)}
+                            {Array.from({length: 7}).map((_, i) => renderInputCell(i + 7))}
                         </TableRow>
                         <TableRow>
                             <TableCell className="font-semibold">6%</TableCell>
-                            {renderInputCell(14)}
-                            {renderInputCell(15)}
-                            {renderInputCell(16)}
-                            {renderInputCell(17)}
-                            {renderInputCell(18)}
-                            {renderInputCell(19)}
-                            {renderInputCell(20)}
+                            {Array.from({length: 7}).map((_, i) => renderInputCell(i + 14))}
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -247,10 +247,26 @@ export const TablaActividad4 = () => {
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
                     Verificar Tabla 4
                 </Button>
-                 <Button variant="outline" size="icon" onClick={handleVerificar} disabled={isPending}>
-                    <Bot className="h-5 w-5" />
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                             <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={() => setIsTeoricoOpen(prev => !prev)} disabled={isPending}>
+                                <Bot className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Ayuda del Tutor de Tablas</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
+            {isTeoricoOpen && (
+                <EjercicioInteractivo 
+                    key="tabla-actividad-4"
+                    groupId="la-rampa-actividad-4"
+                    contextFileName='la-rampa/tutor-calculadora/consolidado' // Asumiendo que este es el contexto correcto
+                />
+            )}
         </div>
     );
 };
@@ -266,8 +282,10 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const { getGuiaEjercicio } = require('@/app/funciones-matrices-actions');
 
-  useEffect(() => {
+
+  useState(() => {
     const loadContext = async () => {
       setIsLoading(true);
       setIsError(false);
@@ -288,7 +306,8 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
     };
 
     loadContext();
-  }, [contextFileName]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
 
 
   if (isLoading) {

@@ -7,6 +7,12 @@ import {
 } from '@/ai/flows/funciones-matrices-assistant';
 import { textToSpeech } from "@/ai/flows/tts-flow";
 import { TextToSpeechOutput } from "@/ai/flows/schemas/tts-schemas";
+import { 
+    teoriaCalculadoraAssistant, 
+    type TeoriaCalculadoraAssistantInput, 
+    type TeoriaCalculadoraAssistantOutput 
+} from '@/ai/flows/teoria-calculadora-assistant';
+
 
 import * as LaRampaTutorCalculadora from '@/content/guias-geogebra/la-rampa/tutor-calculadora/consolidado';
 import * as LaRampaTutorGeogebra from '@/content/guias-geogebra/la-rampa/tutor-geogebra/consolidado';
@@ -19,6 +25,13 @@ export async function getFuncionesMatricesAiResponse(
 ): Promise<FuncionesMatricesAssistantOutput> {
   return await funcionesMatricesAssistant(input);
 }
+
+export async function getTeoriaCalculadoraAiResponse(
+  input: TeoriaCalculadoraAssistantInput
+): Promise<TeoriaCalculadoraAssistantOutput> {
+  return await teoriaCalculadoraAssistant(input);
+}
+
 
 export async function generateFuncionesMatricesSpeech(text: string): Promise<TextToSpeechOutput> {
     return await textToSpeech(text);

@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
-import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
+import { getTeoriaCalculadoraAiResponse } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -81,7 +81,7 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
       setMessages([...updatedHistory, assistantPlaceholder]);
       
       startTransition(() => {
-        teoriaCalculadoraAssistant({
+        getTeoriaCalculadoraAiResponse({
           history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
           contextoEjercicio: initialContext
         })
@@ -154,7 +154,7 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
               content: [{ text: m.content }],
             }));
             
-            const { response: aiResponse } = await teoriaCalculadoraAssistant({
+            const { response: aiResponse } = await getTeoriaCalculadoraAiResponse({
               history: genkitHistory,
               contextoEjercicio: initialContext,
             });
