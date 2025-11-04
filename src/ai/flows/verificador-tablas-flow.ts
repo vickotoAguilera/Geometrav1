@@ -39,7 +39,7 @@ function sonNumerosEquivalentes(val1: string, val2: string): boolean {
     return Math.abs(num1 - num2) < 0.01;
   }
   // Podríamos añadir lógica para fracciones, pero por ahora comparamos como texto.
-  return false;
+  return val1.trim().toLowerCase() === val2.trim().toLowerCase();
 }
 
 const verificadorTablasFlow = ai.defineFlow(
