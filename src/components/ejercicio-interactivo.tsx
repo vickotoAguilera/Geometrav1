@@ -129,10 +129,15 @@ export const TablaActividad1 = () => {
           </div>
         ))}
       </div>
-       <Button onClick={handleVerificar} disabled={isPending} className="w-full">
-        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-        Verificar Tabla 1
-      </Button>
+       <div className="flex gap-2">
+            <Button onClick={handleVerificar} disabled={isPending} className="w-full">
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                Verificar Tabla 1
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleVerificar} disabled={isPending}>
+                <Bot className="h-5 w-5" />
+            </Button>
+       </div>
     </div>
   );
 };
@@ -237,10 +242,15 @@ export const TablaActividad4 = () => {
                     </TableBody>
                 </Table>
             </div>
-            <Button onClick={handleVerificar} disabled={isPending} className="w-full">
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                Verificar Tabla 4
-            </Button>
+            <div className="flex gap-2">
+                <Button onClick={handleVerificar} disabled={isPending} className="w-full">
+                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                    Verificar Tabla 4
+                </Button>
+                 <Button variant="outline" size="icon" onClick={handleVerificar} disabled={isPending}>
+                    <Bot className="h-5 w-5" />
+                </Button>
+            </div>
         </div>
     );
 };
