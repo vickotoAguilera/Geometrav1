@@ -3,7 +3,7 @@
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Construction } from 'lucide-react';
 import Link from 'next/link';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { LaRampaSVG } from '@/components/LaRampaSVG';
@@ -22,7 +22,7 @@ export default function PaginaEjerciciosTrigonometria() {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
                     
                     <Card className="flex flex-col">
                         <CardHeader>
@@ -59,6 +59,23 @@ export default function PaginaEjerciciosTrigonometria() {
                                     Iniciar Módulo <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
+                        </div>
+                    </Card>
+
+                    <Card className="flex flex-col bg-muted/50 border-dashed">
+                        <CardHeader>
+                            <CardTitle>Módulo 1.2: Próximamente</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-1 flex flex-col items-center justify-center">
+                            <Construction className="w-16 h-16 text-muted-foreground/50 mx-auto my-4" />
+                             <p className="text-sm text-muted-foreground text-center mt-4">
+                                Nuevos desafíos y ejercicios interactivos estarán disponibles aquí muy pronto.
+                            </p>
+                        </CardContent>
+                         <div className="p-6 pt-0">
+                            <Button className="w-full" disabled>
+                                En construcción
+                            </Button>
                         </div>
                     </Card>
 
