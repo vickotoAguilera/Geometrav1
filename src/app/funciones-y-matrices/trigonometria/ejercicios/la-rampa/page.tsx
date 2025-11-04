@@ -40,13 +40,52 @@ export default function PaginaLaRampa() {
                                 </div>
                             </div>
                             
-                            <h3 className="text-lg font-semibold mt-8 mb-4">Actividad 1: Cálculo de Diferencia de Nivel</h3>
+                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 1: Cálculo de Diferencia de Nivel</h3>
                             <p className="text-muted-foreground mb-4 text-sm">Completa la siguiente tabla calculando la "Diferencia de nivel" para cada rampa según su pendiente y distancia horizontal.</p>
                             <TablaActividad1 />
 
-                            <h3 className="text-lg font-semibold mt-8 mb-4">Actividad 4: Razones Trigonométricas</h3>
+                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 2: Construcción en GeoGebra</h3>
+                             <div className="prose prose-invert max-w-none mb-4">
+                                <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
+                                <ul>
+                                    <li>¿Qué tipo de triángulo representa las rampas dibujadas?</li>
+                                    <li>¿Qué semejanzas y diferencias observas entre ellas?</li>
+                                </ul>
+                                <div className="flex justify-center">
+                                     <Image src="/imagenes-ejercicios/rampa/2.png" alt="Representación de una rampa en GeoGebra" width={500} height={300} className="rounded-lg shadow-md" />
+                                </div>
+                            </div>
+
+                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 3: Medición de Ángulos</h3>
+                             <div className="prose prose-invert max-w-none mb-4">
+                                <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
+                                <ul>
+                                    <li>¿Cuál es el ángulo para la pendiente del 12%?</li>
+                                    <li>¿Y para la del 8%?</li>
+                                    <li>¿Cuál debería ser el ángulo para una pendiente del 6%?</li>
+                                </ul>
+                                <div className="flex justify-center">
+                                     <Image src="/imagenes-ejercicios/rampa/3.png" alt="Medición de ángulos en GeoGebra" width={500} height={300} className="rounded-lg shadow-md" />
+                                </div>
+                            </div>
+
+
+                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 4: Razones Trigonométricas</h3>
                              <p className="text-muted-foreground mb-4 text-sm">Completa la tabla calculando el ángulo y las razones trigonométricas correspondientes a cada pendiente.</p>
                             <TablaActividad4 />
+
+                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 5: Cierre</h3>
+                             <div className="prose prose-invert max-w-none mb-4">
+                                <p>Utiliza los comandos de tu calculadora o GeoGebra para responder:</p>
+                                <ul>
+                                    <li>¿Qué funciones te permiten encontrar un ángulo a partir de sus lados?</li>
+                                    <li>Si una rampa debe tener 4° de inclinación, ¿cuál es su pendiente?</li>
+                                    <li>Para esa misma rampa de 4°, si la altura a salvar es de 25 cm, ¿qué distancia horizontal se necesita?</li>
+                                </ul>
+                                <div className="flex justify-center">
+                                     <Image src="/imagenes-ejercicios/rampa/5.png" alt="Cálculos en calculadora científica" width={500} height={150} className="rounded-lg shadow-md" />
+                                </div>
+                            </div>
 
                             <div className="flex justify-end pt-4 mt-6">
                                 <AyudaContextual
