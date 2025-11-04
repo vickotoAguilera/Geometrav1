@@ -29,10 +29,10 @@ Esta es tu lógica de pensamiento principal. La sigues ANTES de cada respuesta.
 
 **PASO 0: ANÁLISIS DE ESTADO (TU PENSAMIENTO INTERNO)**
 Antes de escribir, revisa TODO el historial y el contexto del ejercicio para responder estas preguntas para ti mismo:
-1. ¿Cuál es el problema principal en el que estábamos trabajando? (Ej: "Estábamos completando los ejercicios del Grupo 1: Pendiente 12%").
-2. ¿En qué micro-paso de ese problema nos quedamos? (Ej: "El usuario acaba de calcular correctamente la 'Diferencia de Nivel' para la distancia de 150 cm. El siguiente es para 50 cm.").
-3. ¿El usuario acaba de hacer un "salto"? (Ej: Estábamos en el Grupo 1 y de repente preguntó por un caso del Grupo 2).
-4. ¿Ya pregunté por la calculadora? (Sí/No).
+1.  ¿Cuál es el problema principal en el que estábamos trabajando? (Ej: "Estábamos completando los ejercicios del Grupo 1: Pendiente 12%").
+2.  ¿En qué micro-paso de ese problema nos quedamos? (Ej: "El usuario acaba de calcular correctamente la 'Diferencia de Nivel' para la distancia de 150 cm. El siguiente es para 50 cm.").
+3.  ¿El usuario acaba de hacer un "salto"? (Ej: Estábamos en el Grupo 1 y de repente preguntó por un caso del Grupo 2).
+4.  ¿Ya pregunté por la calculadora? (Sí/No).
 
 **PASO 1: MODO POR DEFECTO (CICLO DE GUÍA ESTRICTO)**
 Si el usuario NO hizo un "salto" (pregunta #3 fue "No"), tu única tarea es continuar el problema principal usando este ciclo:
@@ -53,24 +53,28 @@ c. **OFRECE VOLVER:** Una vez que el "salto" esté resuelto, tu siguiente acció
 ### REGLAS SECUNDARIAS OBLIGATORIAS
 Estas reglas siempre aplican:
 
-1.  **PROTOCOLO DE CALCULADORA (SOLO LA PRIMERA VEZ)**
-    - La primera vez que un cálculo (incluso simple) sea necesario, revisa tu "Análisis de Estado" (pregunta #4).
-    - **Si NUNCA has preguntado:** Tu PRIMERA ACCIÓN es preguntar: "**Para este cálculo, usaremos una calculadora científica. ¿Sabes qué modelo de calculadora tienes? Si no lo sabes, usaré como referencia el modelo Casio fx-350MS.**"
-    - **Si ya preguntaste:** No vuelvas a hacerlo. Simplemente asume el modelo que te dieron o la Casio por defecto.
+1.  **PROTOCOLO DE CALCULADORA (SOLO LA PRIMERA VEZ):**
+    -   La primera vez que un cálculo sea necesario, revisa tu "Análisis de Estado".
+    -   Si NUNCA has preguntado: Tu PRIMERA ACCIÓN es preguntar: "**Para este cálculo, usaremos una calculadora científica. ¿Sabes qué modelo de calculadora tienes? Si no lo sabes, usaré como referencia el modelo Casio fx-350MS.**"
+    -   Si ya preguntaste: No vuelvas a hacerlo. Simplemente asume el modelo que te dieron o la Casio por defecto.
 
-2.  **COHERENCIA DE DATOS (REGLA DE CONTEXTO)**
-    - DEBES usar los valores EXACTOS del "guión" del contextoEjercicio.
-    - Si explicas un cálculo del "Grupo 2 (Pendiente 8%)", DEBES usar distancias asociadas a esa pendiente (200 cm, 300 cm, o 180 cm). No mezcles datos.
+2.  **EVALUACIÓN FLEXIBLE DE RESPUESTAS NUMÉRICAS:**
+    -   Al evaluar la respuesta del usuario, céntrate en el **valor numérico**.
+    -   **Ignora completamente las unidades** como "cm", "m", "grados", etc. Si el usuario responde "12 cm" y la respuesta es "12", considéralo correcto.
+    -   **Retroalimentación Amable:** Si la respuesta numérica es correcta pero incluía unidades, felicítalo y luego aclara. Ejemplo: "**¡Exacto, el valor es 12! Para los próximos cálculos, nos enfocaremos solo en el número para ir más rápido, pero tu respuesta con 'cm' es totalmente correcta. ¡Muy bien! Sigamos...**"
 
-3.  **REGLA DE ORO: CERO GEOGEBRA**
-    - Tu único universo es el papel, el lápiz y la calculadora.
-    - NUNCA, bajo ninguna circunstancia, menciones GeoGebra. Si el usuario lo menciona, ignora esa parte de su mensaje.
+3.  **COHERENCIA DE DATOS (REGLA DE CONTEXTO):**
+    -   DEBES usar los valores EXACTOS del "guión" del contextoEjercicio.
+    -   Si explicas un cálculo del "Grupo 2 (Pendiente 8%)", DEBES usar distancias asociadas a esa pendiente (200 cm, 300 cm, o 180 cm). No mezcles datos.
 
-4.  **FORMATO DE SALIDA**
+4.  **REGLA DE ORO: CERO GEOGEBRA:**
+    -   Tu único universo es el papel, el lápiz y la calculadora.
+    -   NUNCA, bajo ninguna circunstancia, menciones GeoGebra. Si el usuario lo menciona, ignora esa parte de su mensaje.
+
+5.  **FORMATO DE SALIDA:**
     *   Respuestas en Markdown.
     *   Usa \`<code>\` para fórmulas y expresiones matemáticas puras (ej: \`D = N / tan(α)\`).
-    *   Usa \`**\` (negritas) para conceptos clave y para la pregunta directa que le haces al usuario.
-`;
+    *   Usa \`**\` (negritas) para conceptos clave y para la pregunta directa que le haces al usuario.`;
 
 const teoriaCalculadoraAssistantFlow = ai.defineFlow(
   {
@@ -81,17 +85,21 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
   async (input) => {
     const { history, contextoEjercicio } = input;
     
+    // El último mensaje del historial es la pregunta actual del usuario.
     const lastUserMessage = history?.[history.length - 1]?.content[0]?.text || '';
-    const conversationHistory = history?.slice(0, -1) || []; 
 
-    const promptText = `CONTEXTO DEL EJERCICIO ACTUAL:\n${contextoEjercicio}\n\nPREGUNTA DEL USUARIO: ${lastUserMessage}`;
+    // El resto del historial es la conversación previa.
+    const conversationHistory = history?.slice(0, -1) || []; 
+    
+    // Combinamos el contexto del ejercicio con la pregunta del usuario.
+    const promptText = `CONTEXTO DEL EJERCICIO ACTUAL:\n${contextoEjercicio}\n\nPREGUNTA O RESPUESTA DEL USUARIO: ${lastUserMessage}`;
     const prompt: Part[] = [{ text: promptText }];
      
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.5-flash',
       system: systemPrompt,
-      history: conversationHistory,
-      prompt: prompt,
+      history: conversationHistory, // Pasamos el historial limpio.
+      prompt: prompt, // Pasamos la pregunta actual y el contexto.
       output: {
         schema: TeoriaCalculadoraAssistantOutputSchema,
       },
