@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Check, Bot, Calculator, X, Camera } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, Check, Bot, Calculator, Camera } from 'lucide-react';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { useToast } from '@/hooks/use-toast';
@@ -23,61 +22,67 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { GeogebraIntegrado } from './geogebra-integrado';
 
-// Este componente contendrá los dos botones de ayuda
+// Este componente contendrá los botones de ayuda
 export function AyudaContextual({ 
     ejercicioId, 
     groupId, 
     onTeoricoToggle, 
     isTeoricoOpen,
-    enunciado
+    enunciado,
+    tutorType = 'ambos' // 'ambos', 'geogebra', 'calculadora'
 }: { 
     ejercicioId: string | string[]; 
     groupId: string; 
-    onTeoricoToggle: () => void;
-    isTeoricoOpen: boolean;
+    onTeoricoToggle?: () => void;
+    isTeoricoOpen?: boolean;
     enunciado?: React.ReactNode;
+    tutorType?: 'ambos' | 'geogebra' | 'calculadora';
 }) {
   
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-              <Button
-                variant={isTeoricoOpen ? 'default' : 'outline'}
-                size="icon"
-                className="h-9 w-9"
-                onClick={onTeoricoToggle}
-              >
-                  <Calculator className="h-5 w-5"/>
-              </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-              <p>Ayuda con el Tutor Teórico</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Dialog>
+        { (tutorType === 'ambos' || tutorType === 'calculadora') && onTeoricoToggle && (
             <Tooltip>
-                <TooltipTrigger asChild>
-                    <DialogTrigger asChild>
-                         <Button variant="outline" size="icon" className="h-9 w-9">
-                            <Bot className="h-5 w-5" />
-                         </Button>
-                    </DialogTrigger>
-                </TooltipTrigger>
-                 <TooltipContent>
-                    <p>Resolver con Tutor de GeoGebra</p>
-                </TooltipContent>
+              <TooltipTrigger asChild>
+                  <Button
+                    variant={isTeoricoOpen ? 'default' : 'outline'}
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={onTeoricoToggle}
+                  >
+                      <Calculator className="h-5 w-5"/>
+                  </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                  <p>Ayuda con el Tutor Teórico</p>
+              </TooltipContent>
             </Tooltip>
-            <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
-                <GeogebraIntegrado
-                    ejercicioId={Array.isArray(ejercicioId) ? ejercicioId.join(',') : ejercicioId}
-                    grupoId={groupId}
-                    enunciado={enunciado}
-                />
-            </DialogContent>
-        </Dialog>
+        )}
+
+        { (tutorType === 'ambos' || tutorType === 'geogebra') && (
+            <Dialog>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                             <Button variant="outline" size="icon" className="h-9 w-9">
+                                <Bot className="h-5 w-5" />
+                             </Button>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                     <TooltipContent>
+                        <p>Resolver con Tutor de GeoGebra</p>
+                    </TooltipContent>
+                </Tooltip>
+                <DialogContent className="w-screen h-screen max-w-full max-h-full p-0 overflow-y-auto">
+                    <GeogebraIntegrado
+                        ejercicioId={Array.isArray(ejercicioId) ? ejercicioId.join(',') : ejercicioId}
+                        grupoId={groupId}
+                        enunciado={enunciado}
+                    />
+                </DialogContent>
+            </Dialog>
+        )}
       </div>
     </TooltipProvider>
   );
@@ -184,7 +189,7 @@ export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
                     <EjercicioInteractivo 
                       key="tabla-actividad-1"
                       groupId="la-rampa-actividad-1"
-                      contextFileName='la-rampa/tutor-calculadora/actividad-1'
+                      contextFileName='la-rampa/tutor-calculadora/actividad-1.ts'
                       tableRef={tablaRef}
                     />
                 </AccordionContent>
@@ -304,7 +309,7 @@ export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
                         <EjercicioInteractivo 
                             key="tabla-actividad-4"
                             groupId="la-rampa-actividad-4"
-                            contextFileName='la-rampa/tutor-calculadora/actividad-4'
+                            contextFileName='la-rampa/tutor-calculadora/actividad-4.ts'
                             tableRef={tablaRef}
                         />
                       </AccordionContent>
@@ -319,7 +324,7 @@ export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
 interface EjercicioInteractivoProps {
   groupId: string;
   contextFileName: string;
-  tableRef: React.RefObject<HTMLDivElement> | null;
+  tableRef?: React.RefObject<HTMLDivElement> | null;
 }
 
 
@@ -391,7 +396,7 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
         <TutorTeoricoChat 
           initialContext={loadedContext}
           groupId={groupId} 
-          contextFileName={`${contextFileName}.ts`}
+          contextFileName={`${contextFileName}`}
           takeScreenshot={tableRef ? takeScreenshot : undefined}
         />
       )}

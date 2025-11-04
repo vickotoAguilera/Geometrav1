@@ -17,7 +17,7 @@ import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { GeogebraIntegrado } from '@/components/geogebra-integrado';
 import { Button } from '@/components/ui/button';
-import { Bot } from 'lucide-react';
+import { Bot, Calculator } from 'lucide-react';
 
 const MarkdownRenderer = ({ content }: { content: string }) => {
     return (
@@ -47,15 +47,15 @@ const ejerciciosGeogebra = [
 ];
 
 const enunciadosGeogebra: Record<string, React.ReactNode> = {
-    'actividad-1': <p>Ingresa a la siguiente dirección: https://www.geogebra.org/classic. <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/2.png" alt="Interfaz de GeoGebra Clásico" /></p>,
-    'actividad-2': <p>Para construir el triángulo con vértices A = (0, 0), B = (4, 0) y C = (4, 3) y determinar las medidas de los ángulos interiores, ¿qué comando único debes usar después de definir los puntos? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/4.png" alt="Resultado de Actividad 2 en GeoGebra" /></p>,
-    'actividad-3': <p>Para transformar la medida en radianes del ángulo π/3 a grados, ¿qué comando debes escribir en la barra de entrada? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/6.png" alt="Resultado de Actividad 3 en GeoGebra" /></p>,
-    'actividad-4': <p>Para calcular el valor del seno de un ángulo que mide 30°, ¿qué comando escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/8.png" alt="Resultado de Actividad 4 en GeoGebra" /></p>,
-    'actividad-5': <p>Para calcular el valor del coseno de un ángulo que mide 30 radianes, ¿qué comando escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/10.png" alt="Resultado de Actividad 5 en GeoGebra" /></p>,
-    'actividad-6': <p>GeoGebra no calcula directamente con gradianes. Para calcular la tangente de 50g, debes convertirlo a grados multiplicando por 0.9. ¿Qué comando final escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/11.png" alt="Resultado de Actividad 6 en GeoGebra" /></p>,
-    'actividad-7': <p>Para calcular la medida en grados de un ángulo cuyo valor de seno es 0.5, ¿qué comando utilizas? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/13.png" alt="Resultado de Actividad 7 en GeoGebra" /></p>,
-    'actividad-8': <p>Para obtener el valor del ángulo en radianes cuyo coseno es 0.5, ¿qué comando debes escribir? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/15.png" alt="Resultado de Actividad 8 en GeoGebra" /></p>,
-    'actividad-9': <p>Para obtener el valor en gradianes del ángulo cuyo tangente es 0.5, ¿qué comando debes escribir? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/17.png" alt="Resultado de Actividad 9 en GeoGebra" /></p>
+    'actividad-1': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Ingresa a la siguiente dirección: https://www.geogebra.org/classic. <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/2.png" alt="Interfaz de GeoGebra Clásico" /></div>,
+    'actividad-2': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para construir el triángulo con vértices A = (0, 0), B = (4, 0) y C = (4, 3) y determinar las medidas de los ángulos interiores, ¿qué comando único debes usar después de definir los puntos? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/4.png" alt="Resultado de Actividad 2 en GeoGebra" /></div>,
+    'actividad-3': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para transformar la medida en radianes del ángulo π/3 a grados, ¿qué comando debes escribir en la barra de entrada? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/6.png" alt="Resultado de Actividad 3 en GeoGebra" /></div>,
+    'actividad-4': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para calcular el valor del seno de un ángulo que mide 30°, ¿qué comando escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/8.png" alt="Resultado de Actividad 4 en GeoGebra" /></div>,
+    'actividad-5': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para calcular el valor del coseno de un ángulo que mide 30 radianes, ¿qué comando escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/10.png" alt="Resultado de Actividad 5 en GeoGebra" /></div>,
+    'actividad-6': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">GeoGebra no calcula directamente con gradianes. Para calcular la tangente de 50g, debes convertirlo a grados multiplicando por 0.9. ¿Qué comando final escribes? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/11.png" alt="Resultado de Actividad 6 en GeoGebra" /></div>,
+    'actividad-7': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para calcular la medida en grados de un ángulo cuyo valor de seno es 0.5, ¿qué comando utilizas? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/13.png" alt="Resultado de Actividad 7 en GeoGebra" /></div>,
+    'actividad-8': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para obtener el valor del ángulo en radianes cuyo coseno es 0.5, ¿qué comando debes escribir? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/15.png" alt="Resultado de Actividad 8 en GeoGebra" /></div>,
+    'actividad-9': <div className="prose prose-invert max-w-none text-muted-foreground mb-4">Para obtener el valor en gradianes del ángulo cuyo tangente es 0.5, ¿qué comando debes escribir? <MarkdownImage src="/imagenes-ejercicios/imagenes Actividad tecnológica 1 Ángulos y razones trigonométricas/17.png" alt="Resultado de Actividad 9 en GeoGebra" /></div>
 };
 
 const ejerciciosCalculadora = [
@@ -78,7 +78,7 @@ export default function AngulosYRazonesPage() {
         const fetchContent = async () => {
             setIsLoading(true);
             try {
-                const calculadoraRes = await getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad');
+                const calculadoraRes = await getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad.md');
                 if ('content' in calculadoraRes) {
                     setContenidoCalculadora(calculadoraRes.content);
                 } else {
@@ -135,9 +135,7 @@ export default function AngulosYRazonesPage() {
                                             <h3 className="text-lg font-semibold text-left">{ej.pregunta}</h3>
                                         </AccordionTrigger>
                                         <AccordionContent>
-                                            <div className="prose prose-invert max-w-none text-muted-foreground mb-4">
-                                                {enunciadosGeogebra[ej.id]}
-                                            </div>
+                                            {enunciadosGeogebra[ej.id]}
                                             <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
                                              <div className="flex justify-end pt-4 mt-4 border-t">
                                                 <Dialog>
@@ -147,11 +145,11 @@ export default function AngulosYRazonesPage() {
                                                             Ayuda con Tutor GeoGebra
                                                          </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                                                    <DialogContent className="max-w-7xl h-screen flex flex-col p-0">
                                                         <GeogebraIntegrado 
-                                                            ejercicioId={`angulos-y-razones/tutor-geogebra/actividad`}
+                                                            ejercicioId={`angulos-y-razones/tutor-geogebra/actividad.md`}
                                                             grupoId={`angulos-y-razones-geogebra-${ej.id}`}
-                                                            enunciado={<div className="prose prose-invert max-w-none">{enunciadosGeogebra[ej.id]}</div>}
+                                                            enunciado={enunciadosGeogebra[ej.id]}
                                                         />
                                                     </DialogContent>
                                                 </Dialog>
@@ -186,20 +184,23 @@ export default function AngulosYRazonesPage() {
                                             <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
                                              <div className="flex justify-end pt-4 mt-4 border-t">
                                                  <AyudaContextual
-                                                    ejercicioId="angulos-y-razones/tutor-calculadora/actividad"
+                                                    ejercicioId={`angulos-y-razones/tutor-calculadora/actividad.md`}
                                                     groupId={`angulos-y-razones-calculadora-${ej.id}`}
                                                     onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
                                                     isTeoricoOpen={activeTeorico === ej.id}
-                                                    enunciado={null}
+                                                    tutorType="calculadora"
                                                 />
                                             </div>
                                             {activeTeorico === ej.id && (
-                                                <AyudaContextual
-                                                    ejercicioId="angulos-y-razones/tutor-calculadora/actividad"
-                                                    groupId={`angulos-y-razones-calculadora-${ej.id}`}
-                                                    onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
-                                                    isTeoricoOpen={activeTeorico === ej.id}
-                                                />
+                                                <div className="mt-4">
+                                                    <AyudaContextual
+                                                        ejercicioId={`angulos-y-razones/tutor-calculadora/actividad.md`}
+                                                        groupId={`angulos-y-razones-calculadora-${ej.id}`}
+                                                        onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
+                                                        isTeoricoOpen={activeTeorico === ej.id}
+                                                        tutorType="calculadora"
+                                                    />
+                                                </div>
                                             )}
                                         </AccordionContent>
                                     </AccordionItem>
