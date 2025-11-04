@@ -12,6 +12,8 @@ import 'katex/dist/katex.min.css';
 import { MarkdownImage } from '@/components/markdown-image';
 import { Loader2 } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 
 // Componente para renderizar el contenido de Markdown
 const MarkdownRenderer = ({ content }: { content: string }) => {
@@ -29,8 +31,30 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
     );
 };
 
+const ejerciciosGeogebra = [
+    {
+        id: 'geogebra-actividad-2',
+        pregunta: '**Actividad 2:** ¿Qué comando usas para crear un polígono con los vértices A, B y C?',
+        respuestaCorrecta: 'Poligono(A,B,C)'
+    },
+    {
+        id: 'geogebra-actividad-3',
+        pregunta: '**Actividad 3:** ¿Qué comando usas para transformar 3π/2 radianes a grados?',
+        respuestaCorrecta: 'Ángulo(3pi/2)'
+    },
+    {
+        id: 'geogebra-actividad-4',
+        pregunta: '**Actividad 4:** ¿Qué comando usas para calcular el seno de 30 grados?',
+        respuestaCorrecta: 'sin(30°)'
+    },
+    {
+        id: 'geogebra-actividad-7',
+        pregunta: '**Actividad 7:** ¿Qué comando usas para encontrar el ángulo (en grados) cuyo seno es 0.5?',
+        respuestaCorrecta: 'asind(0.5)'
+    },
+];
+
 export default function AngulosYRazonesPage() {
-    const [contenidoGeogebra, setContenidoGeogebra] = useState<string | null>(null);
     const [contenidoCalculadora, setContenidoCalculadora] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTeorico, setActiveTeorico] = useState<string | null>(null);
@@ -39,14 +63,8 @@ export default function AngulosYRazonesPage() {
         const fetchContent = async () => {
             setIsLoading(true);
             try {
-                const [geogebraRes, calculadoraRes] = await Promise.all([
-                    getGuiaEjercicio('angulos-y-razones/tutor-geogebra/actividad'),
-                    getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad')
-                ]);
-
-                if ('content' in geogebraRes) setContenidoGeogebra(geogebraRes.content);
+                const calculadoraRes = await getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad');
                 if ('content' in calculadoraRes) setContenidoCalculadora(calculadoraRes.content);
-
             } catch (error) {
                 console.error("Error cargando guías:", error);
             } finally {
@@ -86,17 +104,23 @@ export default function AngulosYRazonesPage() {
                 <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Parte 1: Guía de GeoGebra</CardTitle>
-                            <CardDescription>Aprende a usar los comandos de GeoGebra para trabajar con trigonometría.</CardDescription>
+                            <CardTitle>Parte 1: Guía Interactiva de GeoGebra</CardTitle>
+                            <CardDescription>Demuestra lo que sabes sobre los comandos de GeoGebra.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            {contenidoGeogebra && <MarkdownRenderer content={contenidoGeogebra} />}
-                             <div className="flex justify-end pt-4 mt-6 border-t">
+                        <CardContent className="space-y-4">
+                            <div className="prose prose-invert max-w-none text-sm">
+                                <p>Para esta sección, responde con el comando exacto que usarías en la barra de entrada de GeoGebra.</p>
+                            </div>
+                            {ejerciciosGeogebra.map(ej => (
+                                <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
+                            ))}
+                            <div className="flex justify-end pt-4 mt-6 border-t">
                                 <AyudaContextual
                                     ejercicioId="angulos-y-razones/tutor-geogebra/actividad"
                                     groupId="angulos-y-razones-geogebra"
-                                    onTeoricoToggle={() => handleTeoricoToggle('geogebra')}
-                                    isTeoricoOpen={false} // Ocultamos el tutor teórico
+                                    onTeoricoToggle={() => {}} // Se deshabilita para este caso
+                                    isTeoricoOpen={false} 
+                                    enunciado={null}
                                 />
                             </div>
                         </CardContent>
@@ -107,13 +131,21 @@ export default function AngulosYRazonesPage() {
                             <CardDescription>Configura y utiliza tu calculadora para resolver problemas trigonométricos.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {contenidoCalculadora && <MarkdownRenderer content={contenidoCalculadora} />}
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger>Ver Guía de Uso de la Calculadora</AccordionTrigger>
+                                    <AccordionContent>
+                                        {contenidoCalculadora && <MarkdownRenderer content={contenidoCalculadora} />}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
                              <div className="flex justify-end pt-4 mt-6 border-t">
                                  <AyudaContextual
                                     ejercicioId="angulos-y-razones/tutor-calculadora/actividad"
                                     groupId="angulos-y-razones-calculadora"
                                     onTeoricoToggle={() => handleTeoricoToggle('calculadora')}
                                     isTeoricoOpen={activeTeorico === 'calculadora'}
+                                    enunciado={null}
                                 />
                             </div>
                             {activeTeorico === 'calculadora' && (
