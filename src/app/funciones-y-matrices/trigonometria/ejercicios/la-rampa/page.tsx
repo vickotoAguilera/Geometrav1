@@ -2,10 +2,11 @@
 
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AyudaContextual, TablaActividad1, TablaActividad4 } from '@/components/ejercicio-interactivo';
+import { AyudaContextual, TablaActividad1, TablaActividad4, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { useState } from 'react';
 import Image from 'next/image';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const ejerciciosPlazaSkate = [
     { id: 'tipo-triangulo', pregunta: '¿Qué tipo de triángulo representa las rampas dibujadas?', respuestaCorrecta: 'Triángulo rectángulo' },
@@ -53,44 +54,72 @@ export default function PaginaLaRampa() {
                                 </div>
                             </div>
                             
-                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 1: Cálculo de Diferencia de Nivel</h3>
-                            <p className="text-muted-foreground mb-4 text-sm">Completa la siguiente tabla calculando la "Diferencia de nivel" para cada rampa según su pendiente y distancia horizontal.</p>
-                            <TablaActividad1 />
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger>
+                                        <h3 className="text-xl font-semibold">Actividad 1: Cálculo de Diferencia de Nivel</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <p className="text-muted-foreground mb-4 text-sm">Completa la siguiente tabla calculando la "Diferencia de nivel" para cada rampa según su pendiente y distancia horizontal.</p>
+                                        <TablaActividad1 />
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="item-2">
+                                     <AccordionTrigger>
+                                        <h3 className="text-xl font-semibold">Actividad 2: Construcción en GeoGebra</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="prose prose-invert max-w-none mb-4">
+                                            <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
+                                        </div>
+                                        <div className="space-y-4 my-4">
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                 <AccordionItem value="item-3">
+                                     <AccordionTrigger>
+                                        <h3 className="text-xl font-semibold">Actividad 3: Medición de Ángulos</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="prose prose-invert max-w-none mb-4">
+                                            <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
+                                        </div>
+                                        <div className="space-y-4 my-4">
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="item-4">
+                                     <AccordionTrigger>
+                                        <h3 className="text-xl font-semibold">Actividad 4: Razones Trigonométricas</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <p className="text-muted-foreground mb-4 text-sm">Completa la tabla calculando el ángulo y las razones trigonométricas correspondientes a cada pendiente.</p>
+                                        <TablaActividad4 />
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="item-5">
+                                     <AccordionTrigger>
+                                        <h3 className="text-xl font-semibold">Actividad 5: Cierre</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="prose prose-invert max-w-none mb-4">
+                                            <p>Utiliza los comandos de tu calculadora o GeoGebra para responder:</p>
+                                        </div>
+                                        <div className="space-y-4 my-4">
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[5]} />
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[6]} />
+                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[7]} />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
 
-                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 2: Construcción en GeoGebra</h3>
-                             <div className="prose prose-invert max-w-none mb-4">
-                                <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
-                            </div>
-                            <div className="space-y-4 my-4">
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
-                            </div>
-
-                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 3: Medición de Ángulos</h3>
-                             <div className="prose prose-invert max-w-none mb-4">
-                                <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
-                            </div>
-                             <div className="space-y-4 my-4">
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
-                            </div>
-
-                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 4: Razones Trigonométricas</h3>
-                             <p className="text-muted-foreground mb-4 text-sm">Completa la tabla calculando el ángulo y las razones trigonométricas correspondientes a cada pendiente.</p>
-                            <TablaActividad4 />
-
-                            <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 5: Cierre</h3>
-                             <div className="prose prose-invert max-w-none mb-4">
-                                <p>Utiliza los comandos de tu calculadora o GeoGebra para responder:</p>
-                            </div>
-                            <div className="space-y-4 my-4">
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[5]} />
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[6]} />
-                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[7]} />
-                            </div>
-
-                            <div className="flex justify-end pt-4 mt-6">
+                            <div className="flex justify-end pt-4 mt-6 border-t">
                                 <AyudaContextual
                                     ejercicioId="la-rampa"
                                     groupId="rampa-trigonometria"
@@ -99,11 +128,12 @@ export default function PaginaLaRampa() {
                                 />
                             </div>
                             {activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria' && (
-                                <div className="border rounded-lg mt-4">
-                                    {/* Aquí puedes renderizar el componente del tutor teórico si es necesario */}
-                                </div>
+                               <EjercicioInteractivo 
+                                    key="rampa-trigonometria"
+                                    groupId="rampa-trigonometria"
+                                    contextFileName={'la-rampa/tutor-calculadora/consolidado'}
+                               />
                             )}
-
                         </CardContent>
                     </Card>
                 </div>
