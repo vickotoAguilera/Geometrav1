@@ -24,7 +24,7 @@ interface GenkitMessage {
 }
 
 interface TutorTeoricoChatProps {
-  ejercicioId: string;
+  initialContext: string;
   groupId: string;
 }
 
@@ -54,7 +54,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ initialContext, groupId }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -65,22 +65,14 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   
   const [isReady, setIsReady] = useState(false);
 
-  const loadAndInitialize = async (isReset: boolean = false) => {
+  const loadAndInitialize = (isReset: boolean = false) => {
+    setIsReady(false);
     const savedMessagesRaw = localStorage.getItem(chatStorageKey);
     let currentHistory: ChatMessage[] = savedMessagesRaw && !isReset ? JSON.parse(savedMessagesRaw) : [];
     
-    // Si no hay historial o si se está reiniciando, comienza con el prompt automático.
     if (currentHistory.length === 0) {
-      setIsReady(false);
-      const guideResult = await getGuiaEjercicio(ejercicioId);
-      if ('error' in guideResult) {
-        toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar la guía del ejercicio.' });
-        setIsReady(true);
-        return;
-      }
       
-      const newContext = guideResult.content;
-      const autoPrompt = `He activado el ejercicio '${ejercicioId}'. Explícame el primer paso para resolverlo con lápiz y papel.`;
+      const autoPrompt = `He activado la guía de ejercicios. Explícame el primer paso para resolverlo con lápiz y papel.`;
 
       const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt };
       const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...' };
@@ -91,7 +83,7 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
       startTransition(() => {
         teoriaCalculadoraAssistant({
           history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
-          contextoEjercicio: newContext
+          contextoEjercicio: initialContext
         })
         .then(({ response }) => {
           const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
@@ -113,7 +105,7 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
   useEffect(() => {
     loadAndInitialize();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, groupId]);
+  }, [initialContext, groupId]);
 
   useEffect(() => {
     if (isReady && messages.length > 0) {
@@ -154,14 +146,6 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
 
     const newHistory = [...messages, userMessage];
     setMessages([...newHistory, assistantPlaceholder]);
-
-    const guideResult = await getGuiaEjercicio(ejercicioId);
-    if ('error' in guideResult) {
-      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo cargar el contexto para responder.' });
-      setMessages(messages); // Revertir
-      return;
-    }
-    const currentContext = guideResult.content;
     
     startTransition(async () => {
         try {
@@ -172,7 +156,7 @@ export function TutorTeoricoChat({ ejercicioId, groupId }: TutorTeoricoChatProps
             
             const { response: aiResponse } = await teoriaCalculadoraAssistant({
               history: genkitHistory,
-              contextoEjercicio: currentContext,
+              contextoEjercicio: initialContext,
             });
 
             setMessages(prev => prev.slice(0, -1).concat({

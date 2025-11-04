@@ -260,23 +260,36 @@ interface EjercicioInteractivoProps {
 export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInteractivoProps) {
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const loadContext = async () => {
       setIsLoading(true);
+      setIsError(false);
       if (contextFileNames && contextFileNames.length > 0) {
         try {
+          const contentPromises = contextFileNames.map(file => getGuiaEjercicio(file));
+          const results = await Promise.all(contentPromises);
+          
           let combinedContent = '';
-          for (const file of contextFileNames) {
-            const result = await getGuiaEjercicio(file);
+          results.forEach((result, index) => {
             if ('content' in result) {
-              combinedContent += `--- INICIO GUÍA: ${file}.md ---\n${result.content}\n--- FIN GUÍA: ${file}.md ---\n\n`;
+                const fileName = contextFileNames[index];
+                combinedContent += `--- INICIO GUÍA: ${fileName}.md ---\n${result.content}\n--- FIN GUÍA: ${fileName}.md ---\n\n`;
+            } else {
+                console.warn(`No se pudo cargar la guía: ${contextFileNames[index]}`);
             }
+          });
+
+          if(combinedContent.trim() === '') {
+              throw new Error('No se pudo cargar ningún contenido de las guías.');
           }
+
           setLoadedContext(combinedContent);
         } catch (error) {
           console.error("Error cargando el contexto del ejercicio:", error);
-          setLoadedContext(''); // Poner un string vacío para evitar errores
+          setLoadedContext(null);
+          setIsError(true);
         }
       } else {
         setLoadedContext('');
@@ -295,6 +308,15 @@ export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInt
         <span className="ml-2 text-muted-foreground">Cargando tutor...</span>
       </div>
     );
+  }
+
+  if (isError) {
+      return (
+          <div className="border-t pt-4 mt-4 text-center text-red-500">
+              <p>Error: No se pudo cargar el contexto para el tutor teórico.</p>
+              <p className="text-xs text-muted-foreground">Por favor, revisa que los archivos de contexto existan y sean accesibles.</p>
+          </div>
+      )
   }
 
   return (

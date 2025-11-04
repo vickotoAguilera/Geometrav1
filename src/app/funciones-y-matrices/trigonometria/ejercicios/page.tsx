@@ -22,7 +22,10 @@ export default function NuevaPaginaEjercicios() {
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
 
     const handleTeoricoToggle = (groupId: string) => {
-        // La lógica del tutor teórico permanece desactivada por ahora
+        setActiveTeorico(prev => ({
+            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
+            groupId: groupId,
+        }));
     };
 
     return (
@@ -69,6 +72,13 @@ export default function NuevaPaginaEjercicios() {
                                                     isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
                                             </div>
+                                             {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
+                                               <EjercicioInteractivo 
+                                                    key="trigonometria-basica"
+                                                    groupId="trigonometria-basica"
+                                                    contextFileNames={['plaza-skate/tutor-calculadora/actividad', 'conversion-radianes/tutor-calculadora/actividad']}
+                                               />
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
