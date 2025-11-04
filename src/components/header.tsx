@@ -17,7 +17,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
-import { GoogleAuthProvider, signInWithRedirect, signOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { usePathname } from 'next/navigation';
 import { ScreenshotGuide } from "./screenshot-guide";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,7 +41,7 @@ const AuthButton = () => {
         if (!auth) return;
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithRedirect(auth, provider);
+            await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google", error);
         }
