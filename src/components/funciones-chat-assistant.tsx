@@ -330,7 +330,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMess
       <div className="p-3 border-b">
          <Accordion type="single" collapsible>
             <AccordionItem value="item-1" className="border-b-0">
-                <AccordionTrigger className="py-2 px-3 rounded-md text-sm hover:no-underline bg-yellow-100 dark:bg-yellow-900/30 data-[state=open]:bg-red-500 data-[state=open]:text-white">
+                <AccordionTrigger className="py-2 px-3 rounded-md text-sm hover:no-underline bg-yellow-100 dark:bg-yellow-900/30">
                      <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         <span className="font-semibold">Atención</span>
