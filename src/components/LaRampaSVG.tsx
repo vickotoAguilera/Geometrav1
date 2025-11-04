@@ -8,8 +8,8 @@ export function LaRampaSVG(props: SVGProps<SVGSVGElement>) {
       {/* Triangle */}
       <polygon points="10,80 110,80 110,30" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth="1" />
 
-      {/* Angle alpha symbol with value */}
-      <path d="M 25 80 A 15 15 0 0 1 10 65" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
+      {/* Angle alpha symbol with value - CORRECTED */}
+      <path d="M 25 80 A 15 15 0 0 1 24.3 65.7" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
       <text x="28" y="70" fontSize="8" fill="hsl(var(--primary))" fontWeight="bold">α = 12°</text>
 
       {/* 90-degree angle symbol */}
