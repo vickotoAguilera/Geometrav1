@@ -95,7 +95,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMess
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const router = useRouter();
-  const [isAttentionCollapsed, setAttentionCollapsed] = useState(false);
 
   const [sendScreenshot, setSendScreenshot] = useState(false);
   const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
@@ -329,12 +328,12 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMess
       </SheetHeader>
       
       <div className="p-3 border-b">
-         <Accordion type="single" collapsible defaultValue='item-1' onValueChange={(value) => setAttentionCollapsed(!value)}>
+         <Accordion type="single" collapsible>
             <AccordionItem value="item-1" className="border-b-0">
-                <AccordionTrigger className={cn("py-2 px-3 rounded-md text-sm hover:no-underline", !isAttentionCollapsed ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-red-500 text-white')}>
+                <AccordionTrigger className="py-2 px-3 rounded-md text-sm hover:no-underline bg-yellow-100 dark:bg-yellow-900/30 data-[state=open]:bg-red-500 data-[state=open]:text-white">
                      <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
-                        <span className="font-semibold">{isAttentionCollapsed ? 'Atención (Haz clic para expandir)' : 'Atención'}</span>
+                        <span className="font-semibold">Atención</span>
                      </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2">
@@ -352,7 +351,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMess
 
       {activeGuides.length > 0 && (
          <div className="p-3 border-b bg-background">
-            <Accordion type="single" collapsible defaultValue="item-1">
+            <Accordion type="single" collapsible>
                 <AccordionItem value="item-1" className="border-b-0">
                     <AccordionTrigger className="text-sm font-medium hover:no-underline py-1">
                         Guías Activas en esta Sesión ({activeGuides.length})
