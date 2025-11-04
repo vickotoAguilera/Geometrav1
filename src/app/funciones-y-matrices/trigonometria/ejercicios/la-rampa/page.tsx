@@ -51,9 +51,6 @@ export default function PaginaLaRampa() {
                                     <li>¿Qué tipo de triángulo representa las rampas dibujadas?</li>
                                     <li>¿Qué semejanzas y diferencias observas entre ellas?</li>
                                 </ul>
-                                <div className="flex justify-center">
-                                     <Image src="/imagenes-ejercicios/rampa/2.png" alt="Representación de una rampa en GeoGebra" width={500} height={300} className="rounded-lg shadow-md" />
-                                </div>
                             </div>
 
                             <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 3: Medición de Ángulos</h3>
@@ -64,9 +61,6 @@ export default function PaginaLaRampa() {
                                     <li>¿Y para la del 8%?</li>
                                     <li>¿Cuál debería ser el ángulo para una pendiente del 6%?</li>
                                 </ul>
-                                <div className="flex justify-center">
-                                     <Image src="/imagenes-ejercicios/rampa/3.png" alt="Medición de ángulos en GeoGebra" width={500} height={300} className="rounded-lg shadow-md" />
-                                </div>
                             </div>
 
 
@@ -82,9 +76,6 @@ export default function PaginaLaRampa() {
                                     <li>Si una rampa debe tener 4° de inclinación, ¿cuál es su pendiente?</li>
                                     <li>Para esa misma rampa de 4°, si la altura a salvar es de 25 cm, ¿qué distancia horizontal se necesita?</li>
                                 </ul>
-                                <div className="flex justify-center">
-                                     <Image src="/imagenes-ejercicios/rampa/5.png" alt="Cálculos en calculadora científica" width={500} height={150} className="rounded-lg shadow-md" />
-                                </div>
                             </div>
 
                             <div className="flex justify-end pt-4 mt-6">
