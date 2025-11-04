@@ -5,7 +5,7 @@ import { GeoGebraAppletContextual } from '@/components/geogebra-applet-contextua
 import { FuncionesChatAssistant, type ChatMessage } from '@/components/funciones-chat-assistant';
 
 interface GeogebraIntegradoProps {
-  ejercicioId: string;
+  ejercicioId: string | string[];
   grupoId: string;
   enunciado: React.ReactNode;
 }
@@ -14,21 +14,23 @@ export function GeogebraIntegrado({ ejercicioId, grupoId, enunciado }: GeogebraI
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatStorageKey = `chat-history-${grupoId}`;
   const initialLoadDone = useRef(false);
+  const currentEjercicioId = Array.isArray(ejercicioId) ? ejercicioId[0] : ejercicioId;
+
 
   useEffect(() => {
-    if (!ejercicioId || !grupoId || initialLoadDone.current) return;
+    if (!currentEjercicioId || !grupoId || initialLoadDone.current) return;
 
     const loadConversation = async () => {
       const savedMessagesRaw = localStorage.getItem(chatStorageKey);
       let currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
-      const isNewExercise = !currentHistory.some(msg => msg.contextFile === ejercicioId);
+      const isNewExercise = !currentHistory.some(msg => msg.contextFile === currentEjercicioId);
       
       if (currentHistory.length === 0 || isNewExercise) {
         const autoPrompt = currentHistory.length === 0
-          ? `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`
-          : `Ahora también he activado la guía '${ejercicioId}'. Considera este nuevo contexto y continúa nuestra conversación.`;
+          ? `He activado la guía '${currentEjercicioId}'. Por favor, dame la primera instrucción.`
+          : `Ahora también he activado la guía '${currentEjercicioId}'. Considera este nuevo contexto y continúa nuestra conversación.`;
 
-        const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
+        const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: currentEjercicioId };
         setMessages(prev => [...prev, userMessage]);
       } else {
         setMessages(currentHistory);
@@ -38,7 +40,7 @@ export function GeogebraIntegrado({ ejercicioId, grupoId, enunciado }: GeogebraI
     
     loadConversation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, grupoId]);
+  }, [currentEjercicioId, grupoId]);
 
   useEffect(() => {
     try {
@@ -64,20 +66,23 @@ export function GeogebraIntegrado({ ejercicioId, grupoId, enunciado }: GeogebraI
         <div className="text-sm text-muted-foreground">{enunciado}</div>
       </div>
       
-      {/* 2. Applet de GeoGebra (flexible) */}
-      <div className="flex-1 w-full relative">
-        <GeoGebraAppletContextual groupId={grupoId} />
-      </div>
+      {/* 2. Applet de GeoGebra y Chat del Tutor en dos columnas */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Columna de GeoGebra */}
+        <div className="lg:w-2/3 w-full h-1/2 lg:h-full relative border-r">
+          <GeoGebraAppletContextual groupId={grupoId} />
+        </div>
 
-      {/* 3. Chat del Tutor (altura fija) */}
-      <div className="h-[40vh] border-t">
-        <FuncionesChatAssistant 
-            ejercicioId={ejercicioId} 
-            grupoId={grupoId}
-            messages={messages}
-            setMessages={setMessages}
-            onReset={handleResetConversation}
-        />
+        {/* Columna del Chat */}
+        <div className="lg:w-1/3 w-full h-1/2 lg:h-full flex flex-col">
+          <FuncionesChatAssistant 
+              ejercicioId={Array.isArray(ejercicioId) ? ejercicioId.join(',') : ejercicioId}
+              grupoId={grupoId}
+              messages={messages}
+              setMessages={setMessages}
+              onReset={handleResetConversation}
+          />
+        </div>
       </div>
     </div>
   );
