@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/tooltip"
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Label } from '@/components/ui/label';
-import { ButtonVerificarConceptual } from './modulo-ejercicios';
-
 
 // Este componente contendrá los dos botones de ayuda
 export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeoricoOpen }: { ejercicioId: string; groupId: string; onTeoricoToggle: () => void; isTeoricoOpen: boolean; }) {

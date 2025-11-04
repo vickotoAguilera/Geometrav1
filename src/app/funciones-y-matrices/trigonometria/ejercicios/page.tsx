@@ -7,7 +7,8 @@ import { useState } from 'react';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Button } from '@/components/ui/button';
 import { BookOpen } from 'lucide-react';
-import { AyudaContextual, EjercicioInteractivo, ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 
 
 const ejerciciosPlazaSkate = [
