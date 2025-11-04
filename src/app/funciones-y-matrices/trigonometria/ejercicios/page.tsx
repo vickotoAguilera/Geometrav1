@@ -5,11 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Calculator, Bot } from 'lucide-react';
-import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
-import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+import { BookOpen } from 'lucide-react';
+import { AyudaContextual, EjercicioInteractivo, ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 
 
 const ejerciciosPlazaSkate = [
@@ -76,7 +74,7 @@ export default function NuevaPaginaEjercicios() {
                                                <EjercicioInteractivo 
                                                     key="trigonometria-basica"
                                                     groupId="trigonometria-basica"
-                                                    contextFileNames={['plaza-skate/tutor-calculadora/actividad', 'conversion-radianes/tutor-calculadora/actividad']}
+                                                    contextFileName={'plaza-skate/tutor-calculadora/consolidado'}
                                                />
                                             )}
                                         </div>

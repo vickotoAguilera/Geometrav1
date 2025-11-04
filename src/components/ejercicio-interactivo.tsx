@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip"
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Label } from '@/components/ui/label';
+import { ButtonVerificarConceptual } from './modulo-ejercicios';
 
 
 // Este componente contendrá los dos botones de ayuda
@@ -44,7 +45,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
+            <Link href={`/applet-contextual?ejercicio=plaza-skate/tutor-geogebra/consolidado&grupo=${groupId}`} passHref>
                 <div className="h-9 w-9 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
                     <Bot className="h-5 w-5" />
                 </div>
@@ -253,11 +254,11 @@ export const TablaActividad4 = ({ onVerify }: { onVerify: (results: (boolean | n
 
 interface EjercicioInteractivoProps {
   groupId: string;
-  contextFileNames: string[];
+  contextFileName: string;
 }
 
 
-export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInteractivoProps) {
+export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInteractivoProps) {
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -266,39 +267,24 @@ export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInt
     const loadContext = async () => {
       setIsLoading(true);
       setIsError(false);
-      if (contextFileNames && contextFileNames.length > 0) {
-        try {
-          const contentPromises = contextFileNames.map(file => getGuiaEjercicio(file));
-          const results = await Promise.all(contentPromises);
-          
-          let combinedContent = '';
-          results.forEach((result, index) => {
-            if ('content' in result) {
-                const fileName = contextFileNames[index];
-                combinedContent += `--- INICIO GUÍA: ${fileName}.md ---\n${result.content}\n--- FIN GUÍA: ${fileName}.md ---\n\n`;
-            } else {
-                console.warn(`No se pudo cargar la guía: ${contextFileNames[index]}`);
-            }
-          });
-
-          if(combinedContent.trim() === '') {
-              throw new Error('No se pudo cargar ningún contenido de las guías.');
-          }
-
-          setLoadedContext(combinedContent);
-        } catch (error) {
-          console.error("Error cargando el contexto del ejercicio:", error);
-          setLoadedContext(null);
-          setIsError(true);
+      try {
+        const result = await getGuiaEjercicio(contextFileName);
+        
+        if ('content' in result) {
+          setLoadedContext(result.content);
+        } else {
+          throw new Error(result.error);
         }
-      } else {
-        setLoadedContext('');
+      } catch (error) {
+        console.error("Error cargando el contexto del ejercicio:", error);
+        setLoadedContext(null);
+        setIsError(true);
       }
       setIsLoading(false);
     };
 
     loadContext();
-  }, [contextFileNames]);
+  }, [contextFileName]);
 
 
   if (isLoading) {
@@ -314,7 +300,7 @@ export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInt
       return (
           <div className="border-t pt-4 mt-4 text-center text-red-500">
               <p>Error: No se pudo cargar el contexto para el tutor teórico.</p>
-              <p className="text-xs text-muted-foreground">Por favor, revisa que los archivos de contexto existan y sean accesibles.</p>
+              <p className="text-xs text-muted-foreground">Por favor, revisa que el archivo '{contextFileName}.md' exista y sea accesible.</p>
           </div>
       )
   }
@@ -325,6 +311,7 @@ export function EjercicioInteractivo({ groupId, contextFileNames }: EjercicioInt
         <TutorTeoricoChat 
           initialContext={loadedContext}
           groupId={groupId} 
+          contextFileName={`${contextFileName}.md`}
         />
       )}
     </div>

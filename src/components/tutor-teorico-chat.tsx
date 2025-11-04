@@ -4,13 +4,12 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, RefreshCw } from 'lucide-react';
+import { Bot, User, Send, Loader2, RefreshCw, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { teoriaCalculadoraAssistant } from '@/ai/flows/teoria-calculadora-assistant';
-import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 interface ChatMessage {
   id: string;
@@ -26,6 +25,7 @@ interface GenkitMessage {
 interface TutorTeoricoChatProps {
   initialContext: string;
   groupId: string;
+  contextFileName: string;
 }
 
 const parseResponse = (content: string) => {
@@ -54,7 +54,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ initialContext, groupId }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -176,7 +176,13 @@ export function TutorTeoricoChat({ initialContext, groupId }: TutorTeoricoChatPr
   return (
     <div className="flex flex-col h-full bg-secondary/30 rounded-b-lg">
       <div className="flex justify-between items-center p-2 border-b bg-background rounded-t-lg">
-        <h4 className="text-sm font-semibold ml-2">Tutor Teórico</h4>
+        <div className="flex items-center gap-2">
+            <h4 className="text-sm font-semibold ml-2">Tutor Teórico</h4>
+            <div className="flex items-center text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                <FileText className="w-3 h-3 mr-1.5"/>
+                <span>Contexto: {contextFileName}</span>
+            </div>
+        </div>
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleResetConversation} title="Reiniciar conversación">
             <RefreshCw className="w-4 h-4"/>
         </Button>
