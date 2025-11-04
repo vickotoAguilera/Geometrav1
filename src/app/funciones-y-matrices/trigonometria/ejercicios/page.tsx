@@ -3,7 +3,7 @@
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calculator } from 'lucide-react';
+import { ArrowRight, Calculator, Construction } from 'lucide-react';
 import Link from 'next/link';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { LaRampaSVG } from '@/components/LaRampaSVG';
@@ -78,6 +78,23 @@ export default function PaginaEjerciciosTrigonometria() {
                                     Iniciar Módulo <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
+                        </div>
+                    </Card>
+
+                     <Card className="flex flex-col bg-muted/50 border-dashed">
+                        <CardHeader>
+                            <CardTitle className="text-muted-foreground">Módulo 1.3: Próximamente</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-1 flex flex-col items-center justify-center">
+                            <Construction className="w-16 h-16 text-muted-foreground/50 mx-auto my-4" />
+                            <p className="text-sm text-muted-foreground text-center mt-4">
+                                Nuevos desafíos interactivos se están construyendo aquí.
+                            </p>
+                        </CardContent>
+                        <div className="p-6 pt-0">
+                            <Button className="w-full" disabled>
+                                En Construcción <Construction className="ml-2 h-4 w-4" />
+                            </Button>
                         </div>
                     </Card>
 
