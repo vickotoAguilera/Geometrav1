@@ -7,9 +7,12 @@ import {
 } from '@/ai/flows/funciones-matrices-assistant';
 import { textToSpeech } from "@/ai/flows/tts-flow";
 import { TextToSpeechOutput } from "@/ai/flows/schemas/tts-schemas";
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+
+import * as LaRampaTutorCalculadora from '@/content/guias-geogebra/la-rampa/tutor-calculadora/consolidado';
+import * as LaRampaTutorGeogebra from '@/content/guias-geogebra/la-rampa/tutor-geogebra/consolidado';
+import * as PlazaSkateTutorCalculadora from '@/content/guias-geogebra/plaza-skate/tutor-calculadora/consolidado';
+import * as PlazaSkateTutorGeogebra from '@/content/guias-geogebra/plaza-skate/tutor-geogebra/consolidado';
+
 
 export async function getFuncionesMatricesAiResponse(
   input: FuncionesMatricesAssistantInput
@@ -21,21 +24,22 @@ export async function generateFuncionesMatricesSpeech(text: string): Promise<Tex
     return await textToSpeech(text);
 }
 
+const contextMap: Record<string, { content: string }> = {
+    'la-rampa/tutor-calculadora/consolidado': { content: LaRampaTutorCalculadora.contexto },
+    'la-rampa/tutor-geogebra/consolidado': { content: LaRampaTutorGeogebra.contexto },
+    'plaza-skate/tutor-calculadora/consolidado': { content: PlazaSkateTutorCalculadora.contexto },
+    'plaza-skate/tutor-geogebra/consolidado': { content: PlazaSkateTutorGeogebra.contexto },
+};
+
 export async function getGuiaEjercicio(ejercicioId: string): Promise<{ content: string; } | { error: string }> {
   try {
-    const filePath = path.join(process.cwd(), 'src', 'content', 'guias-geogebra', `${ejercicioId}.md`);
-    if (!fs.existsSync(filePath)) {
-      return { error: `La guía '${ejercicioId}.md' no fue encontrada.` };
+    const data = contextMap[ejercicioId];
+    if (!data) {
+      return { error: `La guía '${ejercicioId}' no fue encontrada.` };
     }
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    const { content } = matter(fileContents);
-    
-    // Devuelve solo el contenido de markdown sin procesar
-    return { content };
+    return { content: data.content };
   } catch (error) {
-    console.error(`Error reading or processing guide for ${ejercicioId}:`, error);
+    console.error(`Error loading guide for ${ejercicioId}:`, error);
     return { error: 'No se pudo cargar el contenido de la guía.' };
   }
 }
-
-    
