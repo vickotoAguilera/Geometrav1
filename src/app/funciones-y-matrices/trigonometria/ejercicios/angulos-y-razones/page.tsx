@@ -3,8 +3,6 @@
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
 import { MarkdownImage } from '@/components/markdown-image';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -12,7 +10,7 @@ import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { GeogebraIntegrado } from '@/components/geogebra-integrado';
 import { Button } from '@/components/ui/button';
-import { Bot, Calculator } from 'lucide-react';
+import { Bot } from 'lucide-react';
 
 const ejerciciosGeogebra = [
     { id: 'actividad-1', pregunta: '**Actividad 1:** ¿Cuál es la dirección del sitio web de GeoGebra Clásico?', respuestaCorrecta: 'https://www.geogebra.org/classic' },
@@ -52,11 +50,11 @@ const ejerciciosCalculadora = [
 
 export default function AngulosYRazonesPage() {
     const [activeTeorico, setActiveTeorico] = useState<string | null>(null);
-    
+
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => (prev === groupId ? null : groupId));
     };
-
+    
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -95,7 +93,7 @@ export default function AngulosYRazonesPage() {
                                                     </DialogTrigger>
                                                     <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
                                                         <GeogebraIntegrado 
-                                                            ejercicioId={`angulos-y-razones/${ej.id}.md`}
+                                                            ejercicioId={`angulos-y-razones/${ej.id}`}
                                                             grupoId={`angulos-y-razones-geogebra-${ej.id}`}
                                                             enunciado={enunciadosGeogebra[ej.id]}
                                                         />
@@ -116,17 +114,17 @@ export default function AngulosYRazonesPage() {
                             <CardDescription>Configura y utiliza tu calculadora para resolver problemas trigonométricos.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Accordion type="multiple" className="w-full">
+                             <Accordion type="multiple" className="w-full">
                                 {ejerciciosCalculadora.map(ej => (
                                     <AccordionItem value={ej.id} key={ej.id}>
-                                         <AccordionTrigger>
+                                        <AccordionTrigger>
                                             <h3 className="text-lg font-semibold text-left">{ej.pregunta}</h3>
                                         </AccordionTrigger>
                                         <AccordionContent>
                                             <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
-                                            <div className="flex justify-end pt-4 mt-4 border-t">
+                                             <div className="flex justify-end pt-4 mt-4 border-t">
                                                 <AyudaContextual
-                                                    ejercicioId={ej.id}
+                                                    ejercicioId={`angulos-y-razones/tutor-calculadora/actividad-${ej.id.replace('actividad-','')}`}
                                                     groupId={`angulos-y-razones-calculadora-${ej.id}`}
                                                     onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
                                                     isTeoricoOpen={activeTeorico === ej.id}

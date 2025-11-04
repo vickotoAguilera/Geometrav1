@@ -68,19 +68,23 @@ export async function getGuiaEjercicio(ejercicioId: string | string[]): Promise<
       if (contextMap[id]) {
          combinedContent += `--- GUÍA: ${id}.ts ---\n${contextMap[id].content}\n\n`;
       } else {
-        const filePath = path.join(process.cwd(), 'src', 'content', 'guias-geogebra', `${id}.md`);
+        // Asegurarse de no añadir .md si ya está presente
+        const cleanId = id.endsWith('.md') ? id.slice(0, -3) : id;
+        const filePath = path.join(process.cwd(), 'src', 'content', 'guias-geogebra', `${cleanId}.md`);
+        
         if (fs.existsSync(filePath)) {
           const fileContent = fs.readFileSync(filePath, 'utf8');
-          combinedContent += `--- GUÍA: ${id}.md ---\n${fileContent}\n\n`;
+          combinedContent += `--- GUÍA: ${cleanId}.md ---\n${fileContent}\n\n`;
         } else {
-           return { error: `La guía '${id}' no fue encontrada.` };
+           return { error: `La guía '${cleanId}.md' no fue encontrada.` };
         }
       }
     }
     
     return { content: combinedContent };
   } catch (error) {
-    console.error(`Error loading guide for ${ejercicioId}:`, error);
+    const idString = Array.isArray(ejercicioId) ? ejercicioId.join(', ') : ejercicioId;
+    console.error(`Error loading guide for ${idString}:`, error);
     return { error: 'No se pudo cargar el contenido de la guía.' };
   }
 }
