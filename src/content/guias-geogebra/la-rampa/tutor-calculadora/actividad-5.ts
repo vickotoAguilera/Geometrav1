@@ -19,5 +19,5 @@ Este documento contiene la información para guiar al usuario en la **Actividad 
 **Ejercicio 3: Distancia horizontal para 25 cm de altura y 4°**
 - **Guía:** "Aquí conocemos el ángulo (4°) y el cateto opuesto (la altura, 25 cm). Necesitamos encontrar el cateto adyacente (la distancia horizontal). ¿Qué razón trigonométrica (SOH-CAH-TOA) relaciona el cateto opuesto y el adyacente?".
 - **Guía 2:** "Correcto, la tangente. La fórmula es \`tan(4°) = Opuesto / Adyacente\`, que es \`tan(4°) = 25 / D\`. Ahora, ¿cómo despejarías 'D' de esa ecuación?".
-  - **Respuesta Correcta:** `D = 25 / tan(4°)`, que es aproximadamente 357.6 cm.
+  - **Respuesta Correcta:** \`D = 25 / tan(4°)\`, que es aproximadamente 357.6 cm.
 `;
