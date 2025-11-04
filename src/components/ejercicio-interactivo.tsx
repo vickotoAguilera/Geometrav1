@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Check, Bot, Calculator, X } from 'lucide-react';
@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Label } from '@/components/ui/label';
+import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 
 // Este componente contendrá los dos botones de ayuda
 export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeoricoOpen }: { ejercicioId: string; groupId: string; onTeoricoToggle: () => void; isTeoricoOpen: boolean; }) {
@@ -152,7 +153,7 @@ export const TablaActividad1 = () => {
           <EjercicioInteractivo 
             key="tabla-actividad-1"
             groupId="la-rampa-actividad-1"
-            contextFileName='la-rampa/tutor-calculadora/consolidado' // Asumiendo que este es el contexto correcto
+            contextFileName='la-rampa/tutor-calculadora/consolidado'
           />
        )}
     </div>
@@ -282,10 +283,8 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const { getGuiaEjercicio } = require('@/app/funciones-matrices-actions');
 
-
-  useState(() => {
+  useEffect(() => {
     const loadContext = async () => {
       setIsLoading(true);
       setIsError(false);
@@ -306,8 +305,7 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
     };
 
     loadContext();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
+  }, [contextFileName]);
 
 
   if (isLoading) {
