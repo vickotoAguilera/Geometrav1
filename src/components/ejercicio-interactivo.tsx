@@ -20,18 +20,22 @@ import {
 import { Label } from '@/components/ui/label';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { GeogebraIntegrado } from './geogebra-integrado';
 
 // Este componente contendrá los dos botones de ayuda
 export function AyudaContextual({ 
     ejercicioId, 
     groupId, 
     onTeoricoToggle, 
-    isTeoricoOpen 
+    isTeoricoOpen,
+    enunciado
 }: { 
-    ejercicioId: string; 
+    ejercicioId: string | string[]; 
     groupId: string; 
     onTeoricoToggle: () => void;
     isTeoricoOpen: boolean;
+    enunciado?: React.ReactNode;
 }) {
   
   return (
@@ -53,18 +57,27 @@ export function AyudaContextual({
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                    <Bot className="h-5 w-5" />
-                </Button>
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Resolver con Tutor de GeoGebra</p>
-          </TooltipContent>
-        </Tooltip>
+        <Dialog>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                         <Button variant="outline" size="icon" className="h-9 w-9">
+                            <Bot className="h-5 w-5" />
+                         </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                 <TooltipContent>
+                    <p>Resolver con Tutor de GeoGebra</p>
+                </TooltipContent>
+            </Tooltip>
+            <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                <GeogebraIntegrado
+                    ejercicioId={Array.isArray(ejercicioId) ? ejercicioId.join(',') : ejercicioId}
+                    grupoId={groupId}
+                    enunciado={enunciado}
+                />
+            </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );

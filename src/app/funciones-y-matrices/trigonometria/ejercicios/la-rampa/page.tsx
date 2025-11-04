@@ -8,6 +8,10 @@ import Image from 'next/image';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Bot } from 'lucide-react';
+import { GeogebraIntegrado } from '@/components/geogebra-integrado';
 
 const ejerciciosPlazaSkate = [
     { id: 'tipo-triangulo', pregunta: '¿Qué tipo de triángulo representa las rampas dibujadas?', respuestaCorrecta: 'Triángulo rectángulo' },
@@ -27,6 +31,27 @@ export default function PaginaLaRampa() {
     const handleTeoricoToggle = (groupId: string) => {
         setActiveTeorico(prev => (prev === groupId ? null : groupId));
     };
+
+    const enunciadoActividad2 = (
+        <div className="prose prose-invert max-w-none mb-4">
+            <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
+            <div className="space-y-4 my-4">
+                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
+                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
+            </div>
+        </div>
+    );
+
+    const enunciadoActividad3 = (
+        <div className="prose prose-invert max-w-none mb-4">
+            <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
+            <div className="space-y-4 my-4">
+                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
+                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
+                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
+            </div>
+        </div>
+    );
     
     return (
         <div className="flex flex-col min-h-screen">
@@ -65,77 +90,57 @@ export default function PaginaLaRampa() {
                                         />
                                     </AccordionContent>
                                 </AccordionItem>
+                                
                                 <AccordionItem value="item-2">
                                      <AccordionTrigger>
                                         <h3 className="text-xl font-semibold">Actividad 2: Construcción en GeoGebra</h3>
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                        <div className="prose prose-invert max-w-none mb-4">
-                                            <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
-                                        </div>
-                                        <div className="space-y-4 my-4">
-                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
-                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
-                                        </div>
+                                        {enunciadoActividad2}
                                          <div className="flex justify-end pt-4 mt-6 border-t">
-                                            <AyudaContextual
-                                                ejercicioId="la-rampa/tutor-geogebra/consolidado"
-                                                groupId="la-rampa-actividad-2"
-                                                onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-2')}
-                                                isTeoricoOpen={activeTeorico === 'la-rampa-actividad-2'}
-                                            />
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                     <Button variant="outline" size="icon" className="h-9 w-9">
+                                                        <Bot className="h-5 w-5" />
+                                                     </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                                                    <GeogebraIntegrado 
+                                                        ejercicioId="la-rampa/tutor-geogebra/actividad-2"
+                                                        grupoId="la-rampa-actividad-2"
+                                                        enunciado={enunciadoActividad2}
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
                                         </div>
-                                        {activeTeorico === 'la-rampa-actividad-2' && (
-                                            <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
-                                                <AccordionItem value="item-1">
-                                                    <AccordionContent>
-                                                        <EjercicioInteractivo 
-                                                            groupId="la-rampa-actividad-2"
-                                                            contextFileName={'la-rampa/tutor-geogebra/consolidado'}
-                                                            tableRef={null}
-                                                        />
-                                                    </AccordionContent>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        )}
                                     </AccordionContent>
                                 </AccordionItem>
+
                                  <AccordionItem value="item-3">
                                      <AccordionTrigger>
                                         <h3 className="text-xl font-semibold">Actividad 3: Medición de Ángulos</h3>
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                        <div className="prose prose-invert max-w-none mb-4">
-                                            <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
-                                        </div>
-                                        <div className="space-y-4 my-4">
-                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
-                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
-                                            <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
-                                        </div>
+                                        {enunciadoActividad3}
                                          <div className="flex justify-end pt-4 mt-6 border-t">
-                                            <AyudaContextual
-                                                ejercicioId="la-rampa/tutor-geogebra/consolidado"
-                                                groupId="la-rampa-actividad-3"
-                                                onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-3')}
-                                                isTeoricoOpen={activeTeorico === 'la-rampa-actividad-3'}
-                                            />
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                     <Button variant="outline" size="icon" className="h-9 w-9">
+                                                        <Bot className="h-5 w-5" />
+                                                     </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                                                    <GeogebraIntegrado 
+                                                        ejercicioId="la-rampa/tutor-geogebra/actividad-3"
+                                                        grupoId="la-rampa-actividad-3"
+                                                        enunciado={enunciadoActividad3}
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
                                         </div>
-                                        {activeTeorico === 'la-rampa-actividad-3' && (
-                                            <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
-                                                <AccordionItem value="item-1">
-                                                    <AccordionContent>
-                                                        <EjercicioInteractivo 
-                                                            groupId="la-rampa-actividad-3"
-                                                            contextFileName={'la-rampa/tutor-geogebra/consolidado'}
-                                                            tableRef={null}
-                                                        />
-                                                    </AccordionContent>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        )}
                                     </AccordionContent>
                                 </AccordionItem>
+
                                 <AccordionItem value="item-4">
                                      <AccordionTrigger>
                                         <h3 className="text-xl font-semibold">Actividad 4: Razones Trigonométricas</h3>
@@ -147,6 +152,7 @@ export default function PaginaLaRampa() {
                                         />
                                     </AccordionContent>
                                 </AccordionItem>
+
                                 <AccordionItem value="item-5">
                                      <AccordionTrigger>
                                         <h3 className="text-xl font-semibold">Actividad 5: Cierre</h3>
@@ -162,7 +168,7 @@ export default function PaginaLaRampa() {
                                         </div>
                                          <div className="flex justify-end pt-4 mt-6 border-t">
                                             <AyudaContextual
-                                                ejercicioId="la-rampa/tutor-calculadora/consolidado"
+                                                ejercicioId="la-rampa/tutor-calculadora/actividad-5"
                                                 groupId="la-rampa-actividad-5"
                                                 onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-5')}
                                                 isTeoricoOpen={activeTeorico === 'la-rampa-actividad-5'}
@@ -174,7 +180,7 @@ export default function PaginaLaRampa() {
                                                     <AccordionContent>
                                                         <EjercicioInteractivo 
                                                             groupId="la-rampa-actividad-5"
-                                                            contextFileName={'la-rampa/tutor-calculadora/consolidado'}
+                                                            contextFileName={'la-rampa/tutor-calculadora/actividad-5'}
                                                             tableRef={null}
                                                         />
                                                     </AccordionContent>
