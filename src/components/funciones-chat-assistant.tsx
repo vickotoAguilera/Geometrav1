@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef, useTransition, Dispatch, SetStateAction } from 'react';
 import { getFuncionesMatricesAiResponse, generateFuncionesMatricesSpeech, getGuiaEjercicio } from '@/app/funciones-matrices-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
-interface ChatMessage {
+export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   content: string;
@@ -35,6 +35,9 @@ interface GenkitMessage {
 interface FuncionesChatAssistantProps {
   ejercicioId: string;
   grupoId: string;
+  messages: ChatMessage[];
+  setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+  onReset: () => void;
 }
 
 const parseResponse = (content: string) => {
@@ -86,9 +89,8 @@ const parseResponse = (content: string) => {
     return finalParts;
 };
 
-export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAssistantProps) {
+export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMessages, onReset }: FuncionesChatAssistantProps) {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -99,8 +101,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
   const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  const chatStorageKey = `chat-history-${grupoId}`;
 
   const { isListening, startListening, stopListening, isSupported } = useSpeechRecognition({
     onTranscript: (newTranscript) => {
@@ -131,61 +131,32 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
     return { guideContent: combinedContent, activeGuides: loadedGuides };
   };
   
-  const loadConversation = async () => {
-    const savedMessagesRaw = localStorage.getItem(chatStorageKey);
-    let currentHistory: ChatMessage[] = savedMessagesRaw ? JSON.parse(savedMessagesRaw) : [];
-    
-    const isNewExercise = !currentHistory.some(msg => msg.contextFile === ejercicioId);
+  // This useEffect triggers the initial AI response when the component mounts with a user message
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].role === 'user') {
+      const userMessage = messages[0];
+      const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: userMessage.contextFile };
+      setMessages(prev => [...prev, assistantPlaceholder]);
 
-    if (currentHistory.length === 0 || isNewExercise) {
-      const autoPrompt = currentHistory.length === 0
-        ? `He activado la guía '${ejercicioId}'. Por favor, dame la primera instrucción.`
-        : `Ahora también he activado la guía '${ejercicioId}'. Considera este nuevo contexto y continúa nuestra conversación.`;
-
-      const userMessage: ChatMessage = { id: `user-context-${Date.now()}`, role: 'user', content: autoPrompt, contextFile: ejercicioId };
-      const assistantPlaceholder: ChatMessage = { id: `assistant-context-${Date.now()}`, role: 'model', content: '...', contextFile: ejercicioId };
-      
-      const updatedHistory = [...currentHistory, userMessage];
-      setMessages([...updatedHistory, assistantPlaceholder]);
-      
-      const { guideContent } = await getActiveGuideContext(updatedHistory);
-
-      startTransition(() => {
-        getFuncionesMatricesAiResponse({
-          history: updatedHistory.map(m => ({ role: m.role, content: [{ text: m.content }] })),
-          initialSystemPrompt: guideContent,
-          userQuery: autoPrompt
-        })
-        .then(({ response }) => {
-          const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
-          setMessages(prev => [...prev.slice(0, -1), finalMessage]);
-        })
-        .catch(error => {
-          console.error("Error starting/continuing chat:", error);
-          setMessages(currentHistory); // Revert on error
-        });
+      startTransition(async () => {
+        try {
+            const { guideContent } = await getActiveGuideContext([userMessage]);
+            const { response } = await getFuncionesMatricesAiResponse({
+              history: [{ role: userMessage.role, content: [{ text: userMessage.content }] }],
+              initialSystemPrompt: guideContent,
+              userQuery: userMessage.content
+            });
+            const finalMessage: ChatMessage = { ...assistantPlaceholder, id: `assistant-final-${Date.now()}`, content: response };
+            setMessages(prev => [...prev.slice(0, -1), finalMessage]);
+        } catch (error) {
+             console.error("Error starting/continuing chat:", error);
+             setMessages([]); // Revert on error
+        }
       });
-    } else {
-      setMessages(currentHistory);
     }
-  };
-
-  useEffect(() => {
-    loadConversation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ejercicioId, grupoId]);
+  }, [messages]);
 
-  useEffect(() => {
-    try {
-      if (messages.length > 0) {
-        localStorage.setItem(chatStorageKey, JSON.stringify(messages));
-      } else {
-        localStorage.removeItem(chatStorageKey);
-      }
-    } catch (error) {
-      console.error("Failed to save to localStorage", error);
-    }
-  }, [messages, chatStorageKey]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -240,12 +211,6 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
 
   const handleBackNavigation = () => {
     router.back();
-  };
-  
-  const handleResetConversation = () => {
-    localStorage.removeItem(chatStorageKey);
-    setMessages([]);
-    loadConversation();
   };
 
   const handleButtonClick = (value: string) => {
@@ -338,7 +303,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId }: FuncionesChatAs
         <SheetTitle className="flex items-center gap-2"><Bot /> Tutor de GeoGebra</SheetTitle>
         <SheetDescription>Sigue los pasos para resolver el ejercicio en la pizarra.</SheetDescription>
          <div className="absolute top-3 right-3 flex gap-1">
-            <Button variant="ghost" size="icon" onClick={handleResetConversation} title="Reiniciar conversación">
+            <Button variant="ghost" size="icon" onClick={onReset} title="Reiniciar conversación">
                 <RefreshCw className="w-5 h-5" />
             </Button>
             <AlertDialog>
