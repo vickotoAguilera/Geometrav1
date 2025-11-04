@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
+import { LaRampaSVG } from '@/components/LaRampaSVG';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ArrowLeft } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import Link from 'next/link';
-import { MarkdownImage } from '@/components/markdown-image';
 
 
 const ejerciciosPlazaSkate = [
@@ -102,7 +102,7 @@ export default function NuevaPaginaEjercicios() {
                                         <div className="space-y-6">
                                             <div className="prose prose-invert max-w-none">
                                                 <p>Se necesita construir una rampa de acceso. Se sabe que la distancia horizontal (D) que cubrirá es de 10 metros y el ángulo de inclinación (`α`) debe ser de 12°. Tu misión es calcular la altura o diferencia de nivel (N) y la longitud de la superficie inclinada de la rampa (H).</p>
-                                                <MarkdownImage src="/imagenes-ejercicios/la-rampa-problema.png" alt="Diagrama de la rampa" />
+                                                <LaRampaSVG className="w-full max-w-xs mx-auto my-4" />
                                             </div>
                                             
                                             <div className="space-y-4">
