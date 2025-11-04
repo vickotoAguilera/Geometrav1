@@ -104,7 +104,7 @@ export default function PaginaLaRampa() {
                                                         <Bot className="h-5 w-5" />
                                                      </Button>
                                                 </DialogTrigger>
-                                                <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                                                <DialogContent className="w-screen h-screen max-w-full max-h-full p-0 overflow-y-auto">
                                                     <GeogebraIntegrado 
                                                         ejercicioId="la-rampa/tutor-geogebra/actividad-2"
                                                         grupoId="la-rampa-actividad-2"
@@ -129,7 +129,7 @@ export default function PaginaLaRampa() {
                                                         <Bot className="h-5 w-5" />
                                                      </Button>
                                                 </DialogTrigger>
-                                                <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
+                                                <DialogContent className="w-screen h-screen max-w-full max-h-full p-0 overflow-y-auto">
                                                     <GeogebraIntegrado 
                                                         ejercicioId="la-rampa/tutor-geogebra/actividad-3"
                                                         grupoId="la-rampa-actividad-3"

@@ -64,12 +64,12 @@ export function GeogebraIntegrado({ ejercicioId, grupoId, enunciado }: GeogebraI
         <div className="text-sm text-muted-foreground">{enunciado}</div>
       </div>
       
-      {/* 2. Applet de GeoGebra */}
-      <div className="flex-1 min-h-[300px]">
+      {/* 2. Applet de GeoGebra (flexible) */}
+      <div className="flex-1 w-full relative">
         <GeoGebraAppletContextual groupId={grupoId} />
       </div>
 
-      {/* 3. Chat del Tutor */}
+      {/* 3. Chat del Tutor (altura fija) */}
       <div className="h-[40vh] border-t">
         <FuncionesChatAssistant 
             ejercicioId={ejercicioId} 
