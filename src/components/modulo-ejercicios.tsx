@@ -64,7 +64,7 @@ const ejerciciosModulo1_2: EjercicioConceptual[] = [
     { id: 'act-tec-27', pregunta: '**Actividad 27 (Calculadora - GRA):** ¿Ángulo cuyo tangente es 0.5? (aprox. a 2 decimales)', respuestaCorrecta: '29.52' },
 ];
 
-const ButtonVerificarConceptual = ({ ejercicio }: { ejercicio: EjercicioConceptual; }) => {
+export const ButtonVerificarConceptual = ({ ejercicio }: { ejercicio: EjercicioConceptual; }) => {
   const [respuesta, setRespuesta] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<boolean | null>(null);
