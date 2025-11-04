@@ -23,6 +23,8 @@ import * as LaRampaActividad2 from '@/content/guias-geogebra/la-rampa/tutor-geog
 import * as LaRampaActividad3 from '@/content/guias-geogebra/la-rampa/tutor-geogebra/actividad-3';
 import * as LaRampaActividad4 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-4';
 import * as LaRampaActividad5 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-5';
+import * as AngulosYRazonesCalculadora from '@/content/guias-geogebra/angulos-y-razones/tutor-calculadora/actividad.md';
+import * as AngulosYRazonesGeogebra from '@/content/guias-geogebra/angulos-y-razones/tutor-geogebra/actividad.md';
 
 
 export async function getFuncionesMatricesAiResponse(
@@ -43,18 +45,22 @@ export async function generateFuncionesMatricesSpeech(text: string): Promise<Tex
 }
 
 const contextMap: Record<string, { content: string }> = {
-    // Contextos consolidados (usados por varias actividades)
+    // Módulo La Rampa
     'la-rampa/tutor-calculadora/consolidado': { content: LaRampaTutorCalculadora.contexto },
     'la-rampa/tutor-geogebra/consolidado': { content: LaRampaTutorGeogebra.contexto },
-    'plaza-skate/tutor-calculadora/consolidado': { content: PlazaSkateTutorCalculadora.contexto },
-    'plaza-skate/tutor-geogebra/consolidado': { content: PlazaSkateTutorGeogebra.contexto },
-    
-    // Contextos específicos por actividad
     'la-rampa/tutor-calculadora/actividad-1': { content: LaRampaActividad1.contexto },
     'la-rampa/tutor-geogebra/actividad-2': { content: LaRampaActividad2.contexto },
     'la-rampa/tutor-geogebra/actividad-3': { content: LaRampaActividad3.contexto },
     'la-rampa/tutor-calculadora/actividad-4': { content: LaRampaActividad4.contexto },
     'la-rampa/tutor-calculadora/actividad-5': { content: LaRampaActividad5.contexto },
+
+    // Módulo Plaza Skate
+    'plaza-skate/tutor-calculadora/consolidado': { content: PlazaSkateTutorCalculadora.contexto },
+    'plaza-skate/tutor-geogebra/consolidado': { content: PlazaSkateTutorGeogebra.contexto },
+    
+    // Módulo Ángulos y Razones
+    'angulos-y-razones/tutor-calculadora/actividad': { content: AngulosYRazonesCalculadora.default },
+    'angulos-y-razones/tutor-geogebra/actividad': { content: AngulosYRazonesGeogebra.default },
 };
 
 export async function getGuiaEjercicio(ejercicioId: string | string[]): Promise<{ content: string; } | { error: string }> {
