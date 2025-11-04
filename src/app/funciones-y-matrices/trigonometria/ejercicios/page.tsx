@@ -6,15 +6,21 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from 'react';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowLeft } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import Link from 'next/link';
+import { MarkdownImage } from '@/components/markdown-image';
 
 
 const ejerciciosPlazaSkate = [
     { id: 'angulo-central', pregunta: '**Ejercicio 1:** El ángulo inscrito `α` mide 20°. ¿Cuánto debe medir el ángulo central `2α` para que la cámara apunte correctamente al objeto sospechoso en C?', respuestaCorrecta: '40' },
     { id: 'conversion-radianes', pregunta: '**Ejercicio 2:** Si el ángulo de la cámara es de 40°, ¿cuál es su medida equivalente en radianes? Explica cómo se calcula y recuerda que `180° = π radianes`.', respuestaCorrecta: '2*pi/9' },
+];
+
+const ejerciciosRampa = [
+    { id: 'calculo-altura', pregunta: '**Ejercicio 1:** ¿Cuál es la altura (N) de la rampa?', respuestaCorrecta: '2.1' },
+    { id: 'calculo-hipotenusa', pregunta: '**Ejercicio 2:** ¿Cuál es la longitud de la superficie inclinada (H) de la rampa?', respuestaCorrecta: '10.2' },
 ];
 
 
@@ -69,6 +75,7 @@ export default function NuevaPaginaEjercicios() {
                                                     ejercicioId="plaza-skate"
                                                     groupId="trigonometria-basica"
                                                     onTeoricoToggle={() => handleTeoricoToggle('trigonometria-basica')}
+                                                    isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica'}
                                                 />
                                             </div>
                                              {activeTeorico.isOpen && activeTeorico.groupId === 'trigonometria-basica' && (
@@ -86,19 +93,43 @@ export default function NuevaPaginaEjercicios() {
                         
                          <AccordionItem value="item-2">
                             <AccordionTrigger className="text-xl font-semibold">Módulo 1.1: Aplicación de Razones Trigonométricas (La Rampa)</AccordionTrigger>
-                            <AccordionContent>
-                               <Card>
+                             <AccordionContent>
+                                <Card>
                                     <CardHeader>
-                                        <CardTitle>Ir al Ejercicio</CardTitle>
+                                        <CardTitle>Descripción del Problema</CardTitle>
                                     </CardHeader>
-                                    <CardContent>
-                                        <p className="text-muted-foreground mb-4">Este módulo te guiará en el uso de Seno, Coseno y Tangente para resolver un problema práctico sobre rampas de acceso.</p>
-                                        <Link href="/funciones-y-matrices/trigonometria/ejercicios/la-rampa" passHref>
-                                            <Button className="w-full">
-                                                Ir al Módulo 1.1
-                                                <ArrowRight className="ml-2 h-4 w-4" />
-                                            </Button>
-                                        </Link>
+                                    <CardContent className="pt-2">
+                                        <div className="space-y-6">
+                                            <div className="prose prose-invert max-w-none">
+                                                <p>Se necesita construir una rampa de acceso. Se sabe que la distancia horizontal (D) que cubrirá es de 10 metros y el ángulo de inclinación (`α`) debe ser de 12°. Tu misión es calcular la altura o diferencia de nivel (N) y la longitud de la superficie inclinada de la rampa (H).</p>
+                                                <MarkdownImage src="/imagenes-ejercicios/la-rampa-problema.png" alt="Diagrama de la rampa" />
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                {ejerciciosRampa.map((ej) => (
+                                                    <ButtonVerificarConceptual 
+                                                        key={ej.id} 
+                                                        ejercicio={ej}
+                                                    />
+                                                ))}
+                                            </div>
+                                        
+                                            <div className="flex justify-end pt-4">
+                                                <AyudaContextual
+                                                    ejercicioId="la-rampa"
+                                                    groupId="rampa-trigonometria"
+                                                    onTeoricoToggle={() => handleTeoricoToggle('rampa-trigonometria')}
+                                                    isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria'}
+                                                />
+                                            </div>
+                                            {activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria' && (
+                                                <EjercicioInteractivo 
+                                                    key="rampa-trigonometria"
+                                                    groupId="rampa-trigonometria"
+                                                    contextFileName={'la-rampa/tutor-calculadora/consolidado'}
+                                                />
+                                            )}
+                                        </div>
                                     </CardContent>
                                 </Card>
                             </AccordionContent>
