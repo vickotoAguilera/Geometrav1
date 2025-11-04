@@ -2,7 +2,7 @@
 
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AyudaContextual, TablaActividad1, TablaActividad4, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { AyudaContextual, TablaActividad1, TablaActividad4 } from '@/components/ejercicio-interactivo';
 import { useState } from 'react';
 import Image from 'next/image';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
@@ -21,14 +21,6 @@ const ejerciciosPlazaSkate = [
 
 
 export default function PaginaLaRampa() {
-    const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
-
-    const handleTeoricoToggle = (groupId: string) => {
-        setActiveTeorico(prev => ({
-            isOpen: prev.groupId !== groupId ? true : !prev.isOpen,
-            groupId: groupId,
-        }));
-    };
     
     return (
         <div className="flex flex-col min-h-screen">
@@ -76,6 +68,12 @@ export default function PaginaLaRampa() {
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
                                         </div>
+                                         <div className="flex justify-end pt-4 mt-6 border-t">
+                                            <AyudaContextual
+                                                ejercicioId="la-rampa/tutor-geogebra/consolidado"
+                                                groupId="la-rampa-actividad-2"
+                                            />
+                                        </div>
                                     </AccordionContent>
                                 </AccordionItem>
                                  <AccordionItem value="item-3">
@@ -90,6 +88,12 @@ export default function PaginaLaRampa() {
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
+                                        </div>
+                                         <div className="flex justify-end pt-4 mt-6 border-t">
+                                            <AyudaContextual
+                                                ejercicioId="la-rampa/tutor-geogebra/consolidado"
+                                                groupId="la-rampa-actividad-3"
+                                            />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -115,25 +119,15 @@ export default function PaginaLaRampa() {
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[6]} />
                                             <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[7]} />
                                         </div>
+                                         <div className="flex justify-end pt-4 mt-6 border-t">
+                                            <AyudaContextual
+                                                ejercicioId="la-rampa/tutor-calculadora/consolidado"
+                                                groupId="la-rampa-actividad-5"
+                                            />
+                                        </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
-
-                            <div className="flex justify-end pt-4 mt-6 border-t">
-                                <AyudaContextual
-                                    ejercicioId="la-rampa"
-                                    groupId="rampa-trigonometria"
-                                    onTeoricoToggle={() => handleTeoricoToggle('rampa-trigonometria')}
-                                    isTeoricoOpen={activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria'}
-                                />
-                            </div>
-                            {activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria' && (
-                               <EjercicioInteractivo 
-                                    key="rampa-trigonometria"
-                                    groupId="rampa-trigonometria"
-                                    contextFileName={'la-rampa/tutor-calculadora/consolidado'}
-                               />
-                            )}
                         </CardContent>
                     </Card>
                 </div>

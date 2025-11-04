@@ -4,17 +4,19 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, User, Send, Loader2, RefreshCw, FileText } from 'lucide-react';
+import { Bot, User, Send, Loader2, RefreshCw, FileText, Camera } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Part } from 'genkit';
 import { useToast } from '@/hooks/use-toast';
 import { getTeoriaCalculadoraAiResponse } from '@/app/funciones-matrices-actions';
+import { getScreenshotVozAiResponse } from '@/app/screenshot-actions'; // Reutilizamos esta acción
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   content: string;
+  screenshot?: string;
 }
 
 interface GenkitMessage {
@@ -26,6 +28,7 @@ interface TutorTeoricoChatProps {
   initialContext: string;
   groupId: string;
   contextFileName: string;
+  takeScreenshot?: () => Promise<string | null>;
 }
 
 const parseResponse = (content: string) => {
@@ -54,7 +57,7 @@ const parseResponse = (content: string) => {
 };
 
 
-export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: TutorTeoricoChatProps) {
+export function TutorTeoricoChat({ initialContext, groupId, contextFileName, takeScreenshot }: TutorTeoricoChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -64,6 +67,7 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
   const chatStorageKey = `chat-teorico-${groupId}`;
   
   const [isReady, setIsReady] = useState(false);
+  const [sendScreenshot, setSendScreenshot] = useState(false);
 
   const loadAndInitialize = (isReset: boolean = false) => {
     setIsReady(false);
@@ -141,7 +145,14 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
     const currentInput = input;
     setInput('');
     
-    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput };
+    let screenshotDataUri: string | null = null;
+    if (sendScreenshot && takeScreenshot) {
+      screenshotDataUri = await takeScreenshot();
+      setSendScreenshot(false);
+      if (!screenshotDataUri) return;
+    }
+    
+    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: 'user', content: currentInput, ...(screenshotDataUri && { screenshot: screenshotDataUri }) };
     const assistantPlaceholder: ChatMessage = { id: `assistant-${Date.now()}`, role: 'model', content: '...' };
 
     const newHistory = [...messages, userMessage];
@@ -150,13 +161,15 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
     startTransition(async () => {
         try {
             const genkitHistory: GenkitMessage[] = newHistory.map(m => ({
-              role: m.role,
+              role: m.role === 'user' ? 'user' : 'model',
               content: [{ text: m.content }],
             }));
             
-            const { response: aiResponse } = await getTeoriaCalculadoraAiResponse({
-              history: genkitHistory,
-              contextoEjercicio: initialContext,
+            // Usaremos el screenshot-assistant porque ya maneja imágenes, pero le pasaremos el prompt de sistema del tutor teórico
+            const { response: aiResponse } = await getScreenshotVozAiResponse({
+              query: `${initialContext}\n\nPregunta del usuario: ${currentInput}`,
+              history: genkitHistory.slice(0, -1),
+              screenshotDataUri: screenshotDataUri ?? undefined,
             });
 
             setMessages(prev => prev.slice(0, -1).concat({
@@ -180,7 +193,7 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
             <h4 className="text-sm font-semibold ml-2">Tutor Teórico</h4>
             <div className="flex items-center text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
                 <FileText className="w-3 h-3 mr-1.5"/>
-                <span>Contexto: {contextFileName}</span>
+                <span className="truncate" title={contextFileName}>Contexto: {contextFileName}</span>
             </div>
         </div>
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleResetConversation} title="Reiniciar conversación">
@@ -196,6 +209,11 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
                 <Avatar className="w-8 h-8 border"><AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback></Avatar>
               )}
               <div className={cn('p-3 rounded-lg max-w-[85%] text-sm', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground border')}>
+                 {message.screenshot && (
+                    <div className="mb-2">
+                        <img src={message.screenshot} alt="Captura de pantalla de la tabla" className="rounded-md object-cover max-h-40"/>
+                    </div>
+                )}
                 {message.content === '...' ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
@@ -225,6 +243,18 @@ export function TutorTeoricoChat({ initialContext, groupId, contextFileName }: T
 
       <div className="p-4 border-t bg-background rounded-b-lg">
         <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
+           {takeScreenshot && (
+              <Button
+                  type="button"
+                  variant={sendScreenshot ? 'default' : 'ghost'}
+                  size="icon"
+                  onClick={() => setSendScreenshot(prev => !prev)}
+                  disabled={isPending}
+                  title={sendScreenshot ? "Desactivar captura" : "Activar captura de tabla"}
+              >
+                  <Camera className="w-5 h-5" />
+              </Button>
+           )}
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}

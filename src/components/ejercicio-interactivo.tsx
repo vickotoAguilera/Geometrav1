@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Check, Bot, Calculator, X } from 'lucide-react';
+import { Loader2, Check, Bot, Calculator, X, Camera } from 'lucide-react';
 import Link from 'next/link';
 import { TutorTeoricoChat } from './tutor-teorico-chat';
 import { verificarTablaAction } from '@/app/verificador-tablas-actions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import html2canvas from 'html2canvas';
 import {
   Tooltip,
   TooltipContent,
@@ -18,10 +19,13 @@ import {
 } from "@/components/ui/tooltip"
 import { Label } from '@/components/ui/label';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
+import { getScreenshotVozAiResponse } from '@/app/screenshot-actions';
 
 // Este componente contendrá los dos botones de ayuda
-export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeoricoOpen }: { ejercicioId: string; groupId: string; onTeoricoToggle: () => void; isTeoricoOpen: boolean; }) {
+export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string; groupId: string;}) {
 
+  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+  
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
@@ -31,7 +35,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
                 variant={isTeoricoOpen ? 'default' : 'outline'}
                 size="icon"
                 className="h-9 w-9"
-                onClick={onTeoricoToggle}
+                onClick={() => setIsTeoricoOpen(prev => !prev)}
               >
                   <Calculator className="h-5 w-5"/>
               </Button>
@@ -43,7 +47,7 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/applet-contextual?ejercicio=${ejercicioId}/tutor-geogebra/consolidado&grupo=${groupId}`} passHref>
+            <Link href={`/applet-contextual?ejercicio=${ejercicioId}&grupo=${groupId}`} passHref>
                 <Button variant="outline" size="icon" className="h-9 w-9">
                     <Bot className="h-5 w-5" />
                 </Button>
@@ -53,7 +57,19 @@ export function AyudaContextual({ ejercicioId, groupId, onTeoricoToggle, isTeori
             <p>Resolver con Tutor de GeoGebra</p>
           </TooltipContent>
         </Tooltip>
-
+        
+        {isTeoricoOpen && (
+            <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setIsTeoricoOpen(false)}></div>
+        )}
+        {isTeoricoOpen && (
+           <div className='absolute bottom-full right-0 w-full max-w-md mb-2 z-50'>
+                <EjercicioInteractivo 
+                    key={groupId}
+                    groupId={groupId}
+                    contextFileName={ejercicioId}
+                />
+           </div>
+        )}
       </div>
     </TooltipProvider>
   );
@@ -110,7 +126,7 @@ export const TablaActividad1 = () => {
   ];
 
   return (
-    <div className="space-y-4 my-6">
+    <div className="space-y-4 my-6 relative">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {celdas.map((celda, i) => (
           <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
@@ -150,11 +166,14 @@ export const TablaActividad1 = () => {
             </TooltipProvider>
        </div>
        {isTeoricoOpen && (
-          <EjercicioInteractivo 
-            key="tabla-actividad-1"
-            groupId="la-rampa-actividad-1"
-            contextFileName='la-rampa/tutor-calculadora/consolidado'
-          />
+          <div className="absolute bottom-full right-0 w-full max-w-md mb-2 z-50">
+            <EjercicioInteractivo 
+              key="tabla-actividad-1"
+              groupId="la-rampa-actividad-1"
+              contextFileName='la-rampa/tutor-calculadora/consolidado'
+              tableRef={null} // Pasamos null porque esta tabla no necesita screenshot por ahora
+            />
+          </div>
        )}
     </div>
   );
@@ -166,6 +185,8 @@ export const TablaActividad4 = () => {
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
     const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(21).fill(null));
     const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+    const tablaRef = useRef<HTMLDivElement>(null);
+
 
     const handleInputChange = (index: number, value: string) => {
         const nuevasRespuestas = [...respuestas];
@@ -211,7 +232,7 @@ export const TablaActividad4 = () => {
     );
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 relative" ref={tablaRef}>
             <p className="text-sm text-muted-foreground">Completa la tabla con los valores solicitados y luego verifica tus respuestas.</p>
             <div className="overflow-x-auto">
                  <Table>
@@ -261,12 +282,15 @@ export const TablaActividad4 = () => {
                     </Tooltip>
                 </TooltipProvider>
             </div>
-            {isTeoricoOpen && (
-                <EjercicioInteractivo 
-                    key="tabla-actividad-4"
-                    groupId="la-rampa-actividad-4"
-                    contextFileName='la-rampa/tutor-calculadora/consolidado' // Asumiendo que este es el contexto correcto
-                />
+             {isTeoricoOpen && (
+                <div className="absolute bottom-full right-0 w-full max-w-md mb-2 z-50">
+                    <EjercicioInteractivo 
+                        key="tabla-actividad-4"
+                        groupId="la-rampa-actividad-4"
+                        contextFileName='la-rampa/tutor-calculadora/consolidado'
+                        tableRef={tablaRef}
+                    />
+                </div>
             )}
         </div>
     );
@@ -276,13 +300,15 @@ export const TablaActividad4 = () => {
 interface EjercicioInteractivoProps {
   groupId: string;
   contextFileName: string;
+  tableRef: React.RefObject<HTMLDivElement> | null;
 }
 
 
-export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInteractivoProps) {
+export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: EjercicioInteractivoProps) {
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadContext = async () => {
@@ -290,7 +316,6 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
       setIsError(false);
       try {
         const result = await getGuiaEjercicio(contextFileName);
-        
         if ('content' in result) {
           setLoadedContext(result.content);
         } else {
@@ -300,12 +325,27 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
         console.error("Error cargando el contexto del ejercicio:", error);
         setLoadedContext(null);
         setIsError(true);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
-
     loadContext();
   }, [contextFileName]);
+
+  const takeScreenshot = async (): Promise<string | null> => {
+    if (!tableRef || !tableRef.current) {
+      toast({ variant: 'destructive', title: 'Error', description: 'No se pudo encontrar la tabla para capturar.' });
+      return null;
+    }
+    try {
+      const canvas = await html2canvas(tableRef.current, { useCORS: true, logging: false, scale: window.devicePixelRatio });
+      return canvas.toDataURL('image/png');
+    } catch (error) {
+      console.error('Error taking screenshot:', error);
+      toast({ variant: 'destructive', title: 'Error de Captura', description: 'No se pudo tomar la captura de pantalla de la tabla.' });
+      return null;
+    }
+  };
 
 
   if (isLoading) {
@@ -321,7 +361,7 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
       return (
           <div className="border-t pt-4 mt-4 text-center text-red-500">
               <p>Error: No se pudo cargar el contexto para el tutor teórico.</p>
-              <p className="text-xs text-muted-foreground">Por favor, revisa que el archivo '{contextFileName}.md' exista y sea accesible.</p>
+              <p className="text-xs text-muted-foreground">Por favor, revisa que el archivo de contexto exista.</p>
           </div>
       )
   }
@@ -333,6 +373,7 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
           initialContext={loadedContext}
           groupId={groupId} 
           contextFileName={`${contextFileName}.md`}
+          takeScreenshot={tableRef ? takeScreenshot : undefined}
         />
       )}
     </div>
