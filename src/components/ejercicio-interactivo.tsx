@@ -19,12 +19,20 @@ import {
 } from "@/components/ui/tooltip"
 import { Label } from '@/components/ui/label';
 import { getGuiaEjercicio } from '@/app/funciones-matrices-actions';
-import { getScreenshotVozAiResponse } from '@/app/screenshot-actions';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Este componente contendrá los dos botones de ayuda
-export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string; groupId: string;}) {
-
-  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+export function AyudaContextual({ 
+    ejercicioId, 
+    groupId, 
+    onTeoricoToggle, 
+    isTeoricoOpen 
+}: { 
+    ejercicioId: string; 
+    groupId: string; 
+    onTeoricoToggle: () => void;
+    isTeoricoOpen: boolean;
+}) {
   
   return (
     <TooltipProvider>
@@ -35,7 +43,7 @@ export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string;
                 variant={isTeoricoOpen ? 'default' : 'outline'}
                 size="icon"
                 className="h-9 w-9"
-                onClick={() => setIsTeoricoOpen(prev => !prev)}
+                onClick={onTeoricoToggle}
               >
                   <Calculator className="h-5 w-5"/>
               </Button>
@@ -57,19 +65,6 @@ export function AyudaContextual({ ejercicioId, groupId }: { ejercicioId: string;
             <p>Resolver con Tutor de GeoGebra</p>
           </TooltipContent>
         </Tooltip>
-        
-        {isTeoricoOpen && (
-            <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setIsTeoricoOpen(false)}></div>
-        )}
-        {isTeoricoOpen && (
-           <div className='absolute bottom-full right-0 w-full max-w-md mb-2 z-50'>
-                <EjercicioInteractivo 
-                    key={groupId}
-                    groupId={groupId}
-                    contextFileName={ejercicioId}
-                />
-           </div>
-        )}
       </div>
     </TooltipProvider>
   );
@@ -126,7 +121,7 @@ export const TablaActividad1 = () => {
   ];
 
   return (
-    <div className="space-y-4 my-6 relative">
+    <div className="space-y-4 my-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {celdas.map((celda, i) => (
           <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
@@ -150,7 +145,7 @@ export const TablaActividad1 = () => {
        <div className="flex gap-2">
             <Button onClick={handleVerificar} disabled={isPending} className="w-full">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                Verificar Tabla 1
+                Verificar Tabla
             </Button>
             <TooltipProvider>
                 <Tooltip>
@@ -166,12 +161,12 @@ export const TablaActividad1 = () => {
             </TooltipProvider>
        </div>
        {isTeoricoOpen && (
-          <div className="absolute bottom-full right-0 w-full max-w-md mb-2 z-50">
+        <div className="mt-4">
             <EjercicioInteractivo 
               key="tabla-actividad-1"
               groupId="la-rampa-actividad-1"
               contextFileName='la-rampa/tutor-calculadora/consolidado'
-              tableRef={null} // Pasamos null porque esta tabla no necesita screenshot por ahora
+              tableRef={null}
             />
           </div>
        )}
@@ -179,12 +174,11 @@ export const TablaActividad1 = () => {
   );
 };
 
-export const TablaActividad4 = () => {
+export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: { onTeoricoToggle: () => void; isTeoricoOpen: boolean }) => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
     const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(21).fill(null));
-    const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
     const tablaRef = useRef<HTMLDivElement>(null);
 
 
@@ -232,7 +226,7 @@ export const TablaActividad4 = () => {
     );
 
     return (
-        <div className="space-y-4 relative" ref={tablaRef}>
+        <div className="space-y-4" ref={tablaRef}>
             <p className="text-sm text-muted-foreground">Completa la tabla con los valores solicitados y luego verifica tus respuestas.</p>
             <div className="overflow-x-auto">
                  <Table>
@@ -267,12 +261,12 @@ export const TablaActividad4 = () => {
             <div className="flex gap-2">
                 <Button onClick={handleVerificar} disabled={isPending} className="w-full">
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                    Verificar Tabla 4
+                    Verificar Tabla
                 </Button>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                             <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={() => setIsTeoricoOpen(prev => !prev)} disabled={isPending}>
+                             <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={onTeoricoToggle} disabled={isPending}>
                                 <Bot className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>
@@ -283,7 +277,7 @@ export const TablaActividad4 = () => {
                 </TooltipProvider>
             </div>
              {isTeoricoOpen && (
-                <div className="absolute bottom-full right-0 w-full max-w-md mb-2 z-50">
+                <div className="mt-4">
                     <EjercicioInteractivo 
                         key="tabla-actividad-4"
                         groupId="la-rampa-actividad-4"
@@ -308,8 +302,7 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
   const [loadedContext, setLoadedContext] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const { toast } = useToast();
-
+  
   useEffect(() => {
     const loadContext = async () => {
       setIsLoading(true);
@@ -347,6 +340,7 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
     }
   };
 
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -367,7 +361,7 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
   }
 
   return (
-    <div className="border-t pt-4 mt-4">
+    <div className="border rounded-lg shadow-md bg-background">
       {loadedContext !== null && (
         <TutorTeoricoChat 
           initialContext={loadedContext}
