@@ -26,5 +26,3 @@ import '@/ai/flows/teoria-calculadora-assistant.ts';
 import '@/ai/flows/schemas/teoria-calculadora-schemas.ts';
 import '@/ai/flows/verificador-tablas-flow.ts';
 import '@/ai/flows/schemas/verificador-tablas-schemas.ts';
-import '@/ai/flows/verificador-respuestas-flow.ts';
-import '@/ai/flows/schemas/verificador-respuestas-schemas.ts';

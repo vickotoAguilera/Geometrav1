@@ -196,7 +196,7 @@ export const TablaActividad4 = () => {
                             <TableHead>Pendiente</TableHead>
                             <TableHead>Ángulo (α)</TableHead>
                             <TableHead>sen(α)</TableHead>
-                            <TableHead>cos(α)</TableHead>
+                            <TableHead>cos(α)</Head>
                             <TableHead>tan(α)</TableHead>
                             <TableHead>N/H</TableHead>
                             <TableHead>N/D</TableHead>
@@ -312,4 +312,3 @@ export function EjercicioInteractivo({ groupId, contextFileName }: EjercicioInte
   );
 }
 
-    
