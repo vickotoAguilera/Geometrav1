@@ -16,10 +16,10 @@ export default function FuncionesYMatricesPage() {
         </div>
         
         <div className="max-w-md mx-auto">
-          <Link href="/funciones-y-matrices/ejercicios" passHref>
+          <Link href="/funciones-y-matrices/trigonometria" passHref>
             <Button variant="outline" className="w-full justify-between h-16 text-lg">
               <BookOpen className="mr-3"/>
-              Ejercicios Interactivos
+              Conceptos de Trigonometría
               <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>
