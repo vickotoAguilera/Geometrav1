@@ -1,7 +1,7 @@
 import Header from '@/components/header';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 export default function FuncionesYMatricesPage() {
   return (
@@ -16,9 +16,10 @@ export default function FuncionesYMatricesPage() {
         </div>
         
         <div className="max-w-md mx-auto">
-          <Link href="/funciones-y-matrices/trigonometria" passHref>
+          <Link href="/funciones-y-matrices/ejercicios" passHref>
             <Button variant="outline" className="w-full justify-between h-16 text-lg">
-              Trigonometría
+              <BookOpen className="mr-3"/>
+              Ejercicios Interactivos
               <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>
