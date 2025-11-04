@@ -1,10 +1,23 @@
 'use client';
 
 import Header from '@/components/header';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { AyudaContextual, EjercicioInteractivo, TablaActividad1, TablaActividad4 } from '@/components/ejercicio-interactivo';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AyudaContextual, TablaActividad1, TablaActividad4 } from '@/components/ejercicio-interactivo';
 import { useState } from 'react';
 import Image from 'next/image';
+import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
+
+const ejerciciosPlazaSkate = [
+    { id: 'tipo-triangulo', pregunta: '¿Qué tipo de triángulo representa las rampas dibujadas?', respuestaCorrecta: 'Triángulo rectángulo' },
+    { id: 'semejanzas-diferencias', pregunta: '¿Qué semejanzas y diferencias observas entre ellas?', respuestaCorrecta: 'Semejanzas: Todas son triángulos rectángulos. Diferencias: Tienen distintas pendientes y, por lo tanto, distintos ángulos de inclinación.' },
+    { id: 'angulo-12-porciento', pregunta: '¿Cuál es el ángulo para la pendiente del 12%?', respuestaCorrecta: '6.84' },
+    { id: 'angulo-8-porciento', pregunta: '¿Y para la del 8%?', respuestaCorrecta: '4.57' },
+    { id: 'angulo-6-porciento', pregunta: '¿Cuál debería ser el ángulo para una pendiente del 6%?', respuestaCorrecta: '3.43' },
+    { id: 'funciones-inversas', pregunta: '¿Qué funciones te permiten encontrar un ángulo a partir de sus lados?', respuestaCorrecta: 'Arcoseno, Arcocoseno, Arcotangente' },
+    { id: 'pendiente-4-grados', pregunta: 'Si una rampa debe tener 4° de inclinación, ¿cuál es su pendiente?', respuestaCorrecta: '7%' },
+    { id: 'distancia-horizontal-4-grados', pregunta: 'Para esa misma rampa de 4°, si la altura a salvar es de 25 cm, ¿qué distancia horizontal se necesita?', respuestaCorrecta: '357.5' },
+];
+
 
 export default function PaginaLaRampa() {
     const [activeTeorico, setActiveTeorico] = useState<{isOpen: boolean, groupId: string | null}>({isOpen: false, groupId: null});
@@ -47,22 +60,21 @@ export default function PaginaLaRampa() {
                             <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 2: Construcción en GeoGebra</h3>
                              <div className="prose prose-invert max-w-none mb-4">
                                 <p>Utiliza GeoGebra para dibujar las rampas de la tabla anterior usando el comando <code>Polígono</code>. Luego, responde:</p>
-                                <ul>
-                                    <li>¿Qué tipo de triángulo representa las rampas dibujadas?</li>
-                                    <li>¿Qué semejanzas y diferencias observas entre ellas?</li>
-                                </ul>
+                            </div>
+                            <div className="space-y-4 my-4">
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[0]} />
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[1]} />
                             </div>
 
                             <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 3: Medición de Ángulos</h3>
                              <div className="prose prose-invert max-w-none mb-4">
                                 <p>Con la herramienta 'Ángulo' de GeoGebra, mide los ángulos de inclinación de las rampas que construiste. Luego, responde:</p>
-                                <ul>
-                                    <li>¿Cuál es el ángulo para la pendiente del 12%?</li>
-                                    <li>¿Y para la del 8%?</li>
-                                    <li>¿Cuál debería ser el ángulo para una pendiente del 6%?</li>
-                                </ul>
                             </div>
-
+                             <div className="space-y-4 my-4">
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[2]} />
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[3]} />
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[4]} />
+                            </div>
 
                             <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 4: Razones Trigonométricas</h3>
                              <p className="text-muted-foreground mb-4 text-sm">Completa la tabla calculando el ángulo y las razones trigonométricas correspondientes a cada pendiente.</p>
@@ -71,11 +83,11 @@ export default function PaginaLaRampa() {
                             <h3 className="text-xl font-semibold mt-8 mb-4">Actividad 5: Cierre</h3>
                              <div className="prose prose-invert max-w-none mb-4">
                                 <p>Utiliza los comandos de tu calculadora o GeoGebra para responder:</p>
-                                <ul>
-                                    <li>¿Qué funciones te permiten encontrar un ángulo a partir de sus lados?</li>
-                                    <li>Si una rampa debe tener 4° de inclinación, ¿cuál es su pendiente?</li>
-                                    <li>Para esa misma rampa de 4°, si la altura a salvar es de 25 cm, ¿qué distancia horizontal se necesita?</li>
-                                </ul>
+                            </div>
+                            <div className="space-y-4 my-4">
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[5]} />
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[6]} />
+                                <ButtonVerificarConceptual ejercicio={ejerciciosPlazaSkate[7]} />
                             </div>
 
                             <div className="flex justify-end pt-4 mt-6">
@@ -87,11 +99,9 @@ export default function PaginaLaRampa() {
                                 />
                             </div>
                             {activeTeorico.isOpen && activeTeorico.groupId === 'rampa-trigonometria' && (
-                                <EjercicioInteractivo 
-                                    key="rampa-trigonometria"
-                                    groupId="rampa-trigonometria"
-                                    contextFileName={'la-rampa/tutor-calculadora/consolidado'}
-                                />
+                                <div className="border rounded-lg mt-4">
+                                    {/* Aquí puedes renderizar el componente del tutor teórico si es necesario */}
+                                </div>
                             )}
 
                         </CardContent>
