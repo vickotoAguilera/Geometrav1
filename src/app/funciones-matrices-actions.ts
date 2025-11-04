@@ -18,6 +18,8 @@ import * as LaRampaTutorCalculadora from '@/content/guias-geogebra/la-rampa/tuto
 import * as LaRampaTutorGeogebra from '@/content/guias-geogebra/la-rampa/tutor-geogebra/consolidado';
 import * as PlazaSkateTutorCalculadora from '@/content/guias-geogebra/plaza-skate/tutor-calculadora/consolidado';
 import * as PlazaSkateTutorGeogebra from '@/content/guias-geogebra/plaza-skate/tutor-geogebra/consolidado';
+import * as LaRampaActividad1 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-1';
+import * as LaRampaActividad4 from '@/content/guias-geogebra/la-rampa/tutor-calculadora/actividad-4';
 
 
 export async function getFuncionesMatricesAiResponse(
@@ -42,6 +44,8 @@ const contextMap: Record<string, { content: string }> = {
     'la-rampa/tutor-geogebra/consolidado': { content: LaRampaTutorGeogebra.contexto },
     'plaza-skate/tutor-calculadora/consolidado': { content: PlazaSkateTutorCalculadora.contexto },
     'plaza-skate/tutor-geogebra/consolidado': { content: PlazaSkateTutorGeogebra.contexto },
+    'la-rampa/tutor-calculadora/actividad-1': { content: LaRampaActividad1.contexto },
+    'la-rampa/tutor-calculadora/actividad-4': { content: LaRampaActividad4.contexto },
 };
 
 export async function getGuiaEjercicio(ejercicioId: string): Promise<{ content: string; } | { error: string }> {

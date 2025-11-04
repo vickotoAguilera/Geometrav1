@@ -70,14 +70,18 @@ export function AyudaContextual({
   );
 }
 
+interface TablaInter RampaProps {
+  onTeoricoToggle: () => void;
+  isTeoricoOpen: boolean;
+}
 
 // Tabla Interactiva para la Actividad 1 de "La Rampa"
-export const TablaActividad1 = () => {
+export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInter RampaProps) => {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
   const [respuestas, setRespuestas] = useState(new Array(6).fill(''));
   const [resultados, setResultados] = useState<(boolean | null)[]>(new Array(6).fill(null));
-  const [isTeoricoOpen, setIsTeoricoOpen] = useState(false);
+  const tablaRef = useRef<HTMLDivElement>(null);
 
 
   const handleInputChange = (index: number, value: string) => {
@@ -121,10 +125,10 @@ export const TablaActividad1 = () => {
   ];
 
   return (
-    <div className="space-y-4 my-6">
+    <div className="space-y-4 my-6" ref={tablaRef}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {celdas.map((celda, i) => (
-          <div key={i} className="p-3 border rounded-lg bg-background space-y-2">
+          <div key={i} className="p-3 border rounded-lg bg-card space-y-2">
             <Label htmlFor={`celda-${i}`}>Distancia Horizontal (D): <span className="font-bold">{celda.label}</span></Label>
             <p className='text-xs text-muted-foreground'>Pendiente: {celda.pendiente}</p>
             <Input
@@ -150,7 +154,7 @@ export const TablaActividad1 = () => {
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                         <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={() => setIsTeoricoOpen(prev => !prev)} disabled={isPending}>
+                         <Button variant={isTeoricoOpen ? "default" : "outline"} size="icon" onClick={onTeoricoToggle} disabled={isPending}>
                             <Bot className="h-5 w-5" />
                         </Button>
                     </TooltipTrigger>
@@ -161,20 +165,24 @@ export const TablaActividad1 = () => {
             </TooltipProvider>
        </div>
        {isTeoricoOpen && (
-        <div className="mt-4">
-            <EjercicioInteractivo 
-              key="tabla-actividad-1"
-              groupId="la-rampa-actividad-1"
-              contextFileName='la-rampa/tutor-calculadora/consolidado'
-              tableRef={null}
-            />
-          </div>
+        <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
+            <AccordionItem value="item-1">
+                <AccordionContent>
+                    <EjercicioInteractivo 
+                      key="tabla-actividad-1"
+                      groupId="la-rampa-actividad-1"
+                      contextFileName='la-rampa/tutor-calculadora/actividad-1'
+                      tableRef={tablaRef}
+                    />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
        )}
     </div>
   );
 };
 
-export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: { onTeoricoToggle: () => void; isTeoricoOpen: boolean }) => {
+export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInter RampaProps) => {
     const { toast } = useToast();
     const [isPending, setIsPending] = useState(false);
     const [respuestas, setRespuestas] = useState(new Array(21).fill(''));
@@ -277,14 +285,18 @@ export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: { onTeoricoT
                 </TooltipProvider>
             </div>
              {isTeoricoOpen && (
-                <div className="mt-4">
-                    <EjercicioInteractivo 
-                        key="tabla-actividad-4"
-                        groupId="la-rampa-actividad-4"
-                        contextFileName='la-rampa/tutor-calculadora/consolidado'
-                        tableRef={tablaRef}
-                    />
-                </div>
+                <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
+                  <AccordionItem value="item-1">
+                      <AccordionContent>
+                        <EjercicioInteractivo 
+                            key="tabla-actividad-4"
+                            groupId="la-rampa-actividad-4"
+                            contextFileName='la-rampa/tutor-calculadora/actividad-4'
+                            tableRef={tablaRef}
+                        />
+                      </AccordionContent>
+                  </AccordionItem>
+              </Accordion>
             )}
         </div>
     );
@@ -366,7 +378,7 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
         <TutorTeoricoChat 
           initialContext={loadedContext}
           groupId={groupId} 
-          contextFileName={`${contextFileName}.md`}
+          contextFileName={`${contextFileName}.ts`}
           takeScreenshot={tableRef ? takeScreenshot : undefined}
         />
       )}

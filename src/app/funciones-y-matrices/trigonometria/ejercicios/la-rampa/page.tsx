@@ -7,7 +7,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AyudaContextual } from '@/components/ejercicio-interactivo';
+import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 
 const ejerciciosPlazaSkate = [
     { id: 'tipo-triangulo', pregunta: '¿Qué tipo de triángulo representa las rampas dibujadas?', respuestaCorrecta: 'Triángulo rectángulo' },
@@ -59,7 +59,10 @@ export default function PaginaLaRampa() {
                                     </AccordionTrigger>
                                     <AccordionContent>
                                         <p className="text-muted-foreground mb-4 text-sm">Completa la siguiente tabla calculando la "Diferencia de nivel" para cada rampa según su pendiente y distancia horizontal.</p>
-                                        <TablaActividad1 />
+                                        <TablaActividad1
+                                            onTeoricoToggle={() => handleTeoricoToggle('la-rampa-actividad-1')}
+                                            isTeoricoOpen={activeTeorico === 'la-rampa-actividad-1'}
+                                        />
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-2">
@@ -83,13 +86,17 @@ export default function PaginaLaRampa() {
                                             />
                                         </div>
                                         {activeTeorico === 'la-rampa-actividad-2' && (
-                                            <div className="mt-4 border-t pt-4">
-                                                <EjercicioInteractivo 
-                                                    groupId="la-rampa-actividad-2"
-                                                    contextFileName={'la-rampa/tutor-geogebra/consolidado'}
-                                                    tableRef={null}
-                                                />
-                                            </div>
+                                            <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
+                                                <AccordionItem value="item-1">
+                                                    <AccordionContent>
+                                                        <EjercicioInteractivo 
+                                                            groupId="la-rampa-actividad-2"
+                                                            contextFileName={'la-rampa/tutor-geogebra/consolidado'}
+                                                            tableRef={null}
+                                                        />
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            </Accordion>
                                         )}
                                     </AccordionContent>
                                 </AccordionItem>
@@ -115,13 +122,17 @@ export default function PaginaLaRampa() {
                                             />
                                         </div>
                                         {activeTeorico === 'la-rampa-actividad-3' && (
-                                            <div className="mt-4 border-t pt-4">
-                                                <EjercicioInteractivo 
-                                                    groupId="la-rampa-actividad-3"
-                                                    contextFileName={'la-rampa/tutor-geogebra/consolidado'}
-                                                    tableRef={null}
-                                                />
-                                            </div>
+                                            <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
+                                                <AccordionItem value="item-1">
+                                                    <AccordionContent>
+                                                        <EjercicioInteractivo 
+                                                            groupId="la-rampa-actividad-3"
+                                                            contextFileName={'la-rampa/tutor-geogebra/consolidado'}
+                                                            tableRef={null}
+                                                        />
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            </Accordion>
                                         )}
                                     </AccordionContent>
                                 </AccordionItem>
@@ -158,13 +169,17 @@ export default function PaginaLaRampa() {
                                             />
                                         </div>
                                         {activeTeorico === 'la-rampa-actividad-5' && (
-                                            <div className="mt-4 border-t pt-4">
-                                                <EjercicioInteractivo 
-                                                    groupId="la-rampa-actividad-5"
-                                                    contextFileName={'la-rampa/tutor-calculadora/consolidado'}
-                                                    tableRef={null}
-                                                />
-                                            </div>
+                                            <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
+                                                <AccordionItem value="item-1">
+                                                    <AccordionContent>
+                                                        <EjercicioInteractivo 
+                                                            groupId="la-rampa-actividad-5"
+                                                            contextFileName={'la-rampa/tutor-calculadora/consolidado'}
+                                                            tableRef={null}
+                                                        />
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            </Accordion>
                                         )}
                                     </AccordionContent>
                                 </AccordionItem>
