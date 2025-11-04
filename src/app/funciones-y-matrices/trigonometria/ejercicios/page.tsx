@@ -4,12 +4,12 @@ import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from 'react';
-// import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { TeoremaAnguloCentralSVG } from '@/components/TeoremaAnguloCentralSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Calculator, Bot } from 'lucide-react';
 import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 
 
 const ejerciciosPlazaSkate = [
@@ -53,21 +53,11 @@ export default function NuevaPaginaEjercicios() {
                                             </div>
                                             
                                             <div className="space-y-4">
-                                                {ejerciciosPlazaSkate.map((ej, index) => (
-                                                    <div key={index} className="space-y-3 p-4 border rounded-lg bg-card">
-                                                        <div className="text-sm font-medium text-foreground" dangerouslySetInnerHTML={{ __html: ej.pregunta.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-                                                        <div className="flex items-start gap-2">
-                                                            <Input
-                                                                id={ej.id}
-                                                                placeholder="Escribe aquí tu respuesta..."
-                                                                disabled 
-                                                            />
-                                                            <Button size="icon" variant="secondary" className="mt-1 flex-shrink-0" disabled>
-                                                                <BookOpen className="h-4 w-4" />
-                                                                <span className="sr-only">Verificar</span>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
+                                                {ejerciciosPlazaSkate.map((ej) => (
+                                                     <ButtonVerificarConceptual 
+                                                        key={ej.id} 
+                                                        ejercicio={ej}
+                                                    />
                                                 ))}
                                             </div>
                                            {/* 
