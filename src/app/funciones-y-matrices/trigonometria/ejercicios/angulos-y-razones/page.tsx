@@ -9,7 +9,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { MarkdownImage } from '@/components/markdown-image';
-import { AyudaContextual } from '@/components/ejercicio-interactivo';
+import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -126,7 +126,7 @@ export default function AngulosYRazonesPage() {
                                                             Ayuda con Tutor GeoGebra
                                                          </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent className="max-w-7xl h-screen flex flex-col p-0">
+                                                    <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0">
                                                         <GeogebraIntegrado 
                                                             ejercicioId={`angulos-y-razones/tutor-geogebra/actividad.md`}
                                                             grupoId={`angulos-y-razones-geogebra-${ej.id}`}
@@ -173,15 +173,12 @@ export default function AngulosYRazonesPage() {
                                                 />
                                             </div>
                                             {activeTeorico === ej.id && (
-                                                <div className="mt-4">
-                                                    <AyudaContextual
-                                                        ejercicioId={`angulos-y-razones/tutor-calculadora/actividad.md`}
+                                               <div className="mt-4 border-t pt-4">
+                                                    <EjercicioInteractivo 
                                                         groupId={`angulos-y-razones-calculadora-${ej.id}`}
-                                                        onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
-                                                        isTeoricoOpen={activeTeorico === ej.id}
-                                                        tutorType="calculadora"
+                                                        contextFileName={'angulos-y-razones/tutor-calculadora/actividad.md'}
                                                     />
-                                                </div>
+                                               </div>
                                             )}
                                         </AccordionContent>
                                     </AccordionItem>
