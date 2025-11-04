@@ -17,21 +17,6 @@ import { GeogebraIntegrado } from '@/components/geogebra-integrado';
 import { Button } from '@/components/ui/button';
 import { Bot, Calculator } from 'lucide-react';
 
-const MarkdownRenderer = ({ content }: { content: string }) => {
-    return (
-        <ReactMarkdown
-            components={{
-                img: (props) => <MarkdownImage src={props.src || ''} alt={props.alt || ''} />,
-            }}
-            remarkPlugins={[remarkMath]}
-            rehypePlugins={[rehypeKatex, rehypeRaw]}
-            className="prose prose-invert max-w-none"
-        >
-            {content}
-        </ReactMarkdown>
-    );
-};
-
 const ejerciciosGeogebra = [
     { id: 'actividad-1', pregunta: '**Actividad 1:** ¿Cuál es la dirección del sitio web de GeoGebra Clásico?', respuestaCorrecta: 'https://www.geogebra.org/classic' },
     { id: 'actividad-2', pregunta: '**Actividad 2:** ¿Qué comando se utiliza para crear un triángulo con los vértices A=(0,0), B=(4,0) y C=(4,3)?', respuestaCorrecta: 'Polígono(A,B,C)' },
@@ -153,7 +138,7 @@ export default function AngulosYRazonesPage() {
                                 <AccordionItem value="video-guia">
                                     <AccordionTrigger>Ver Guía y Video de Apoyo</AccordionTrigger>
                                     <AccordionContent>
-                                        <MarkdownRenderer content={videoCalculadora} />
+                                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>{videoCalculadora}</ReactMarkdown>
                                     </AccordionContent>
                                 </AccordionItem>
                                 {ejerciciosCalculadora.map(ej => (
@@ -165,7 +150,7 @@ export default function AngulosYRazonesPage() {
                                             <ButtonVerificarConceptual key={ej.id} ejercicio={ej} />
                                              <div className="flex justify-end pt-4 mt-4 border-t">
                                                  <AyudaContextual
-                                                    ejercicioId={`angulos-y-razones/tutor-calculadora/actividad.md`}
+                                                    ejercicioId={ej.id}
                                                     groupId={`angulos-y-razones-calculadora-${ej.id}`}
                                                     onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
                                                     isTeoricoOpen={activeTeorico === ej.id}
@@ -176,7 +161,7 @@ export default function AngulosYRazonesPage() {
                                                <div className="mt-4 border-t pt-4">
                                                     <EjercicioInteractivo 
                                                         groupId={`angulos-y-razones-calculadora-${ej.id}`}
-                                                        contextFileName={'angulos-y-razones/tutor-calculadora/actividad.md'}
+                                                        initialContext={`Necesito ayuda con la siguiente pregunta de la calculadora: "${ej.pregunta}"`}
                                                     />
                                                </div>
                                             )}

@@ -186,11 +186,11 @@ export const TablaActividad1 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
         <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
             <AccordionItem value="item-1">
                 <AccordionContent>
-                    <EjercicioInteractivo 
-                      key="tabla-actividad-1"
-                      groupId="la-rampa-actividad-1"
-                      contextFileName='la-rampa/tutor-calculadora/actividad-1.ts'
-                      tableRef={tablaRef}
+                    <EjercicioInteractivo
+                        key="tabla-actividad-1"
+                        groupId="la-rampa-actividad-1"
+                        initialContext="Estoy resolviendo la tabla de la Actividad 1 sobre el cálculo de la diferencia de nivel en rampas. Necesito ayuda para entender cómo calcular los valores."
+                        tableRef={tablaRef}
                     />
                 </AccordionContent>
             </AccordionItem>
@@ -306,10 +306,10 @@ export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
                 <Accordion type="single" collapsible defaultValue="item-1" className="mt-4">
                   <AccordionItem value="item-1">
                       <AccordionContent>
-                        <EjercicioInteractivo 
+                         <EjercicioInteractivo
                             key="tabla-actividad-4"
                             groupId="la-rampa-actividad-4"
-                            contextFileName='la-rampa/tutor-calculadora/actividad-4.ts'
+                            initialContext="Estoy resolviendo la tabla de la Actividad 4 sobre razones trigonométricas. Necesito ayuda para entender la relación entre el ángulo y los cocientes."
                             tableRef={tablaRef}
                         />
                       </AccordionContent>
@@ -323,37 +323,14 @@ export const TablaActividad4 = ({ onTeoricoToggle, isTeoricoOpen }: TablaInterRa
 
 interface EjercicioInteractivoProps {
   groupId: string;
-  contextFileName: string;
+  initialContext: string;
   tableRef?: React.RefObject<HTMLDivElement> | null;
 }
 
 
-export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: EjercicioInteractivoProps) {
-  const [loadedContext, setLoadedContext] = useState<string | null>(null);
+export function EjercicioInteractivo({ groupId, initialContext, tableRef }: EjercicioInteractivoProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  
-  useEffect(() => {
-    const loadContext = async () => {
-      setIsLoading(true);
-      setIsError(false);
-      try {
-        const result = await getGuiaEjercicio(contextFileName);
-        if ('content' in result) {
-          setLoadedContext(result.content);
-        } else {
-          throw new Error(result.error);
-        }
-      } catch (error) {
-        console.error("Error cargando el contexto del ejercicio:", error);
-        setLoadedContext(null);
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadContext();
-  }, [contextFileName]);
+  const { toast } = useToast();
 
   const takeScreenshot = async (): Promise<string | null> => {
     if (!tableRef || !tableRef.current) {
@@ -370,36 +347,13 @@ export function EjercicioInteractivo({ groupId, contextFileName, tableRef }: Eje
     }
   };
 
-  const { toast } = useToast();
-
-  if (isLoading) {
-    return (
-      <div className="border-t pt-4 mt-4 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <span className="ml-2 text-muted-foreground">Cargando tutor...</span>
-      </div>
-    );
-  }
-
-  if (isError) {
-      return (
-          <div className="border-t pt-4 mt-4 text-center text-red-500">
-              <p>Error: No se pudo cargar el contexto para el tutor teórico.</p>
-              <p className="text-xs text-muted-foreground">Por favor, revisa que el archivo de contexto exista.</p>
-          </div>
-      )
-  }
-
   return (
     <div className="border rounded-lg shadow-md bg-background">
-      {loadedContext !== null && (
         <TutorTeoricoChat 
-          initialContext={loadedContext}
+          initialContext={initialContext}
           groupId={groupId} 
-          contextFileName={`${contextFileName}`}
           takeScreenshot={tableRef ? takeScreenshot : undefined}
         />
-      )}
     </div>
   );
 }
