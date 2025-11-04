@@ -11,7 +11,7 @@ import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { MarkdownImage } from '@/components/markdown-image';
 import { Loader2 } from 'lucide-react';
-import { AyudaContextual, EjercicioInteractivo } from '@/components/ejercicio-interactivo';
+import { AyudaContextual } from '@/components/ejercicio-interactivo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ButtonVerificarConceptual } from '@/components/modulo-ejercicios';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -79,7 +79,11 @@ export default function AngulosYRazonesPage() {
             setIsLoading(true);
             try {
                 const calculadoraRes = await getGuiaEjercicio('angulos-y-razones/tutor-calculadora/actividad');
-                if ('content' in calculadoraRes) setContenidoCalculadora(calculadoraRes.content);
+                if ('content' in calculadoraRes) {
+                    setContenidoCalculadora(calculadoraRes.content);
+                } else {
+                    console.error("Error al cargar guía de calculadora:", calculadoraRes.error);
+                }
             } catch (error) {
                 console.error("Error cargando guías:", error);
             } finally {
@@ -190,10 +194,11 @@ export default function AngulosYRazonesPage() {
                                                 />
                                             </div>
                                             {activeTeorico === ej.id && (
-                                                <EjercicioInteractivo
+                                                <AyudaContextual
+                                                    ejercicioId="angulos-y-razones/tutor-calculadora/actividad"
                                                     groupId={`angulos-y-razones-calculadora-${ej.id}`}
-                                                    contextFileName="angulos-y-razones/tutor-calculadora/actividad"
-                                                    tableRef={null}
+                                                    onTeoricoToggle={() => handleTeoricoToggle(ej.id)}
+                                                    isTeoricoOpen={activeTeorico === ej.id}
                                                 />
                                             )}
                                         </AccordionContent>
@@ -203,7 +208,6 @@ export default function AngulosYRazonesPage() {
                         </CardContent>
                     </Card>
                 </div>
-
             </main>
         </div>
     );
