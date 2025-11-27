@@ -1,0 +1,41 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "user_notes",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "temaId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "fecha_modificacion",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "user_highlights",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "temaId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "fecha",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
+import FeedbackButton from '@/components/feedback/FeedbackButton';
 import 'katex/dist/katex.min.css';
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           {children}
+          <FeedbackButton />
         </FirebaseClientProvider>
       </body>
     </html>

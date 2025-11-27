@@ -1,5 +1,6 @@
 import { getPostBySlug } from '@/lib/estudia';
 import Header from '@/components/header';
+import StudyPageClient from '@/components/StudyPageClient';
 import { notFound } from 'next/navigation';
 
 export default async function StudyTopicPage({ params }: { params: { slug: string[] } }) {
@@ -9,14 +10,18 @@ export default async function StudyTopicPage({ params }: { params: { slug: strin
     notFound();
   }
 
+  // Create unique topic ID from slug
+  const temaId = params.slug.join('/');
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
-        <article className="prose prose-invert lg:prose-xl max-w-none mx-auto bg-card p-8 rounded-lg">
-          <h1>{post.title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-        </article>
+        <StudyPageClient
+          temaId={temaId}
+          temaNombre={post.title}
+          contentHtml={post.contentHtml}
+        />
       </main>
     </div>
   );

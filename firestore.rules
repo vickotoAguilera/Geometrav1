@@ -57,6 +57,75 @@ service cloud.firestore {
     }
 
     /**
+     * @description Feedback General - Users can create and read their own feedback, admins can read all
+     * @path /feedback_general/{feedbackId}
+     */
+    match /feedback_general/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false; // Mantener historial
+    }
+
+    /**
+     * @description Feedback de Temas - Users can create and read their own feedback, admins can read all
+     * @path /feedback_temas/{feedbackId}
+     */
+    match /feedback_temas/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Feedback de IA - Users can create and read their own feedback, admins can read all
+     * @path /feedback_ia/{feedbackId}
+     */
+    match /feedback_ia/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Admins collection - Read-only for verification
+     * @path /admins/{userId}
+     */
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Solo desde consola Firebase
+    }
+
+    /**
+     * @description User Notes - Users can only access their own notes
+     * @path /user_notes/{noteId}
+     */
+    match /user_notes/{noteId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description User Highlights - Users can only access their own highlights
+     * @path /user_highlights/{highlightId}
+     */
+    match /user_highlights/{highlightId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
+    }
+
+    /**
      * @description Allows public read access to GeoGebra applets. Only authenticated users can create, update, and delete applets.
      * @path /geoGebraApplets/{appletId}
      * @allow (get) Any user (authenticated or not) reads a GeoGebra applet.
@@ -86,5 +155,9 @@ service cloud.firestore {
 
   function isExistingOwner(userId) {
     return isOwner(userId) && resource != null;
+  }
+
+  function isAdmin() {
+    return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
   }
 }
