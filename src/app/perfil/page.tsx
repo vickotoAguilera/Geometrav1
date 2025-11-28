@@ -82,12 +82,17 @@ export default function PerfilPage() {
                                 )}
                             </div>
                         </div>
-                        <Link href="/perfil/editar">
-                            <Button variant="outline" size="sm">
-                                <Edit className="w-4 h-4 mr-2" />
-                                Editar
-                            </Button>
-                        </Link>
+                        <div className="flex flex-col items-end gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                                🚧 Próximamente: Edición completa
+                            </Badge>
+                            <Link href="/perfil/editar">
+                                <Button variant="outline" size="sm">
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Editar
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </CardHeader>
             </Card>
