@@ -12,11 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LogOut, User as UserIcon, Bot, MessageSquareHeart, Menu } from "lucide-react";
+import { LogOut, User as UserIcon, Bot, MessageSquareHeart, Menu, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, VisuallyHidden } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
 import { useAuth, useUser } from "@/firebase";
+import { useUserProfile } from "@/firebase/hooks/use-user-profile";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { usePathname } from 'next/navigation';
 import { ScreenshotGuide } from "./screenshot-guide";
@@ -35,6 +36,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const AuthButton = () => {
   const { user, isUserLoading } = useUser();
+  const { profile } = useUserProfile();
   const auth = useAuth();
 
   const handleSignIn = async () => {
@@ -74,7 +76,7 @@ const AuthButton = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'Usuario'} />
+            <AvatarImage src={profile?.photoURL || user.photoURL || ''} alt={profile?.displayName || user.displayName || 'Usuario'} />
             <AvatarFallback>
               <UserIcon className="h-5 w-5" />
             </AvatarFallback>
@@ -84,13 +86,19 @@ const AuthButton = () => {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.displayName}</p>
+            <p className="text-sm font-medium leading-none">{profile?.displayName || user.displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/perfil">
+            <UserCircle className="mr-2 h-4 w-4" />
+            <span>Mi Perfil</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Cerrar sesión</span>
