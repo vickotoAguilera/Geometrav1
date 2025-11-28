@@ -8,12 +8,13 @@ import { uploadProfileImage } from '@/lib/r2-upload';
 
 /**
  * Sube una foto de perfil a Cloudflare R2
+ * Recibe un blob ya optimizado desde el cliente
  */
 export async function uploadProfilePhoto(formData: FormData): Promise<{ url: string }> {
     try {
-        const file = formData.get('photo') as File;
+        const blob = formData.get('photo') as Blob;
 
-        if (!file) {
+        if (!blob) {
             throw new Error('No se proporcionó ningún archivo');
         }
 
@@ -24,8 +25,8 @@ export async function uploadProfilePhoto(formData: FormData): Promise<{ url: str
             throw new Error('No se proporcionó el ID del usuario');
         }
 
-        // Subir imagen a R2
-        const url = await uploadProfileImage(file, userId);
+        // Subir blob a R2 (ya viene optimizado del cliente)
+        const url = await uploadProfileImage(blob, userId);
 
         return { url };
     } catch (error) {

@@ -28,8 +28,14 @@ const TARGET_QUALITY = 0.8; // 80% calidad
 
 /**
  * Optimiza una imagen: redimensiona y comprime
+ * NOTA: Esta función debe ejecutarse en el CLIENTE, no en el servidor
  */
 export async function optimizeImage(file: File): Promise<Blob> {
+    // Verificar que estamos en el cliente
+    if (typeof window === 'undefined') {
+        throw new Error('optimizeImage debe ejecutarse en el cliente');
+    }
+
     return new Promise((resolve, reject) => {
         const img = new Image();
         const canvas = document.createElement('canvas');
@@ -114,27 +120,19 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 
 /**
  * Sube una foto de perfil a R2
+ * NOTA: Recibe un Blob ya optimizado desde el cliente
  */
 export async function uploadProfileImage(
-    file: File,
+    blob: Blob,
     userId: string
 ): Promise<string> {
-    // Validar archivo
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-        throw new Error(validation.error);
-    }
-
-    // Optimizar imagen
-    const optimizedBlob = await optimizeImage(file);
-
     // Generar nombre único
     const timestamp = Date.now();
     const extension = 'jpg'; // Siempre guardamos como JPG
     const key = `profiles/${userId}/${timestamp}.${extension}`;
 
     // Convertir Blob a ArrayBuffer
-    const arrayBuffer = await optimizedBlob.arrayBuffer();
+    const arrayBuffer = await blob.arrayBuffer();
 
     // Subir a R2
     const command = new PutObjectCommand({

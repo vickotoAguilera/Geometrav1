@@ -14,14 +14,31 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { Edit, TrendingUp, Award, Calendar, Target } from 'lucide-react';
 import { getLevelProgress } from '@/lib/points-system';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PerfilPage() {
     const { user, isUserLoading } = useUser();
     const { profile, isLoading: isLoadingProfile } = useUserProfile();
     const { mathLevel, isLoading: isLoadingMathLevel } = useMathLevel();
     const { progress, isLoading: isLoadingProgress } = useProgress();
+    const searchParams = useSearchParams();
+    const { toast } = useToast();
+
+    // Mostrar toast si viene de guardar cambios
+    useEffect(() => {
+        if (searchParams.get('saved') === 'true') {
+            toast({
+                title: '✅ Cambios guardados exitosamente',
+                description: 'Tu perfil ha sido actualizado correctamente.',
+            });
+            // Limpiar el query param de la URL
+            window.history.replaceState({}, '', '/perfil');
+        }
+    }, [searchParams, toast]);
 
     if (isUserLoading || isLoadingProfile || isLoadingMathLevel || isLoadingProgress) {
         return <PerfilSkeleton />;

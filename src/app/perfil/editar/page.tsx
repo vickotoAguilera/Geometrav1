@@ -17,12 +17,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { uploadProfilePhoto } from '@/app/profile-actions';
+import { optimizeImage, validateImageFile } from '@/lib/r2-upload';
 
 export default function EditarPerfilPage() {
     const { user } = useUser();
     const { profile, updateProfile, isLoading } = useUserProfile();
     const { toast } = useToast();
+    const router = useRouter();
 
     const [displayName, setDisplayName] = useState(profile?.displayName || '');
     const [bio, setBio] = useState(profile?.bio || '');
@@ -53,14 +56,50 @@ export default function EditarPerfilPage() {
             // Primero subir foto si hay una nueva
             let photoURL = profile?.photoURL || null;
             if (photoFile) {
-                setIsUploadingPhoto(true);
-                const formData = new FormData();
-                formData.append('photo', photoFile);
-                formData.append('userId', user.uid);
+                // ⚠️ UPLOAD DE FOTO DESHABILITADO TEMPORALMENTE
+                // Requiere configurar Cloudflare R2 en .env.local
+                // Por ahora solo mostramos el preview local
+                toast({
+                    title: 'Upload de foto deshabilitado',
+                    description: 'Configura Cloudflare R2 para habilitar esta función. Por ahora los demás cambios se guardarán.',
+                });
 
-                const { url } = await uploadProfilePhoto(formData);
-                photoURL = url;
+                // Mantener el preview pero no subir
+                photoURL = profile?.photoURL || null;
+
+                /* CÓDIGO COMENTADO - Descomentar cuando R2 esté configurado
+                setIsUploadingPhoto(true);
+
+                try {
+                    // Validar archivo
+                    const validation = validateImageFile(photoFile);
+                    if (!validation.valid) {
+                        throw new Error(validation.error);
+                    }
+
+                    // Optimizar imagen en el cliente
+                    const optimizedBlob = await optimizeImage(photoFile);
+
+                    // Subir blob optimizado
+                    const formData = new FormData();
+                    formData.append('photo', optimizedBlob);
+                    formData.append('userId', user.uid);
+
+                    const { url } = await uploadProfilePhoto(formData);
+                    photoURL = url;
+                } catch (error) {
+                    console.error('Error uploading photo:', error);
+                    toast({
+                        variant: 'destructive',
+                        title: 'Error al subir foto',
+                        description: error instanceof Error ? error.message : 'Error desconocido',
+                    });
+                    setIsUploadingPhoto(false);
+                    return;
+                }
+
                 setIsUploadingPhoto(false);
+                */
             }
 
             // Actualizar perfil
@@ -71,16 +110,14 @@ export default function EditarPerfilPage() {
                 photoURL,
             });
 
-            toast({
-                title: 'Perfil actualizado',
-                description: 'Tus cambios han sido guardados exitosamente.',
-            });
+            // Redirigir con query param para mostrar toast en la página de perfil
+            router.push('/perfil?saved=true');
         } catch (error) {
             console.error('Error saving profile:', error);
             toast({
                 variant: 'destructive',
-                title: 'Error',
-                description: 'No se pudo guardar el perfil. Inténtalo de nuevo.',
+                title: '❌ Error al guardar cambios',
+                description: 'No se pudieron guardar tus cambios. Por favor, intenta de nuevo o contacta al administrador usando el botón de "Reportar Bug" en el menú.',
             });
         } finally {
             setIsSaving(false);
