@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { Edit, TrendingUp, Award, Calendar, Target } from 'lucide-react';
 import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
+import { StorageManager } from '@/components/storage/StorageManager';
 
 export default function PerfilPage() {
     const { user, isUserLoading } = useUser();
@@ -83,9 +84,6 @@ export default function PerfilPage() {
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                            <Badge variant="secondary" className="text-xs">
-                                🚧 Próximamente: Edición completa
-                            </Badge>
                             <Link href="/perfil/editar">
                                 <Button variant="outline" size="sm">
                                     <Edit className="w-4 h-4 mr-2" />
@@ -262,6 +260,9 @@ export default function PerfilPage() {
                     </CardContent>
                 </Card>
             )}
+
+            {/* Gestión de Almacenamiento R2 */}
+            <StorageManager />
         </div>
     );
 }
