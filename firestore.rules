@@ -126,6 +126,51 @@ service cloud.firestore {
     }
 
     /**
+     * @description User Profile - Users can only access their own profile data
+     * @path /users/{userId}/profile/{document}
+     */
+    match /users/{userId}/profile/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Math Level - Users can only access their own math level data
+     * @path /users/{userId}/mathLevel/{document}
+     */
+    match /users/{userId}/mathLevel/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description User Progress - Users can only access their own progress data
+     * @path /users/{userId}/progress/{document}
+     */
+    match /users/{userId}/progress/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Learning Profile - Users can only access their own learning profile
+     * @path /users/{userId}/learningProfile/{document}
+     */
+    match /users/{userId}/learningProfile/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Personal Tutor Config - Users can only access their own tutor configuration
+     * @path /users/{userId}/personalTutor/{document}
+     */
+    match /users/{userId}/personalTutor/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
      * @description Allows public read access to GeoGebra applets. Only authenticated users can create, update, and delete applets.
      * @path /geoGebraApplets/{appletId}
      * @allow (get) Any user (authenticated or not) reads a GeoGebra applet.
