@@ -16,19 +16,28 @@ interface StudyPageClientProps {
 export default function StudyPageClient({ temaId, temaNombre, contentHtml }: StudyPageClientProps) {
     const [notesOpen, setNotesOpen] = useState(false);
     const [selection, setSelection] = useState<Selection | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     useEffect(() => {
         const handleSelection = () => {
-            const sel = window.getSelection();
-            if (sel && sel.toString().length > 0) {
-                setSelection(sel);
-            } else {
-                setSelection(null);
-            }
+            // Small delay to ensure selection is complete
+            setTimeout(() => {
+                const sel = window.getSelection();
+                if (sel && sel.toString().trim().length > 0 && !sel.isCollapsed) {
+                    setSelection(sel);
+                } else {
+                    setSelection(null);
+                }
+            }, 10);
         };
 
         document.addEventListener('mouseup', handleSelection);
-        return () => document.removeEventListener('mouseup', handleSelection);
+        document.addEventListener('touchend', handleSelection); // Add touch support
+
+        return () => {
+            document.removeEventListener('mouseup', handleSelection);
+            document.removeEventListener('touchend', handleSelection);
+        };
     }, []);
 
     return (
@@ -59,10 +68,9 @@ export default function StudyPageClient({ temaId, temaNombre, contentHtml }: Stu
                     selection={selection}
                     temaId={temaId}
                     onHighlight={() => {
+                        setRefreshKey(prev => prev + 1);
                         setSelection(null);
                         window.getSelection()?.removeAllRanges();
-                        // Opcional: Abrir panel de notas para ver el highlight guardado
-                        // setNotesOpen(true); 
                     }}
                     onClose={() => {
                         setSelection(null);
@@ -73,6 +81,7 @@ export default function StudyPageClient({ temaId, temaNombre, contentHtml }: Stu
 
             {/* Panel de Notas */}
             <NotesPanel
+                key={refreshKey}
                 temaId={temaId}
                 temaNombre={temaNombre}
                 isOpen={notesOpen}

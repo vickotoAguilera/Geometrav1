@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Highlighter, PenTool, MessageSquare, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,48 +17,129 @@ interface HighlightToolbarProps {
 
 export default function HighlightToolbar({ selection, temaId, onHighlight, onClose }: HighlightToolbarProps) {
     const { user } = useUser();
-    const [position, setPosition] = useState({ top: 0, left: 0 });
 
-    useEffect(() => {
-        if (selection && selection.rangeCount > 0) {
+    // Capture selection data immediately to prevent loss when clicking buttons
+    const capturedData = (() => {
+        if (!selection || selection.rangeCount === 0) {
+            return null;
+        }
+        try {
+            const range = selection.getRangeAt(0);
+            const text = selection.toString().trim();
+            return { range: range.cloneRange(), text };
+        } catch (error) {
+            console.error('Error capturing selection:', error);
+            return null;
+        }
+    })();
+
+    // Calculate position directly from selection
+    const getPosition = () => {
+        if (!selection || selection.rangeCount === 0) {
+            return { top: 0, left: 0 };
+        }
+
+        try {
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
 
             // Calcular posición absoluta considerando el scroll
-            setPosition({
-                top: rect.top + window.scrollY - 50, // 50px arriba de la selección
-                left: rect.left + window.scrollX + (rect.width / 2) - 100 // Centrado
-            });
+            const top = rect.top + window.scrollY - 60; // 60px arriba de la selección
+            const left = rect.left + window.scrollX + (rect.width / 2) - 100; // Centrado
+
+
+
+            return { top, left };
+        } catch (error) {
+            console.error('Error calculating position:', error);
+            return { top: 0, left: 0 };
         }
-    }, [selection]);
+    };
+
+    const position = getPosition();
 
     const handleHighlight = async (color: ColorHighlight) => {
-        if (!user || !selection) return;
+        console.log('handleHighlight called with color:', color);
+        console.log('User:', user);
+        console.log('Captured data:', capturedData);
 
-        const text = selection.toString();
-        if (!text) return;
+        if (!user) {
+            console.error('No user authenticated');
+            alert('Debes iniciar sesión para guardar resaltados');
+            return;
+        }
+
+        if (!capturedData) {
+            console.error('No captured selection data');
+            return;
+        }
+
+        const { text, range } = capturedData;
+        console.log('Selected text:', text);
+
+        if (!text) {
+            console.error('Empty text selection');
+            return;
+        }
 
         try {
-            await addDoc(collection(db, 'user_highlights'), {
+            // Save to Firestore
+            console.log('Saving to Firestore...');
+            const docRef = await addDoc(collection(db, 'user_highlights'), {
                 userId: user.uid,
                 temaId,
                 texto: text,
                 color,
                 fecha: serverTimestamp()
             });
+            console.log('Saved to Firestore with ID:', docRef.id);
+
+            // Apply visual highlight
+            try {
+                const span = document.createElement('mark');
+
+                // Apply color styling
+                const colorMap = {
+                    yellow: 'bg-yellow-300/40 dark:bg-yellow-400/30',
+                    green: 'bg-green-300/40 dark:bg-green-400/30',
+                    blue: 'bg-blue-300/40 dark:bg-blue-400/30',
+                    pink: 'bg-pink-300/40 dark:bg-pink-400/30'
+                };
+
+                span.className = `${colorMap[color]} rounded px-0.5`;
+                span.setAttribute('data-highlight-color', color);
+
+                // Wrap the selected text using the captured range
+                range.surroundContents(span);
+                console.log('Visual highlight applied successfully');
+            } catch (visualError) {
+                console.warn('Could not apply visual highlight:', visualError);
+                console.log('Highlight saved to DB but visual wrapping failed');
+            }
 
             onHighlight();
         } catch (error) {
-            console.error('Error guardando highlight:', error);
+            console.error('Error in handleHighlight:', error);
+            alert('Error al guardar el resaltado: ' + (error as Error).message);
         }
     };
 
-    if (!selection || selection.isCollapsed) return null;
+    if (!selection || selection.isCollapsed) {
+        return null;
+    }
+
+    const selectedText = selection.toString().trim();
+    if (!selectedText) {
+        return null;
+    }
 
     return (
-        <Card
-            className="fixed z-50 p-2 flex gap-2 items-center shadow-xl animate-in fade-in zoom-in duration-200"
-            style={{ top: position.top, left: position.left }}
+        <div
+            className="fixed z-[9999] p-3 flex gap-3 items-center shadow-2xl bg-slate-800 border border-slate-600 rounded-lg backdrop-blur-sm animate-in fade-in zoom-in duration-200"
+            style={{
+                top: `${position.top}px`,
+                left: `${position.left}px`,
+            }}
         >
             <div className="flex gap-1 border-r pr-2 mr-2">
                 <button
@@ -87,6 +167,6 @@ export default function HighlightToolbar({ selection, temaId, onHighlight, onClo
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
                 <X className="h-4 w-4" />
             </Button>
-        </Card>
+        </div>
     );
 }

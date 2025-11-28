@@ -139,8 +139,6 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
     };
 
     const eliminarNota = async (notaId: string) => {
-        if (!confirm('¿Eliminar esta nota?')) return;
-
         try {
             await deleteDoc(doc(db, 'user_notes', notaId));
             await cargarDatos();
@@ -150,17 +148,28 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
             }
         } catch (error) {
             console.error('Error eliminando nota:', error);
+            alert('Error al eliminar la nota: ' + (error as Error).message);
         }
     };
 
     const eliminarHighlight = async (highlightId: string) => {
-        if (!confirm('¿Eliminar este resaltado?')) return;
+        console.log('Intentando eliminar highlight con ID:', highlightId);
+
+        if (!highlightId) {
+            console.error('ID de highlight inválido');
+            alert('Error: No se puede eliminar un resaltado sin ID');
+            return;
+        }
 
         try {
+            console.log('Eliminando de Firestore...');
             await deleteDoc(doc(db, 'user_highlights', highlightId));
+            console.log('Eliminado exitosamente, recargando datos...');
             await cargarDatos();
+            console.log('Datos recargados');
         } catch (error) {
             console.error('Error eliminando highlight:', error);
+            alert('Error al eliminar el resaltado: ' + (error as Error).message);
         }
     };
 
@@ -229,7 +238,7 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
                                 <Button
                                     variant="outline"
                                     className="w-full"
-                                    onClick={() => exportNoteToPDF(notaActual)}
+                                    onClick={() => exportNoteToPDF(notaActual, temaId ? highlights : undefined)}
                                 >
                                     <Download className="h-4 w-4 mr-2" />
                                     Exportar PDF
@@ -255,7 +264,7 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
                                 </Button>
                             </div>
 
-                            <ScrollArea className="flex-1">
+                            <ScrollArea className="flex-1 max-h-[calc(100vh-300px)]" style={{ height: '100%' }}>
                                 {loading ? (
                                     <div className="p-8 text-center text-muted-foreground">
                                         <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2" />
@@ -322,8 +331,8 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
                     )}
                 </TabsContent>
 
-                <TabsContent value="highlights" className="flex-1 flex flex-col mt-0 h-full">
-                    <ScrollArea className="flex-1">
+                <TabsContent value="highlights" className="flex-1 flex flex-col mt-0 overflow-hidden">
+                    <ScrollArea className="flex-1 max-h-[calc(100vh-250px)]" style={{ height: '100%' }}>
                         {loading ? (
                             <div className="p-8 text-center text-muted-foreground">
                                 Cargando...
@@ -358,8 +367,17 @@ export default function NotesPanel({ temaId, temaNombre, isOpen, onClose }: Note
                                                         {highlight.fecha.toLocaleDateString()}
                                                     </span>
                                                     <button
-                                                        onClick={() => eliminarHighlight(highlight.id!)}
-                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (highlight.id) {
+                                                                eliminarHighlight(highlight.id);
+                                                            } else {
+                                                                console.error('Highlight sin ID:', highlight);
+                                                                alert('Error: Este resaltado no tiene ID');
+                                                            }
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 p-1 rounded transition-colors"
+                                                        title="Eliminar resaltado"
                                                     >
                                                         <X className="h-3 w-3" />
                                                     </button>
