@@ -50,45 +50,60 @@ export default function EditarPerfilPage() {
     const handleSave = async () => {
         if (!user) return;
 
+        console.log('🚀 [CLIENT] handleSave iniciado');
+        console.log('👤 [CLIENT] User ID:', user.uid);
+        console.log('📸 [CLIENT] ¿Hay foto nueva?', photoFile ? 'SÍ' : 'NO');
+
         try {
             setIsSaving(true);
 
             // Primero subir foto si hay una nueva
             let photoURL = profile?.photoURL || null;
             if (photoFile) {
-                // ⚠️ UPLOAD DE FOTO DESHABILITADO TEMPORALMENTE
-                // Requiere configurar Cloudflare R2 en .env.local
-                // Por ahora solo mostramos el preview local
-                toast({
-                    title: 'Upload de foto deshabilitado',
-                    description: 'Configura Cloudflare R2 para habilitar esta función. Por ahora los demás cambios se guardarán.',
+                console.log('📤 [CLIENT] Iniciando upload de foto...');
+                console.log('📦 [CLIENT] Archivo original:', {
+                    name: photoFile.name,
+                    size: photoFile.size,
+                    type: photoFile.type
                 });
 
-                // Mantener el preview pero no subir
-                photoURL = profile?.photoURL || null;
-
-                /* CÓDIGO COMENTADO - Descomentar cuando R2 esté configurado
                 setIsUploadingPhoto(true);
 
                 try {
                     // Validar archivo
+                    console.log('✅ [CLIENT] Validando archivo...');
                     const validation = validateImageFile(photoFile);
+                    console.log('📋 [CLIENT] Resultado validación:', validation);
+
                     if (!validation.valid) {
                         throw new Error(validation.error);
                     }
 
                     // Optimizar imagen en el cliente
+                    console.log('🔄 [CLIENT] Optimizando imagen...');
                     const optimizedBlob = await optimizeImage(photoFile);
+                    console.log('✅ [CLIENT] Imagen optimizada:', {
+                        size: optimizedBlob.size,
+                        type: optimizedBlob.type
+                    });
 
-                    // Subir blob optimizado
+                    // Subir blob optimizado a R2
+                    console.log('📤 [CLIENT] Preparando FormData...');
                     const formData = new FormData();
                     formData.append('photo', optimizedBlob);
                     formData.append('userId', user.uid);
+                    console.log('📤 [CLIENT] FormData preparado, llamando a uploadProfilePhoto...');
 
                     const { url } = await uploadProfilePhoto(formData);
+                    console.log('✅ [CLIENT] Upload exitoso! URL:', url);
                     photoURL = url;
+
+                    toast({
+                        title: '✅ Foto subida a R2',
+                        description: 'Tu foto de perfil se ha guardado correctamente',
+                    });
                 } catch (error) {
-                    console.error('Error uploading photo:', error);
+                    console.error('❌ [CLIENT] Error uploading photo:', error);
                     toast({
                         variant: 'destructive',
                         title: 'Error al subir foto',
@@ -99,8 +114,8 @@ export default function EditarPerfilPage() {
                 }
 
                 setIsUploadingPhoto(false);
-                */
             }
+
 
             // Actualizar perfil
             await updateProfile({
@@ -110,8 +125,14 @@ export default function EditarPerfilPage() {
                 photoURL,
             });
 
-            // Redirigir con query param para mostrar toast en la página de perfil
-            router.push('/perfil?saved=true');
+            // TEMPORALMENTE DESHABILITADO: Redirigir con query param para mostrar toast en la página de perfil
+            // router.push('/perfil?saved=true');
+
+            // Mostrar toast de éxito aquí mismo
+            toast({
+                title: '✅ Perfil actualizado',
+                description: 'Tus cambios se han guardado correctamente. Revisa los logs abajo para ver el detalle del upload.',
+            });
         } catch (error) {
             console.error('Error saving profile:', error);
             toast({
@@ -270,3 +291,4 @@ export default function EditarPerfilPage() {
         </div>
     );
 }
+

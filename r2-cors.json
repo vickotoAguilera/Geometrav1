@@ -1,0 +1,25 @@
+[
+    {
+        "AllowedOrigins": [
+            "http://localhost:3000",
+            "http://localhost:9002",
+            "https://*.vercel.app",
+            "https://geometra.com",
+            "https://*.geometra.com"
+        ],
+        "AllowedMethods": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE",
+            "HEAD"
+        ],
+        "AllowedHeaders": [
+            "*"
+        ],
+        "ExposeHeaders": [
+            "ETag"
+        ],
+        "MaxAgeSeconds": 3600
+    }
+]
