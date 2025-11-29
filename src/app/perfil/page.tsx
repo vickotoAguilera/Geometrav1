@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { Edit, TrendingUp, Award, Calendar, Target, GraduationCap, Shield } from 'lucide-react';
 import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ import { TeacherRequestButton } from '@/components/profile/TeacherRequestButton'
 import DebugPanel from '@/components/debug/DebugPanel';
 import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
 
-export default function PerfilPage() {
+function PerfilPageContent() {
     const { user, isUserLoading } = useUser();
     const { profile, isLoading: isLoadingProfile } = useUserProfile();
     const { mathLevel, isLoading: isLoadingMathLevel } = useMathLevel();
@@ -331,5 +331,13 @@ function PerfilSkeleton() {
                 <Skeleton className="h-32" />
             </div>
         </div>
+    );
+}
+
+export default function PerfilPage() {
+    return (
+        <Suspense fallback={<PerfilSkeleton />}>
+            <PerfilPageContent />
+        </Suspense>
     );
 }
