@@ -13,6 +13,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // 🚨 EMERGENCY RULE: Allow everything for the admin user
+    match /{document=**} {
+      allow read, write: if request.auth.uid == 'kRJ3QUGPsCRxImr3zKH9vrHnbk03';
+    }
 
     /**
      * @description Enforces access control for user profiles. Users can only read and write their own profile data.
@@ -28,8 +32,8 @@ service cloud.firestore {
      * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false; // User listing is not permitted.
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin(); // Admins can list all users
       allow create: if isOwner(userId);
       allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
@@ -98,7 +102,9 @@ service cloud.firestore {
      */
     match /admins/{userId} {
       allow read: if isSignedIn();
-      allow write: if false; // Solo desde consola Firebase
+      // Allow write if user is already marked as admin in their profile (bootstrapping)
+      allow write: if isSignedIn() && 
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
     }
 
     /**
@@ -126,12 +132,12 @@ service cloud.firestore {
     }
 
     /**
-     * @description User Profile - Users can only access their own profile data
+     * @description User Profile - Users can only access their own profile data, admins can read all
      * @path /users/{userId}/profile/{document}
      */
     match /users/{userId}/profile/{document=**} {
-      allow read: if isOwner(userId);
-      allow write: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
     }
 
     /**
@@ -203,6 +209,15 @@ service cloud.firestore {
   }
 
   function isAdmin() {
-    return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    return isSignedIn() && (
+      request.auth.uid == 'kRJ3QUGPsCRxImr3zKH9vrHnbk03' || 
+      exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+    );
+  }
+
+  // Check if user is admin by checking their role in profile
+  function isAdminByRole(userId) {
+    return isSignedIn() && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
   }
 }

@@ -16,10 +16,13 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { Edit, TrendingUp, Award, Calendar, Target } from 'lucide-react';
+import { Edit, TrendingUp, Award, Calendar, Target, GraduationCap, Shield } from 'lucide-react';
 import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
 import { StorageManager } from '@/components/storage/StorageManager';
+import { TeacherRequestButton } from '@/components/profile/TeacherRequestButton';
+import DebugPanel from '@/components/debug/DebugPanel';
+import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
 
 export default function PerfilPage() {
     const { user, isUserLoading } = useUser();
@@ -77,8 +80,20 @@ export default function PerfilPage() {
                                 <h1 className="text-3xl font-bold">{profile?.displayName || user.displayName || 'Usuario'}</h1>
                                 {profile?.bio && <p className="text-muted-foreground mt-1">{profile.bio}</p>}
                                 {profile?.grade && (
-                                    <Badge variant="secondary" className="mt-2">
+                                    <Badge variant="secondary" className="mt-2 mr-2">
                                         {profile.grade}
+                                    </Badge>
+                                )}
+                                {profile?.role === 'teacher' && (
+                                    <Badge variant="default" className="mt-2 mr-2 bg-blue-600 hover:bg-blue-700">
+                                        <GraduationCap className="w-3 h-3 mr-1" />
+                                        Docente
+                                    </Badge>
+                                )}
+                                {profile?.role === 'admin' && (
+                                    <Badge variant="default" className="mt-2 mr-2 bg-purple-600 hover:bg-purple-700">
+                                        <Shield className="w-3 h-3 mr-1" />
+                                        Admin
                                     </Badge>
                                 )}
                             </div>
@@ -196,6 +211,16 @@ export default function PerfilPage() {
                     <CardTitle>Accesos Rápidos</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Botón de Admin - Solo visible para admins */}
+                    {profile?.role === 'admin' && (
+                        <Link href="/admin/teacher-requests" className="md:col-span-2">
+                            <Button variant="default" className="w-full justify-start bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" size="lg">
+                                <Shield className="w-5 h-5 mr-2" />
+                                Panel de Administración - Solicitudes de Docentes
+                            </Button>
+                        </Link>
+                    )}
+
                     <Link href="/perfil/evaluacion">
                         <Button variant="outline" className="w-full justify-start" size="lg">
                             <Award className="w-5 h-5 mr-2" />
@@ -261,8 +286,21 @@ export default function PerfilPage() {
                 </Card>
             )}
 
+            {/* Solicitud de Docente */}
+            {profile && user && (
+                <TeacherRequestButton
+                    profile={profile}
+                    userId={user.uid}
+                    onRequestSent={() => window.location.reload()}
+                />
+            )}
+
             {/* Gestión de Almacenamiento R2 */}
             <StorageManager />
+
+            {/* Debug Tools */}
+            <DebugPanel />
+            <ResetTeacherRequestButton />
         </div>
     );
 }

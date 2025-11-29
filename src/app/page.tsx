@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Header from '@/components/header';
 import Logo from '@/components/logo';
+import MakeAdminButton from '@/components/admin/MakeAdminButton';
 
 export default function HomePage() {
   return (
@@ -16,7 +17,7 @@ export default function HomePage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-          
+
           <Link href="/applet" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
               <span className="text-2xl mb-2">칠</span>
@@ -43,17 +44,17 @@ export default function HomePage() {
 
           <Link href="/glosario" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
-               <span className="text-2xl mb-2">📖</span>
-               <span className="font-semibold">Glosario de Funciones</span>
-               <p className="text-sm text-muted-foreground mt-1">Comandos y guías.</p>
+              <span className="text-2xl mb-2">📖</span>
+              <span className="font-semibold">Glosario de Funciones</span>
+              <p className="text-sm text-muted-foreground mt-1">Comandos y guías.</p>
             </div>
           </Link>
-          
+
           <Link href="/estudia-con-geogebra" passHref className="group">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-card text-card-foreground border shadow-sm hover:shadow-lg hover:border-primary transition-all">
-               <span className="text-2xl mb-2">📐</span>
-               <span className="font-semibold">Estudia con el Geometra</span>
-               <p className="text-sm text-muted-foreground mt-1">Lecciones interactivas.</p>
+              <span className="text-2xl mb-2">📐</span>
+              <span className="font-semibold">Estudia con el Geometra</span>
+              <p className="text-sm text-muted-foreground mt-1">Lecciones interactivas.</p>
             </div>
           </Link>
 
@@ -65,7 +66,7 @@ export default function HomePage() {
             </div>
           </Link>
 
-           <Link href="/paes" passHref className="group lg:col-span-3">
+          <Link href="/paes" passHref className="group lg:col-span-3">
             <div className="w-full h-40 text-lg flex flex-col items-center justify-center p-4 rounded-lg bg-primary text-primary-foreground border-2 border-primary-foreground/50 shadow-lg hover:shadow-2xl hover:bg-primary/90 transition-all">
               <span className="text-3xl mb-2">🚀</span>
               <span className="text-2xl font-bold">Prepárate para la PAES 2025 con el Geometra</span>
@@ -78,6 +79,7 @@ export default function HomePage() {
       <footer className="py-4 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} Geometra. Todos los derechos reservados.</p>
       </footer>
+      <MakeAdminButton />
     </div>
   );
 }

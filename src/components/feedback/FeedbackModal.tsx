@@ -58,6 +58,32 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 estado: 'pendiente'
             });
 
+            // Enviar email de notificación
+            try {
+                await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'feedback',
+                        subject: `[Geometra] Nuevo Feedback: ${tipo} - ${titulo || 'Sin título'}`,
+                        userEmail: user.email,
+                        userName: user.displayName,
+                        metadata: {
+                            tipo,
+                            rating,
+                            titulo,
+                            comentario,
+                            experiencia,
+                            screenshot,
+                            pagina: window.location.pathname
+                        }
+                    })
+                });
+            } catch (emailError) {
+                console.error('Error enviando email:', emailError);
+                // No bloquear el flujo si falla el email
+            }
+
             setShowSuccess(true);
             setTimeout(() => {
                 onClose();

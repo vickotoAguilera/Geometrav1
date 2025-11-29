@@ -45,6 +45,7 @@ export function useUserProfile() {
                             emailUpdates: false,
                             learningReminders: true,
                         },
+                        role: 'student', // Rol por defecto
                         createdAt: serverTimestamp() as any,
                         updatedAt: serverTimestamp() as any,
                     };

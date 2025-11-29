@@ -264,7 +264,10 @@ export default function EditarPerfilPage() {
                                 <SelectItem value="2° Medio">2° Medio</SelectItem>
                                 <SelectItem value="3° Medio">3° Medio</SelectItem>
                                 <SelectItem value="4° Medio">4° Medio</SelectItem>
-                                <SelectItem value="Universidad">Universidad</SelectItem>
+                                <SelectItem value="Enseñanza Superior">Enseñanza Superior</SelectItem>
+                                {profile?.role === 'teacher' && (
+                                    <SelectItem value="Docente">Docente</SelectItem>
+                                )}
                                 <SelectItem value="Otro">Otro</SelectItem>
                             </SelectContent>
                         </Select>

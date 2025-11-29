@@ -1,17 +1,47 @@
 import { Timestamp } from 'firebase/firestore';
 
 /**
+ * Roles de usuario en el sistema
+ */
+export type UserRole = 'student' | 'teacher' | 'admin';
+
+/**
+ * Estado de solicitud de docente
+ */
+export type TeacherRequestStatus = 'pending' | 'approved' | 'rejected';
+
+/**
+ * Solicitud para ser docente
+ */
+export interface TeacherRequest {
+    status: TeacherRequestStatus;
+    requestedAt: Timestamp;
+    reviewedAt?: Timestamp;
+    reviewedBy?: string; // userId del admin
+    reason?: string; // Razón de la solicitud
+    rejectionReason?: string; // Razón del rechazo
+}
+
+/**
  * Perfil básico del usuario
  */
 export interface UserProfile {
     displayName: string;
     photoURL: string | null;
     bio: string;
-    grade: string; // ej: "3° Medio"
+    grade: string; // ej: "3° Medio" - Solo para estudiantes
     goals: string[];
     preferences: UserPreferences;
     createdAt: Timestamp;
     updatedAt: Timestamp;
+
+    // Sistema de roles
+    role: UserRole;
+    teacherRequest?: TeacherRequest;
+
+    // Solo para docentes
+    subjects?: string[]; // Materias que enseña
+    institution?: string; // Institución donde trabaja
 }
 
 /**
@@ -81,10 +111,25 @@ export interface StudyGoal {
     progress: number; // 0-100
 }
 
+export interface UserProgress {
+    level: number;
+    points: number;
+    completedTopics: string[];
+    currentStreak: number;
+    lastActivityDate: Date | Timestamp;
+}
+
+export interface UserStats {
+    totalExercises: number;
+    correctAnswers: number;
+    averageScore: number;
+    studyTimeMinutes: number;
+}
+
 /**
  * Progreso del usuario
  */
-export interface UserProgress {
+export interface OriginalUserProgress { // Renamed to avoid conflict
     totalPoints: number;
     level: number;
     currentLevelPoints: number; // Puntos en el nivel actual
