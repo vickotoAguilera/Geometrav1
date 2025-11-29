@@ -1,3 +1,5 @@
+'use server';
+
 /**
  * Server actions para el perfil de usuario
  */
