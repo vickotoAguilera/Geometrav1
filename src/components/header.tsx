@@ -121,9 +121,8 @@ const AIChatButton = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button className="w-full justify-start text-base">
-          <Bot className="mr-2 h-5 w-5" />
-          Asistente
+        <Button size="icon" title="Asistente IA">
+          <Bot className="h-5 w-5" />
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-full lg:max-w-md p-0 flex flex-col h-full">
@@ -265,6 +264,11 @@ export default function Header() {
 
               <ScreenshotGuideButton />
               <AIChatButton />
+              <Link href="/perfil?tab=feedback">
+                <Button variant="outline" size="icon" title="Enviar Feedback">
+                  <MessageSquareHeart className="h-5 w-5" />
+                </Button>
+              </Link>
               <AuthButton />
             </div>
           </>
