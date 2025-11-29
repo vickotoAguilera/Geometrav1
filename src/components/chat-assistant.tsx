@@ -59,7 +59,7 @@ interface GenkitMessage {
   content: Part[];
 }
 
-type TutorMode = 'math' | 'geogebra';
+type TutorMode = 'math' | 'geogebra' | 'stepByStep' | 'socratic';
 
 // Firestore's document size limit is 1 MiB (1,048,576 bytes).
 // We set a chunk size just below this to account for other fields in the document.
@@ -166,6 +166,7 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [tutorMode, setTutorMode] = useState<TutorMode>('math');
+  const [previousTutorMode, setPreviousTutorMode] = useState<TutorMode>('math');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -183,6 +184,19 @@ export function ChatAssistant() {
       setInput(prev => (prev.endsWith(' ') ? prev : prev + ' ') + newTranscript);
     }
   });
+
+  // Persistir modo de tutor en localStorage
+  useEffect(() => {
+    const savedMode = localStorage.getItem('geometra-tutor-mode');
+    if (savedMode && ['math', 'geogebra', 'stepByStep', 'socratic'].includes(savedMode)) {
+      setTutorMode(savedMode as TutorMode);
+      setPreviousTutorMode(savedMode as TutorMode);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('geometra-tutor-mode', tutorMode);
+  }, [tutorMode]);
 
   const messagesRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -439,6 +453,25 @@ export function ChatAssistant() {
               role: m.role === 'assistant' ? 'model' : 'user',
               content: [{ text: (m as TextMessage).content }],
             }));
+
+          // Detectar cambio de modo y agregar mensaje del sistema
+          const modeNames = {
+            math: 'Normal',
+            geogebra: 'GeoGebra',
+            stepByStep: 'Paso a Paso',
+            socratic: 'Sócrates'
+          };
+
+          if (tutorMode !== previousTutorMode && history.length > 0) {
+            // Agregar mensaje del sistema informando del cambio de modo
+            history.push({
+              role: 'user',
+              content: [{
+                text: `[CAMBIO DE MODO: El usuario ha cambiado del modo "${modeNames[previousTutorMode]}" al modo "${modeNames[tutorMode]}". Por favor, adapta tu siguiente respuesta al nuevo modo de enseñanza. Si el usuario hizo una pregunta, respóndela usando el nuevo enfoque.]`
+              }]
+            });
+            setPreviousTutorMode(tutorMode);
+          }
 
           const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, concatenatedFiles);
 
@@ -777,19 +810,41 @@ export function ChatAssistant() {
       <SheetFooter className="p-4 border-t bg-background">
         <div className="w-full space-y-3">
           {user && (
-            <div className="flex items-center justify-center gap-4 text-sm">
-              <div className='flex items-center gap-2 text-muted-foreground'>
-                <Sigma className={cn('w-5 h-5', tutorMode === 'math' && 'text-primary')} />
-                <Label htmlFor="tutor-mode">Tutor de Mates</Label>
-              </div>
-              <Switch
-                id="tutor-mode"
-                checked={tutorMode === 'geogebra'}
-                onCheckedChange={(checked) => setTutorMode(checked ? 'geogebra' : 'math')}
-              />
-              <div className='flex items-center gap-2 text-muted-foreground'>
-                <GraduationCap className={cn('w-5 h-5', tutorMode === 'geogebra' && 'text-primary')} />
-                <Label htmlFor="tutor-mode">Tutor de GeoGebra</Label>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground text-center">Modo de Asistencia</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant={tutorMode === 'math' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTutorMode('math')}
+                  className="text-xs h-auto py-2"
+                >
+                  📚 Normal
+                </Button>
+                <Button
+                  variant={tutorMode === 'geogebra' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTutorMode('geogebra')}
+                  className="text-xs h-auto py-2"
+                >
+                  🔧 GeoGebra
+                </Button>
+                <Button
+                  variant={tutorMode === 'stepByStep' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTutorMode('stepByStep')}
+                  className="text-xs h-auto py-2"
+                >
+                  📝 Paso a Paso
+                </Button>
+                <Button
+                  variant={tutorMode === 'socratic' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTutorMode('socratic')}
+                  className="text-xs h-auto py-2"
+                >
+                  💭 Sócrates
+                </Button>
               </div>
             </div>
           )}
