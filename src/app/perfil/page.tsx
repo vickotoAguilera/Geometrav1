@@ -299,8 +299,13 @@ export default function PerfilPage() {
             <StorageManager />
 
             {/* Debug Tools */}
-            <DebugPanel />
-            <ResetTeacherRequestButton />
+            {/* Debug Tools - Solo visibles en desarrollo */}
+            {process.env.NODE_ENV === 'development' && (
+                <>
+                    <DebugPanel />
+                    <ResetTeacherRequestButton />
+                </>
+            )}
         </div>
     );
 }
