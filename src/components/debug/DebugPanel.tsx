@@ -87,6 +87,11 @@ export default function DebugPanel() {
     const [isOpen, setIsOpen] = useState(false);
     const [logs, setLogs] = useState<DebugLog[]>([]);
 
+    // No mostrar en producción
+    if (process.env.NODE_ENV === 'production') {
+        return null;
+    }
+
     // Cargar logs al montar
     useEffect(() => {
         setLogs(loadLogsFromStorage());

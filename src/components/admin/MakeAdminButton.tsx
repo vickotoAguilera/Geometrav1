@@ -39,8 +39,8 @@ export default function MakeAdminButton() {
         }
     };
 
-    // No mostrar el botón si está cargando
-    if (isUserLoading) {
+    // No mostrar el botón si está cargando o en producción
+    if (isUserLoading || process.env.NODE_ENV === 'production') {
         return null;
     }
 
