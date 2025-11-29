@@ -1,23 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as admin from 'firebase-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { getFirestore } from '@/firebase/server';
 
-// Inicializar Firebase Admin si no está inicializado
-if (!admin.apps.length) {
-    try {
-        admin.initializeApp({
-            credential: admin.credential.cert({
-                projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-            }),
-        });
-        console.log('✅ Firebase Admin initialized');
-    } catch (error) {
-        console.error('❌ Error initializing Firebase Admin:', error);
-    }
-}
-
-const db = admin.firestore();
+const db = getFirestore();
 
 export async function GET(request: NextRequest) {
     try {

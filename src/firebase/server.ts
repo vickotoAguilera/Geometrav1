@@ -21,7 +21,13 @@ if (serviceAccount) {
         credential: cert(serviceAccount),
     });
 } else {
-    console.warn('⚠️ Firebase Admin no se pudo inicializar: Faltan credenciales (FIREBASE_SERVICE_ACCOUNT o FIREBASE_PRIVATE_KEY/CLIENT_EMAIL)');
+    console.warn('⚠️ Firebase Admin: Faltan credenciales. Inicializando app dummy para build.');
+    // Inicializar sin credenciales para evitar que getFirestore() lance error "App not exist" durante build
+    if (!getApps().length) {
+        initializeApp({
+            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'dummy-project'
+        });
+    }
 }
 
 export function getFirestore() {
