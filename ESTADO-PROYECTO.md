@@ -141,14 +141,20 @@
   - `src/components/chat-assistant.tsx`
 - **Fecha de completación**: 29 de noviembre de 2025, 14:05
 
-### 2. Ejercicios con Verificación Automática
+### ~~2. Ejercicios con Verificación Automática~~ 🚧 **PARCIALMENTE COMPLETADO**
 **Descripción**: Más tipos de ejercicios interactivos
-- Ejercicios de arrastrar y soltar
-- Ejercicios de completar pasos
-- Ejercicios de construcción geométrica
-- **Archivos a crear**:
+- ✅ Ejercicios de arrastrar y soltar (ordenar pasos)
+- ✅ Ejercicios de completar espacios (fill-in-blanks)
+- ⏳ Ejercicios de construcción geométrica (pendiente)
+- ✅ Validación automática con feedback visual
+- ✅ Sistema de puntuación
+- **Archivos creados**:
+  - `src/types/exercises.ts`
+  - `src/lib/exercise-validator.ts`
   - `src/components/exercises/DragDropExercise.tsx`
-  - `src/components/exercises/FillInStepsExercise.tsx`
+  - `src/components/exercises/FillInBlanksExercise.tsx`
+  - `src/app/ejercicios-ejemplo/page.tsx`
+- **Fecha de completación parcial**: 29 de noviembre de 2025, 17:35
 
 ### 3. Sistema de Repaso Espaciado
 **Descripción**: Flashcards inteligentes con algoritmo de repetición
