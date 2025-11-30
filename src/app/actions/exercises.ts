@@ -85,6 +85,12 @@ export async function saveResult(userId: string, result: ExerciseResult) {
                 completedAt: new Date(),
             });
 
+        // Actualizar puntos del usuario si ganó puntos
+        if (result.pointsEarned > 0) {
+            const { updateUserPoints } = await import('@/app/actions/points');
+            await updateUserPoints(userId, result.pointsEarned);
+        }
+
         return { success: true };
     } catch (error) {
         console.error('Error saving result:', error);
