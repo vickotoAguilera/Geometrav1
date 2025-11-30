@@ -1,9 +1,11 @@
 // Funciones de Firestore para ejercicios
 
-import { firestore } from '@/firebase';
+import { initializeFirebase } from '@/firebase';
 import { collection, doc, getDoc, setDoc, getDocs, query, where, serverTimestamp, Timestamp } from 'firebase/firestore';
 import type { DragDropExercise, FillInBlanksExercise, ExerciseResult } from '@/types/exercises';
 import { generateExercises } from '@/ai/flows/exercise-generator';
+
+const { firestore } = initializeFirebase();
 
 type Exercise = DragDropExercise | FillInBlanksExercise;
 
@@ -176,3 +178,92 @@ function shuffleArray<T>(array: T[]): T[] {
     }
     return shuffled;
 }
+
+/**
+ * Obtiene ejercicios mixtos (desde caché o generando nuevos)
+ */
+export async function getMixedExercises(
+    gradeId: string,
+    count: number = 50
+): Promise<Exercise[]> {
+    // Intentar obtener desde caché
+    const cachedExercises = await getCachedMixedExercises(gradeId);
+
+    // Verificar si el caché es válido (menos de 7 días)
+    if (cachedExercises.exercises.length >= count && !isCacheExpired(cachedExercises.cachedAt)) {
+        console.log(`Using cached mixed exercises for ${gradeId}`);
+        return shuffleArray(cachedExercises.exercises).slice(0, count);
+    }
+
+    // Generar nuevos ejercicios mixtos
+    console.log(`Generating ${count} mixed exercises for ${gradeId}`);
+    const { generateMixedExercises } = await import('@/ai/flows/exercise-generator');
+    const newExercises = await generateMixedExercises(gradeId, count);
+
+    // Guardar en caché
+    await cacheMixedExercises(gradeId, newExercises);
+
+    return newExercises;
+}
+
+/**
+ * Obtiene ejercicios mixtos desde el caché de Firestore
+ */
+async function getCachedMixedExercises(
+    gradeId: string
+): Promise<{ exercises: Exercise[]; cachedAt: Date | null }> {
+    try {
+        const mixedRef = doc(firestore, 'exercises', 'mixed', gradeId, 'data');
+        const snapshot = await getDoc(mixedRef);
+
+        if (!snapshot.exists()) {
+            return { exercises: [], cachedAt: null };
+        }
+
+        const data = snapshot.data();
+        const cachedAt = data.cachedAt instanceof Timestamp
+            ? data.cachedAt.toDate()
+            : null;
+
+        return {
+            exercises: data.exercises || [],
+            cachedAt,
+        };
+    } catch (error) {
+        console.error('Error getting cached mixed exercises:', error);
+        return { exercises: [], cachedAt: null };
+    }
+}
+
+/**
+ * Guarda ejercicios mixtos en el caché de Firestore
+ */
+async function cacheMixedExercises(
+    gradeId: string,
+    exercises: Exercise[]
+): Promise<void> {
+    try {
+        const mixedRef = doc(firestore, 'exercises', 'mixed', gradeId, 'data');
+        await setDoc(mixedRef, {
+            exercises,
+            cachedAt: serverTimestamp(),
+            version: 1,
+        });
+        console.log(`Cached ${exercises.length} mixed exercises for ${gradeId}`);
+    } catch (error) {
+        console.error('Error caching mixed exercises:', error);
+    }
+}
+
+/**
+ * Verifica si el caché ha expirado (más de 7 días)
+ */
+function isCacheExpired(cachedAt: Date | null): boolean {
+    if (!cachedAt) return true;
+
+    const now = new Date();
+    const diffDays = (now.getTime() - cachedAt.getTime()) / (1000 * 60 * 60 * 24);
+
+    return diffDays > 7;
+}
+
