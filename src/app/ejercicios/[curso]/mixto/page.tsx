@@ -12,6 +12,7 @@ import { getGradeById } from '@/data/curriculum';
 import { getMixedExercisesAction, saveResult } from '@/app/actions/exercises';
 import { useAuth } from '@/firebase';
 import MixedExerciseCard from '@/components/exercises/MixedExerciseCard';
+import ExerciseTimer, { useExerciseTimer } from '@/components/exercises/ExerciseTimer';
 import type { DragDropExercise as DragDropType, FillInBlanksExercise as FillInBlanksType } from '@/types/exercises';
 
 // Importar componentes sin SSR
@@ -44,6 +45,7 @@ export default function MixtoExercisesPage() {
     const [loading, setLoading] = useState(true);
     const [completedCount, setCompletedCount] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
+    const { timeSpent, handleTimeUpdate, handleComplete: handleTimerComplete, resetTime } = useExerciseTimer();
 
     useEffect(() => {
         loadExercises();
@@ -70,14 +72,15 @@ export default function MixtoExercisesPage() {
 
         const exercise = exercises[currentIndex];
         const pointsEarned = isCorrect ? exercise.points : 0;
+        const finalTime = handleTimerComplete(timeSpent);
 
-        // Guardar resultado
+        // Guardar resultado con tiempo
         await saveResult(user.uid, {
             exerciseId: exercise.id,
             userId: user.uid,
             isCorrect,
             attempts,
-            timeSpent: 0, // TODO: implementar timer
+            timeSpent: finalTime,
             pointsEarned,
             completedAt: new Date(),
         });
@@ -91,12 +94,14 @@ export default function MixtoExercisesPage() {
     function handleNext() {
         if (currentIndex < exercises.length - 1) {
             setCurrentIndex(prev => prev + 1);
+            resetTime();
         }
     }
 
     function handlePrevious() {
         if (currentIndex > 0) {
             setCurrentIndex(prev => prev - 1);
+            resetTime();
         }
     }
 
@@ -104,6 +109,7 @@ export default function MixtoExercisesPage() {
         setCurrentIndex(0);
         setCompletedCount(0);
         setTotalPoints(0);
+        resetTime();
     }
 
     if (!grade) {
@@ -159,10 +165,19 @@ export default function MixtoExercisesPage() {
 
                 {/* Progress Bar */}
                 <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-muted-foreground">
+                            Ejercicio {currentIndex + 1} de {exercises.length}
+                        </p>
+                        {!loading && exercises.length > 0 && (
+                            <ExerciseTimer
+                                onTimeUpdate={handleTimeUpdate}
+                                autoStart={true}
+                                showControls={true}
+                            />
+                        )}
+                    </div>
                     <Progress value={progress} className="h-2" />
-                    <p className="text-sm text-muted-foreground mt-2">
-                        Ejercicio {currentIndex + 1} de {exercises.length}
-                    </p>
                 </div>
 
                 {/* Exercise Content */}
