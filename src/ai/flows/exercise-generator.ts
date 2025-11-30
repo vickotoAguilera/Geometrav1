@@ -204,7 +204,107 @@ Genera exactamente ${count} ejercicios ahora.`;
  * Genera ejercicios mixtos combinando todas las materias de un curso
  */
 export async function generateMixedExercises(gradeId: string, count: number = 50) {
-    // Implementar lógica para generar ejercicios mixtos
-    // Por ahora, retornar array vacío
-    return [];
+    const { getSubjectsByGrade } = await import('@/data/curriculum');
+    const subjects = getSubjectsByGrade(gradeId);
+
+    if (subjects.length === 0) {
+        throw new Error(`No subjects found for grade: ${gradeId}`);
+    }
+
+    // Calcular distribución proporcional de ejercicios por materia
+    const exercisesPerSubject = Math.floor(count / subjects.length);
+    const remainder = count % subjects.length;
+
+    const allExercises: (DragDropExercise | FillInBlanksExercise)[] = [];
+
+    // Distribución de dificultades: 30% fácil, 50% medio, 20% difícil
+    const difficulties: ('facil' | 'medio' | 'dificil')[] = [
+        ...Array(Math.floor(count * 0.3)).fill('facil'),
+        ...Array(Math.floor(count * 0.5)).fill('medio'),
+        ...Array(Math.floor(count * 0.2)).fill('dificil'),
+    ];
+
+    // Rellenar hasta count si hay diferencia por redondeo
+    while (difficulties.length < count) {
+        difficulties.push('medio');
+    }
+
+    // Mezclar dificultades
+    shuffleArray(difficulties);
+
+    let difficultyIndex = 0;
+
+    // Generar ejercicios para cada materia
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
+        // Dar ejercicios extra a las primeras materias si hay remainder
+        const subjectCount = exercisesPerSubject + (i < remainder ? 1 : 0);
+
+        if (subjectCount === 0) continue;
+
+        // Alternar entre tipos de ejercicios (50% cada uno)
+        const dragDropCount = Math.ceil(subjectCount / 2);
+        const fillInBlanksCount = subjectCount - dragDropCount;
+
+        try {
+            // Generar ejercicios drag-drop
+            if (dragDropCount > 0) {
+                const dragDropExercises = await generateExercises({
+                    gradeId,
+                    subjectId: subject.id,
+                    type: 'drag-drop',
+                    count: dragDropCount,
+                    difficulty: difficulties[difficultyIndex % difficulties.length],
+                });
+
+                // Agregar metadata de materia a cada ejercicio
+                dragDropExercises.forEach(ex => {
+                    (ex as any).subjectId = subject.id;
+                    (ex as any).subjectName = subject.name;
+                    (ex as any).subjectIcon = subject.icon;
+                });
+
+                allExercises.push(...dragDropExercises);
+                difficultyIndex += dragDropCount;
+            }
+
+            // Generar ejercicios fill-in-blanks
+            if (fillInBlanksCount > 0) {
+                const fillInBlanksExercises = await generateExercises({
+                    gradeId,
+                    subjectId: subject.id,
+                    type: 'fill-in-blanks',
+                    count: fillInBlanksCount,
+                    difficulty: difficulties[difficultyIndex % difficulties.length],
+                });
+
+                // Agregar metadata de materia a cada ejercicio
+                fillInBlanksExercises.forEach(ex => {
+                    (ex as any).subjectId = subject.id;
+                    (ex as any).subjectName = subject.name;
+                    (ex as any).subjectIcon = subject.icon;
+                });
+
+                allExercises.push(...fillInBlanksExercises);
+                difficultyIndex += fillInBlanksCount;
+            }
+        } catch (error) {
+            console.error(`Error generating exercises for ${subject.name}:`, error);
+        }
+    }
+
+    // Mezclar todos los ejercicios aleatoriamente
+    shuffleArray(allExercises);
+
+    return allExercises.slice(0, count);
+}
+
+/**
+ * Función auxiliar para mezclar un array (Fisher-Yates shuffle)
+ */
+function shuffleArray<T>(array: T[]): void {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }

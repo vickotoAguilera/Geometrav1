@@ -100,3 +100,63 @@ function shuffleArray<T>(array: T[]): T[] {
     }
     return shuffled;
 }
+
+export async function getMixedExercisesAction(gradeId: string, count: number = 50) {
+    try {
+        // Intentar obtener desde caché
+        const mixedRef = firestore.collection('exercises').doc('mixed').collection(gradeId).doc('data');
+        const snapshot = await mixedRef.get();
+
+        // Verificar si el caché existe y es válido (menos de 7 días)
+        if (snapshot.exists) {
+            const data = snapshot.data();
+            const cachedAt = data?.cachedAt?.toDate();
+            const exercises = data?.exercises || [];
+
+            if (cachedAt) {
+                const now = new Date();
+                const diffDays = (now.getTime() - cachedAt.getTime()) / (1000 * 60 * 60 * 24);
+
+                if (diffDays <= 7 && exercises.length >= count) {
+                    console.log(`Using cached mixed exercises for ${gradeId}`);
+                    const shuffled = shuffleArray(exercises);
+                    return { success: true, exercises: shuffled.slice(0, count) };
+                }
+            }
+        }
+
+        // Generar nuevos ejercicios mixtos
+        console.log(`Generating ${count} mixed exercises for ${gradeId}`);
+
+        try {
+            const { generateMixedExercises } = await import('@/ai/flows/exercise-generator');
+            const newExercises = await generateMixedExercises(gradeId, count);
+
+            // Cachear en Firestore
+            await mixedRef.set({
+                exercises: newExercises,
+                cachedAt: new Date(),
+                version: 1,
+            });
+
+            return { success: true, exercises: newExercises };
+        } catch (aiError) {
+            console.error('AI generation failed for mixed exercises:', aiError);
+            // Usar ejercicios de fallback si la IA falla
+            const { getFallbackExercises } = await import('@/lib/fallback-exercises');
+            const fallbackExercises = getFallbackExercises('mixto', count);
+            return { success: true, exercises: fallbackExercises };
+        }
+    } catch (error) {
+        console.error('Error getting mixed exercises:', error);
+        // En caso de error total, usar fallback
+        try {
+            const { getFallbackExercises } = await import('@/lib/fallback-exercises');
+            const fallbackExercises = getFallbackExercises('mixto', count);
+            return { success: true, exercises: fallbackExercises };
+        } catch (fallbackError) {
+            return { success: false, error: 'Failed to load mixed exercises', exercises: [] };
+        }
+    }
+}
+
