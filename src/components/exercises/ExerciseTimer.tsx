@@ -21,13 +21,22 @@ export default function ExerciseTimer({
     const [seconds, setSeconds] = useState(0);
     const [isRunning, setIsRunning] = useState(autoStart);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const onTimeUpdateRef = useRef(onTimeUpdate);
+
+    // Actualizar la ref cuando cambie el callback
+    useEffect(() => {
+        onTimeUpdateRef.current = onTimeUpdate;
+    }, [onTimeUpdate]);
 
     useEffect(() => {
         if (isRunning) {
             intervalRef.current = setInterval(() => {
                 setSeconds((prev) => {
                     const newTime = prev + 1;
-                    onTimeUpdate?.(newTime);
+                    // Llamar al callback en el próximo tick para evitar setState durante render
+                    if (onTimeUpdateRef.current) {
+                        setTimeout(() => onTimeUpdateRef.current?.(newTime), 0);
+                    }
                     return newTime;
                 });
             }, 1000);
@@ -43,7 +52,7 @@ export default function ExerciseTimer({
                 clearInterval(intervalRef.current);
             }
         };
-    }, [isRunning, onTimeUpdate]);
+    }, [isRunning]);
 
     const toggleTimer = () => {
         setIsRunning((prev) => !prev);
