@@ -180,12 +180,20 @@ Alterna entre ambos tipos de ejercicios.`,
 ${typeInstructions[type]}
 
 **REQUISITOS IMPORTANTES**:
-1. Los ejercicios deben ser educativos y desafiantes
-2. Usar contextos reales cuando sea posible
-3. Las respuestas deben ser verificables automáticamente
-4. Variar los temas entre ejercicios
-5. IDs únicos para cada ejercicio (usar timestamp + random)
-6. Puntos: 10 para fácil, 15 para medio, 20 para difícil
+1. **CADA EJERCICIO DEBE INCLUIR UN EJEMPLO EXPLICATIVO** en la descripción
+2. El ejemplo debe mostrar un caso similar resuelto paso a paso
+3. La descripción debe tener el formato: "Ejemplo: [caso resuelto]. Ahora resuelve: [ejercicio]"
+4. Los ejercicios deben ser educativos y desafiantes
+5. Usar contextos reales cuando sea posible
+6. Las respuestas deben ser verificables automáticamente
+7. Variar los temas entre ejercicios
+8. IDs únicos para cada ejercicio (usar timestamp + random)
+9. Puntos: 10 para fácil, 15 para medio, 20 para difícil
+
+**EJEMPLO DE DESCRIPCIÓN CON EXPLICACIÓN**:
+"Ejemplo: Para resolver 2x + 3 = 7, primero restamos 3 de ambos lados: 2x = 4, luego dividimos entre 2: x = 2. 
+
+Ahora resuelve la siguiente ecuación siguiendo los mismos pasos."
 
 **FORMATO DE SALIDA**:
 Responde SOLO con un array JSON válido de ejercicios, sin texto adicional.
