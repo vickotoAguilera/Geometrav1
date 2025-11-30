@@ -22,6 +22,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { usePathname } from 'next/navigation';
 import { ScreenshotGuide } from "./screenshot-guide";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PointsBadge } from "./points-badge";
 
 // SVG para el icono de Google
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -217,6 +218,7 @@ export default function Header() {
               <span className="font-bold font-headline sm:inline-block">Geometra</span>
             </Link>
             <div className="flex items-center gap-2">
+              <PointsBadge />
               <AuthButton />
             </div>
           </div>
@@ -269,6 +271,7 @@ export default function Header() {
                   <MessageSquareHeart className="h-5 w-5" />
                 </Button>
               </Link>
+              <PointsBadge />
               <AuthButton />
             </div>
           </>
