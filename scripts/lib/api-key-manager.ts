@@ -1,10 +1,3 @@
-// Sistema inteligente de gestión de API keys para Gemini
-// - Detecta automáticamente keys agotadas
-// - Reset automático a las 4 AM (hora Chile)
-// - Persistencia de estado entre ejecuciones
-// - Solo usa keys con capacidad disponible
-
-import { ai } from '@/ai/genkit';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -21,28 +14,30 @@ interface ApiKeyState {
     lastResetDate: string;
 }
 
-class ApiKeyManager {
+/**
+ * Gestor inteligente de API keys con:
+ * - Detección automática de keys agotadas
+ * - Reset automático a las 4 AM (hora Chile)
+ * - Persistencia de estado entre ejecuciones
+ * - Rotación solo entre keys disponibles
+ */
+export class ApiKeyManager {
     private keys: ApiKeyStatus[] = [];
     private currentIndex = 0;
     private stateFile: string;
     private readonly RESET_HOUR = 4; // 4 AM Chile
     private readonly CHILE_TIMEZONE = 'America/Santiago';
-    private static instance: ApiKeyManager | null = null;
 
-    private constructor() {
-        this.stateFile = resolve(process.cwd(), '.api-keys-state.json');
+    constructor(stateFilePath?: string) {
+        this.stateFile = stateFilePath || resolve(process.cwd(), '.api-keys-state.json');
         this.loadKeys();
         this.loadState();
         this.checkAndResetIfNeeded();
     }
 
-    static getInstance(): ApiKeyManager {
-        if (!ApiKeyManager.instance) {
-            ApiKeyManager.instance = new ApiKeyManager();
-        }
-        return ApiKeyManager.instance;
-    }
-
+    /**
+     * Carga todas las API keys desde las variables de entorno
+     */
     private loadKeys() {
         const keys: ApiKeyStatus[] = [];
 
@@ -63,10 +58,15 @@ class ApiKeyManager {
         }
 
         this.keys = keys;
+        console.log(`📊 Cargadas ${keys.length} API keys`);
     }
 
+    /**
+     * Carga el estado persistente desde el archivo
+     */
     private loadState() {
         if (!existsSync(this.stateFile)) {
+            console.log('📝 No hay estado previo, iniciando desde cero');
             return;
         }
 
@@ -74,6 +74,7 @@ class ApiKeyManager {
             const data = readFileSync(this.stateFile, 'utf-8');
             const state: ApiKeyState = JSON.parse(data);
 
+            // Actualizar estado de las keys
             state.keys.forEach(savedKey => {
                 const key = this.keys.find(k => k.keyNumber === savedKey.keyNumber);
                 if (key) {
@@ -82,11 +83,16 @@ class ApiKeyManager {
                     key.requestCount = savedKey.requestCount;
                 }
             });
+
+            console.log('✅ Estado cargado desde archivo');
         } catch (error) {
             console.error('⚠️  Error cargando estado:', error);
         }
     }
 
+    /**
+     * Guarda el estado actual en el archivo
+     */
     private saveState() {
         const state: ApiKeyState = {
             keys: this.keys,
@@ -100,6 +106,9 @@ class ApiKeyManager {
         }
     }
 
+    /**
+     * Obtiene la fecha actual en hora de Chile
+     */
     private getCurrentChileDate(): string {
         return new Date().toLocaleString('en-CA', {
             timeZone: this.CHILE_TIMEZONE,
@@ -109,6 +118,9 @@ class ApiKeyManager {
         }).split(',')[0];
     }
 
+    /**
+     * Obtiene la hora actual en Chile
+     */
     private getCurrentChileHour(): number {
         const chileTime = new Date().toLocaleString('en-US', {
             timeZone: this.CHILE_TIMEZONE,
@@ -118,6 +130,9 @@ class ApiKeyManager {
         return parseInt(chileTime);
     }
 
+    /**
+     * Verifica si es necesario resetear las keys (después de las 4 AM)
+     */
     private checkAndResetIfNeeded() {
         if (!existsSync(this.stateFile)) {
             return;
@@ -130,6 +145,7 @@ class ApiKeyManager {
             const currentDate = this.getCurrentChileDate();
             const currentHour = this.getCurrentChileHour();
 
+            // Si cambió el día y ya pasaron las 4 AM, resetear
             if (state.lastResetDate !== currentDate && currentHour >= this.RESET_HOUR) {
                 console.log('🔄 Nuevo día detectado (después de las 4 AM), reseteando todas las keys...');
                 this.resetAllKeys();
@@ -139,6 +155,9 @@ class ApiKeyManager {
         }
     }
 
+    /**
+     * Resetea todas las keys (marca como disponibles)
+     */
     private resetAllKeys() {
         this.keys.forEach(key => {
             key.isExhausted = false;
@@ -153,10 +172,16 @@ class ApiKeyManager {
         console.log(`✅ Todas las keys reseteadas. ${available} keys disponibles`);
     }
 
+    /**
+     * Obtiene las keys disponibles (no agotadas)
+     */
     private getAvailableKeys(): ApiKeyStatus[] {
         return this.keys.filter(k => !k.isExhausted);
     }
 
+    /**
+     * Obtiene la siguiente API key disponible
+     */
     getNextKey(): { keyNumber: number; apiKey: string } | null {
         const available = this.getAvailableKeys();
 
@@ -165,6 +190,7 @@ class ApiKeyManager {
             return null;
         }
 
+        // Rotar entre las keys disponibles
         const key = available[this.currentIndex % available.length];
         this.currentIndex++;
 
@@ -174,6 +200,9 @@ class ApiKeyManager {
         };
     }
 
+    /**
+     * Marca una key como agotada
+     */
     markKeyAsExhausted(keyNumber: number) {
         const key = this.keys.find(k => k.keyNumber === keyNumber);
         if (key && !key.isExhausted) {
@@ -186,17 +215,24 @@ class ApiKeyManager {
         }
     }
 
+    /**
+     * Incrementa el contador de requests de una key
+     */
     incrementRequestCount(keyNumber: number) {
         const key = this.keys.find(k => k.keyNumber === keyNumber);
         if (key) {
             key.requestCount++;
 
+            // Guardar estado cada 10 requests
             if (key.requestCount % 10 === 0) {
                 this.saveState();
             }
         }
     }
 
+    /**
+     * Obtiene estadísticas de uso
+     */
     getStats() {
         const available = this.getAvailableKeys();
         const exhausted = this.keys.filter(k => k.isExhausted);
@@ -211,87 +247,27 @@ class ApiKeyManager {
             exhaustedKeys: exhausted.map(k => k.keyNumber)
         };
     }
-}
 
-// Instancia singleton
-const manager = ApiKeyManager.getInstance();
+    /**
+     * Imprime un resumen del estado actual
+     */
+    printStatus() {
+        const stats = this.getStats();
 
-/**
- * Genera contenido con IA usando el sistema inteligente de API keys
- */
-export async function generateWithFallback(params: {
-    model: string;
-    prompt: string;
-    config?: any;
-}) {
-    const { model, prompt, config } = params;
-    const stats = manager.getStats();
-    const maxAttempts = stats.available;
-
-    if (maxAttempts === 0) {
-        throw new Error('No hay API keys disponibles. Las cuotas se resetean a las 4 AM (Chile).');
-    }
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const keyInfo = manager.getNextKey();
-
-        if (!keyInfo) {
-            throw new Error('No se pudo obtener una API key disponible');
+        console.log('\n' + '═'.repeat(70));
+        console.log('📊 ESTADO DE API KEYS');
+        console.log('═'.repeat(70));
+        console.log(`Total de keys: ${stats.total}`);
+        console.log(`✅ Disponibles: ${stats.available} keys`);
+        if (stats.available > 0) {
+            console.log(`   Keys: ${stats.availableKeys.join(', ')}`);
         }
-
-        try {
-            console.log(`🔑 Intentando con API key #${keyInfo.keyNumber} (${attempt + 1}/${maxAttempts} disponibles)`);
-
-            const result = await ai.generate({
-                model,
-                prompt,
-                config: {
-                    ...config,
-                    apiKey: keyInfo.apiKey,
-                },
-            });
-
-            // Incrementar contador de requests exitosos
-            manager.incrementRequestCount(keyInfo.keyNumber);
-            return result;
-
-        } catch (error: any) {
-            const errorMessage = error.message || String(error);
-
-            // Detectar rate limit / quota exceeded
-            if (errorMessage.includes('429') ||
-                errorMessage.includes('quota') ||
-                errorMessage.includes('RESOURCE_EXHAUSTED') ||
-                errorMessage.includes('Too Many Requests')) {
-
-                console.warn(`⚠️  API Key #${keyInfo.keyNumber} agotada`);
-                manager.markKeyAsExhausted(keyInfo.keyNumber);
-
-                // Continuar con la siguiente key
-                continue;
-            }
-
-            // Si es otro tipo de error, lanzarlo
-            throw error;
+        console.log(`⚠️  Agotadas: ${stats.exhausted} keys`);
+        if (stats.exhausted > 0) {
+            console.log(`   Keys: ${stats.exhaustedKeys.join(', ')}`);
         }
+        console.log(`📈 Total requests: ${stats.totalRequests}`);
+        console.log(`🕐 Próximo reset: Mañana a las 4:00 AM (Chile)`);
+        console.log('═'.repeat(70) + '\n');
     }
-
-    throw new Error('Todas las API keys disponibles han sido agotadas');
 }
-
-/**
- * Obtiene estadísticas de uso
- */
-export function getKeyStats() {
-    return manager.getStats();
-}
-
-/**
- * Fuerza un reset manual de todas las keys (solo para testing)
- */
-export function forceResetAllKeys() {
-    const newManager = new (ApiKeyManager as any)();
-    (newManager as any).resetAllKeys();
-    console.log('🔄 Reset manual ejecutado');
-}
-

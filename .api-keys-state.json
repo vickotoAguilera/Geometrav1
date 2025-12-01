@@ -1,0 +1,301 @@
+{
+  "keys": [
+    {
+      "keyNumber": 2,
+      "apiKey": "AIzaSyBwtEKaiIPSTLgVKExOGIH0oRG1Q4JMaZo",
+      "isExhausted": false,
+      "requestCount": 2
+    },
+    {
+      "keyNumber": 3,
+      "apiKey": "AIzaSyChZNsZQz3EE6nsE1HKJJrqrNmg4ioCVU8",
+      "isExhausted": false,
+      "requestCount": 2
+    },
+    {
+      "keyNumber": 4,
+      "apiKey": "AIzaSyAFvN63sGHvv8lmQaCSmDAmz7RBMuOY8IM",
+      "isExhausted": false,
+      "requestCount": 2
+    },
+    {
+      "keyNumber": 5,
+      "apiKey": "AIzaSyASbCmNPmzFKuNj93lPEeojnGL0jcJfqHM",
+      "isExhausted": false,
+      "requestCount": 2
+    },
+    {
+      "keyNumber": 6,
+      "apiKey": "AIzaSyDGuBnaXBKWnNJlX-OMPMXjM3JS0ZL7L7o",
+      "isExhausted": false,
+      "requestCount": 2
+    },
+    {
+      "keyNumber": 7,
+      "apiKey": "AIzaSyCqzyhpx5xjh-V_IcqTkkw1PBLjqd8IiNo",
+      "isExhausted": true,
+      "requestCount": 0,
+      "lastExhaustedAt": "2025-12-01T18:20:45.547Z"
+    },
+    {
+      "keyNumber": 8,
+      "apiKey": "AIzaSyDwoEuVDDjY7LxteN1u8sXAhjQd6AXLbOs",
+      "isExhausted": true,
+      "requestCount": 0,
+      "lastExhaustedAt": "2025-12-01T18:22:34.290Z"
+    },
+    {
+      "keyNumber": 9,
+      "apiKey": "AIzaSyDSFrVpwTT2KQQhYzYeNGa7sVxsGjHtsaI",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 10,
+      "apiKey": "AIzaSyBONBnRI2gKufzgBBr-i3QwK-j5n8tANg0",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 11,
+      "apiKey": "AIzaSyC3SMmHCGB9EwoOjVfr2KZyYxH2ooqtbdw",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 12,
+      "apiKey": "AIzaSyC54ASb1PWEgke-DyGgXpXiX6aC0ovlWLw",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 13,
+      "apiKey": "AIzaSyAxG5aZCJ2J02JFp7gROf5kJHzMkhrbO8E",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 14,
+      "apiKey": "AIzaSyByKLOYFKCabPBswdWxwmzJO9e5PgvLMaY",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 15,
+      "apiKey": "AIzaSyDsxa5RVlE8w3piFIrU7V46wK8UBWNLVJ8",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 16,
+      "apiKey": "AIzaSyC9NoNtYPp75_VWIZblshGbQu_6qZigqII",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 17,
+      "apiKey": "AIzaSyA3FpzT8aB9kJew1CgntNcMrMtcWZPbzV4",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 18,
+      "apiKey": "AIzaSyDbs2rV9v0ZXhbklesUtJ3hn5xbFJmETIY",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 19,
+      "apiKey": "AIzaSyAzZcsRbQXpBf5itlGjROWCBt3NP5vMK-c",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 20,
+      "apiKey": "AIzaSyAKKBY69rIvaPJVZUmTkHRjLKmruARikyI",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 21,
+      "apiKey": "AIzaSyD-ScGUIRgkgfA9qLysUaznedNO4pL_8LU",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 22,
+      "apiKey": "AIzaSyBBDIVpJdrRn-4erhAV78m_-AZHfOEqmis",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 23,
+      "apiKey": "AIzaSyCrq1MmsjGZgo5TFYJPY0RN7tKcGZtysV8",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 24,
+      "apiKey": "AIzaSyByTYR1LQwG8BBLSaRWhSfd2oxIdYAfra4",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 25,
+      "apiKey": "AIzaSyA-OKsaV8p4zctpXPfjOGsbEL1xlQjifiw",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 26,
+      "apiKey": "AIzaSyAnKUjdOTU1op7jP7M4t5cpztCj5Bgdx6Q",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 27,
+      "apiKey": "AIzaSyCyPMaezBRw6IrTL5e7SImVikSfU8BOPAU",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 28,
+      "apiKey": "AIzaSyBSzYSaVrjNwXtLHmHHEhL51pssO8dEpYA",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 29,
+      "apiKey": "AIzaSyBO1pXjKsDmZknl54U7ris8iMYBUWgoSk0",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 30,
+      "apiKey": "AIzaSyBwIHT5Kje3ylMe5tO5FrFDPO158O6IOF4",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 31,
+      "apiKey": "AIzaSyAh_n5EOgOkFgCcyo8NDDVhr7Pv45fF_hA",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 32,
+      "apiKey": "AIzaSyD4z_tdg2NkxQAhN1VKI3MqUvqj_FWjLFY",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 33,
+      "apiKey": "AIzaSyCF15ikSNKCrpeq3xByHmBnw92ncy8Jjgc",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 34,
+      "apiKey": "AIzaSyCRTRRMclpkgGfbNAF23JGtsguVb69kyss",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 35,
+      "apiKey": "AIzaSyDW0a4dWQgmMLZz3UZgJ6NwGnwOTzRAhTQ",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 36,
+      "apiKey": "AIzaSyDAmzFBkl1J72IuyW2fmuLeQ8wgsKpSXFQ",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 37,
+      "apiKey": "AIzaSyCsblsz1N_lH9rJtSY5KO2UPirqUK63bSE",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 38,
+      "apiKey": "AIzaSyAwUrXbkEXYfITfE-kRhjoCpP0mppZdB2s",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 39,
+      "apiKey": "AIzaSyAkK6VceEY4uRxMY5xOIyGrel4eqojYKRU",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 40,
+      "apiKey": "AIzaSyCyw8VFqfzanqg3yAaYRaZYMQ3-Gc9zqpA",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 41,
+      "apiKey": "AIzaSyBxqrZX9MZ0Yn5bBhslo-O0IbLsOvaDxqg",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 42,
+      "apiKey": "AIzaSyC06jiK4Ald1DArEy5T-a0vRbVH6XH9Heo",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 43,
+      "apiKey": "AIzaSyCCuYWphkBUK-856N87rQ2AWjmdhVdWcqI",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 44,
+      "apiKey": "AIzaSyBsNLQZNyPr-RbJyDkkAUeAOCfczGHPHTU",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 45,
+      "apiKey": "AIzaSyBm0MTAveUTVSZyHIklp2yy1-rVY8X6KM4",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 46,
+      "apiKey": "AIzaSyAYyNcADxw_0JZRyk2XqBFUtSQn6y1PYis",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 47,
+      "apiKey": "AIzaSyB1H4oNr-bK833RllCs-1H2ylclZQWCrFI",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 48,
+      "apiKey": "AIzaSyBSsko1YShi9R6mHRUWZW840eHQKcp4Ieg",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 49,
+      "apiKey": "AIzaSyDLxj_ikhNlpx7GoIHNOiwMFhpQx0mP2cQ",
+      "isExhausted": false,
+      "requestCount": 0
+    },
+    {
+      "keyNumber": 50,
+      "apiKey": "AIzaSyDJ2e6O7UGkCMBWkDR0LFq1WlXJSHKWlGY",
+      "isExhausted": false,
+      "requestCount": 0
+    }
+  ],
+  "lastResetDate": "2025-12-01"
+}
