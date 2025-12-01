@@ -46,37 +46,37 @@ Lista todos los pools generados con estadísticas.
 ## 📚 3° Medio
 
 ### 🚀 Iniciar Generación
-*Pendiente de crear*
+Inicia el proceso de generación en segundo plano.
 
     cd ~/Documentos/dev-tools && ./start-tercero-medio.sh
 
 ### 📊 Ver Estado y Progreso
-*Pendiente de crear*
+Muestra el estado actual, uso de recursos y progreso.
 
     cd ~/Documentos/dev-tools && ./status-tercero-medio.sh
 
 ### 👀 Ver Log en Tiempo Real
-*Pendiente de crear*
+Sigue el log en tiempo real (Ctrl+C para salir).
 
     tail -f ~/Documentos/dev-tools/tercero-medio.log
 
 ### 📈 Ver Estado Actualizado Automáticamente
-*Pendiente de crear*
+Actualiza el estado cada 30 segundos.
 
     cd ~/Documentos/dev-tools && watch -n 30 ./status-tercero-medio.sh
 
 ### ⏸️ Pausar/Reanudar
-*Pendiente de crear*
+Primera ejecución: pausa. Segunda ejecución: reanuda.
 
     cd ~/Documentos/dev-tools && ./pause-tercero-medio.sh
 
 ### 🛑 Detener
-*Pendiente de crear*
+Detiene el proceso completamente.
 
     cd ~/Documentos/dev-tools && ./stop-tercero-medio.sh
 
 ### ✅ Ver Pools Completados
-*Pendiente de crear*
+Lista todos los pools generados con estadísticas.
 
     cd ~/Documentos/dev-tools && ./completed-tercero-medio.sh
 
