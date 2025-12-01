@@ -17,6 +17,7 @@ async function verifyAllPools() {
     });
 
     const grades = [
+        { id: 'primero-medio', name: '1° Medio', expected: 12 },
         { id: 'segundo-medio', name: '2° Medio', expected: 9 },
         { id: 'tercero-medio', name: '3° Medio', expected: 8 },
         { id: 'cuarto-medio', name: '4° Medio', expected: 8 },
