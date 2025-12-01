@@ -5,7 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Loader2, Download, CheckCircle2, XCircle } from 'lucide-react';
 import type { DragDropExercise, FillInBlanksExercise } from '@/types/exercises';
-import type { UserAnswer } from '@/ai/flows/feedback-generator';
+
+// Define UserAnswer locally to avoid importing server-only code
+interface UserAnswer {
+    exerciseId: string;
+    answer: any;
+    isCorrect: boolean;
+    timeSpent?: number;
+}
 
 type Exercise = DragDropExercise | FillInBlanksExercise;
 
@@ -35,8 +42,9 @@ export default function ExerciseResults({
     async function generateFeedback() {
         setGenerating(true);
         try {
-            const { generateExerciseFeedback } = await import('@/ai/flows/feedback-generator');
-            const feedbackText = await generateExerciseFeedback(
+            // Dynamic import to avoid bundling server-only code in client
+            const feedbackModule = await import('@/ai/flows/feedback-generator');
+            const feedbackText = await feedbackModule.generateExerciseFeedback(
                 exercises,
                 userAnswers,
                 subjectName,
@@ -56,8 +64,9 @@ export default function ExerciseResults({
 
         setLoading(true);
         try {
-            const { generateFeedbackPDF } = await import('@/lib/pdf-generator');
-            generateFeedbackPDF(
+            // Dynamic import to avoid bundling in client
+            const pdfModule = await import('@/lib/pdf-generator');
+            pdfModule.generateFeedbackPDF(
                 feedback,
                 exercises,
                 userAnswers,
