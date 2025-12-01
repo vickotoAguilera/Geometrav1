@@ -239,8 +239,12 @@ export async function generateWithFallback(params: {
             throw new Error('No se pudo obtener una API key disponible');
         }
 
+        // Obtener el conteo actual de keys disponibles
+        const currentStats = manager.getStats();
+        const availableCount = currentStats.available;
+
         try {
-            console.log(`🔑 Intentando con API key #${keyInfo.keyNumber} (${attempt + 1}/${maxAttempts} disponibles)`);
+            console.log(`🔑 Intentando con API key #${keyInfo.keyNumber} (${availableCount} disponibles)`);
 
             const result = await ai.generate({
                 model,
@@ -266,6 +270,10 @@ export async function generateWithFallback(params: {
 
                 console.warn(`⚠️  API Key #${keyInfo.keyNumber} agotada`);
                 manager.markKeyAsExhausted(keyInfo.keyNumber);
+
+                // Mostrar cuántas keys quedan después de agotar esta
+                const updatedStats = manager.getStats();
+                console.log(`   📊 Keys restantes: ${updatedStats.available}`);
 
                 // Continuar con la siguiente key
                 continue;
