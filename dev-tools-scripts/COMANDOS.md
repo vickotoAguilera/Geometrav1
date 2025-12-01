@@ -7,172 +7,145 @@ Comandos para gestionar la generación de pools de ejercicios en segundo plano.
 ## 📚 2° Medio
 
 ### 🚀 Iniciar Generación
-```bash
-cd ~/Documentos/dev-tools && ./start-segundo-medio.sh
-```
 Inicia el proceso de generación en segundo plano.
 
+    cd ~/Documentos/dev-tools && ./start-segundo-medio.sh
+
 ### 📊 Ver Estado y Progreso
-```bash
-cd ~/Documentos/dev-tools && ./status-segundo-medio.sh
-```
 Muestra el estado actual, uso de recursos y progreso.
 
+    cd ~/Documentos/dev-tools && ./status-segundo-medio.sh
+
 ### 👀 Ver Log en Tiempo Real
-```bash
-tail -f ~/Documentos/dev-tools/segundo-medio.log
-```
 Sigue el log en tiempo real (Ctrl+C para salir).
 
+    tail -f ~/Documentos/dev-tools/segundo-medio.log
+
 ### 📈 Ver Estado Actualizado Automáticamente
-```bash
-cd ~/Documentos/dev-tools && watch -n 30 ./status-segundo-medio.sh
-```
 Actualiza el estado cada 30 segundos.
 
+    cd ~/Documentos/dev-tools && watch -n 30 ./status-segundo-medio.sh
+
 ### ⏸️ Pausar/Reanudar
-```bash
-cd ~/Documentos/dev-tools && ./pause-segundo-medio.sh
-```
 Primera ejecución: pausa. Segunda ejecución: reanuda.
 
+    cd ~/Documentos/dev-tools && ./pause-segundo-medio.sh
+
 ### 🛑 Detener
-```bash
-cd ~/Documentos/dev-tools && ./stop-segundo-medio.sh
-```
 Detiene el proceso completamente.
 
+    cd ~/Documentos/dev-tools && ./stop-segundo-medio.sh
+
 ### ✅ Ver Pools Completados
-```bash
-cd ~/Documentos/dev-tools && ./completed-segundo-medio.sh
-```
 Lista todos los pools generados con estadísticas.
+
+    cd ~/Documentos/dev-tools && ./completed-segundo-medio.sh
 
 ---
 
 ## 📚 3° Medio
 
 ### 🚀 Iniciar Generación
-```bash
-cd ~/Documentos/dev-tools && ./start-tercero-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./start-tercero-medio.sh
 
 ### 📊 Ver Estado y Progreso
-```bash
-cd ~/Documentos/dev-tools && ./status-tercero-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./status-tercero-medio.sh
 
 ### 👀 Ver Log en Tiempo Real
-```bash
-tail -f ~/Documentos/dev-tools/tercero-medio.log
-```
 *Pendiente de crear*
+
+    tail -f ~/Documentos/dev-tools/tercero-medio.log
 
 ### 📈 Ver Estado Actualizado Automáticamente
-```bash
-cd ~/Documentos/dev-tools && watch -n 30 ./status-tercero-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && watch -n 30 ./status-tercero-medio.sh
 
 ### ⏸️ Pausar/Reanudar
-```bash
-cd ~/Documentos/dev-tools && ./pause-tercero-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./pause-tercero-medio.sh
 
 ### 🛑 Detener
-```bash
-cd ~/Documentos/dev-tools && ./stop-tercero-medio.sh
-```
 *Pendiente de crear*
 
+    cd ~/Documentos/dev-tools && ./stop-tercero-medio.sh
+
 ### ✅ Ver Pools Completados
-```bash
-cd ~/Documentos/dev-tools && ./completed-tercero-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./completed-tercero-medio.sh
 
 ---
 
 ## 📚 4° Medio
 
 ### 🚀 Iniciar Generación
-```bash
-cd ~/Documentos/dev-tools && ./start-cuarto-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./start-cuarto-medio.sh
 
 ### 📊 Ver Estado y Progreso
-```bash
-cd ~/Documentos/dev-tools && ./status-cuarto-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./status-cuarto-medio.sh
 
 ### 👀 Ver Log en Tiempo Real
-```bash
-tail -f ~/Documentos/dev-tools/cuarto-medio.log
-```
 *Pendiente de crear*
+
+    tail -f ~/Documentos/dev-tools/cuarto-medio.log
 
 ### 📈 Ver Estado Actualizado Automáticamente
-```bash
-cd ~/Documentos/dev-tools && watch -n 30 ./status-cuarto-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && watch -n 30 ./status-cuarto-medio.sh
 
 ### ⏸️ Pausar/Reanudar
-```bash
-cd ~/Documentos/dev-tools && ./pause-cuarto-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./pause-cuarto-medio.sh
 
 ### 🛑 Detener
-```bash
-cd ~/Documentos/dev-tools && ./stop-cuarto-medio.sh
-```
 *Pendiente de crear*
 
+    cd ~/Documentos/dev-tools && ./stop-cuarto-medio.sh
+
 ### ✅ Ver Pools Completados
-```bash
-cd ~/Documentos/dev-tools && ./completed-cuarto-medio.sh
-```
 *Pendiente de crear*
+
+    cd ~/Documentos/dev-tools && ./completed-cuarto-medio.sh
 
 ---
 
 ## 🔧 Comandos Útiles Generales
 
 ### Ver todos los procesos en ejecución
-```bash
-ps aux | grep generate-
-```
+
+    ps aux | grep generate-
 
 ### Ver todos los logs
-```bash
-ls -lh ~/Documentos/dev-tools/*.log
-```
+
+    ls -lh ~/Documentos/dev-tools/*.log
 
 ### Limpiar logs antiguos
-```bash
-rm ~/Documentos/dev-tools/*.log
-```
+
+    rm ~/Documentos/dev-tools/*.log
 
 ### Ver espacio usado por logs
-```bash
-du -sh ~/Documentos/dev-tools/*.log
-```
+
+    du -sh ~/Documentos/dev-tools/*.log
 
 ### Buscar errores en logs
-```bash
-grep "❌" ~/Documentos/dev-tools/*.log
-```
+
+    grep "❌" ~/Documentos/dev-tools/*.log
 
 ### Contar pools completados en todos los niveles
-```bash
-grep -c "✅ Pool subido" ~/Documentos/dev-tools/*.log
-```
+
+    grep -c "✅ Pool subido" ~/Documentos/dev-tools/*.log
 
 ---
 
