@@ -50,9 +50,18 @@ async function getCompletedPools(): Promise<Set<string>> {
     }
 }
 
-async function generatePoolForSubject(gradeId: string, subjectId: string, subjectName: string) {
+async function generatePoolForSubject(
+    gradeId: string,
+    subjectId: string,
+    subjectName: string,
+    currentSubject: number,
+    totalSubjects: number,
+    alreadyCompleted: number
+) {
+    const overallProgress = alreadyCompleted + currentSubject;
+
     console.log(`\n${'='.repeat(70)}`);
-    console.log(`📚 ${subjectName}`);
+    console.log(`📚 ${subjectName} [Materia ${overallProgress}/${totalSubjects}]`);
     console.log(`${'='.repeat(70)}\n`);
 
     // Crear tracker con nombre descriptivo
@@ -205,11 +214,15 @@ async function generateSegundoMedio() {
     let completedNow = 0;
     let failed = 0;
 
-    for (const subject of pending) {
+    for (let i = 0; i < pending.length; i++) {
+        const subject = pending[i];
         const success = await generatePoolForSubject(
             segundoMedio.id,
             subject.id,
-            subject.name
+            subject.name,
+            i + 1,
+            segundoMedio.subjects.length,
+            completed.size
         );
 
         if (success) {
@@ -218,7 +231,7 @@ async function generateSegundoMedio() {
             failed++;
         }
 
-        if (subject !== pending[pending.length - 1]) {
+        if (i < pending.length - 1) {
             console.log(`⏳ Esperando ${DELAY_BETWEEN_SUBJECTS / 1000}s...\n`);
             await new Promise(r => setTimeout(r, DELAY_BETWEEN_SUBJECTS));
         }
