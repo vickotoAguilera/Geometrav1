@@ -127,3 +127,47 @@ export async function poolExists(gradeId: string, subjectId: string): Promise<bo
         return false;
     }
 }
+
+/**
+ * Carga ejercicios aleatorios con items de drag-drop desordenados
+ */
+export async function loadRandomExercises(
+    gradeId: string,
+    subjectId: string,
+    count: number = 20
+): Promise<Exercise[]> {
+    try {
+        // 1. Cargar pool completo desde R2
+        const pool = await getExercisePool(gradeId, subjectId);
+
+        if (pool.length === 0) {
+            console.warn(`No exercises found for ${gradeId}/${subjectId}`);
+            return [];
+        }
+
+        // 2. Seleccionar ejercicios aleatorios
+        const selectedExercises = selectRandomExercises(pool, count);
+
+        // 3. Desordenar items de drag-drop
+        const exercisesWithShuffledItems = selectedExercises.map(exercise => {
+            if (exercise.type === 'drag-drop') {
+                return {
+                    ...exercise,
+                    items: shuffleArray([...exercise.items])
+                };
+            }
+            return exercise;
+        });
+
+        return exercisesWithShuffledItems;
+    } catch (error) {
+        console.error(`Error loading random exercises:`, error);
+        return [];
+    }
+}
+
+/**
+ * Exportar shuffleArray para uso externo
+ */
+export { shuffleArray };
+
