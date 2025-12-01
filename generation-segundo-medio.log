@@ -1,0 +1,693 @@
+[dotenv@17.2.3] injecting env (63) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+======================================================================
+🔄 GENERACIÓN DE POOLS - 2° MEDIO
+======================================================================
+
+🔍 Verificando pools existentes...
+
+✅ Pools completados: 1
+   - funcion-cuadratica
+
+📋 Pendientes: 8
+   - Función Lineal
+   - Logaritmos
+   - Números Irracionales
+   - Potencias con Exponente Racional
+   - Probabilidad Condicional
+   - Raíces y Propiedades
+   - Sectores Circulares
+   - Trigonometría
+
+
+======================================================================
+📚 Función Lineal
+======================================================================
+
+📂 Estado previo cargado: 30/100 completados
+📝 Lote 1/10: generando 10 ejercicios...
+
+============================================================
+📊 🎯 Generando pool de ejercicios: Función Lineal (2° Medio)
+============================================================
+Progreso: 0/100 (0.0%)
+Barra: [                                                  ]
+Actual: Generando lote 1/10 de ejercicios
+Tiempo transcurrido: 12m 14s
+Tiempo estimado restante: Calculando...
+============================================================
+
+🔑 Intentando con API key 1/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 1/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 20.021778787s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 1
+🔑 Intentando con API key 2/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 2/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 13.055238731s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 2
+🔑 Intentando con API key 3/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 3/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 5.086815584s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 3
+🔑 Intentando con API key 4/50
+✅ JSON parseado exitosamente
+✅ 1/1 ejercicios válidos agregados
+
+============================================================
+📊 🎯 Generando pool de ejercicios: Función Lineal (2° Medio)
+============================================================
+Progreso: 10/100 (10.0%)
+Barra: [█████                                             ]
+Actual: Lote 1/10 completado
+Tiempo transcurrido: 12m 47s
+Tiempo estimado restante: 1h 55m 8s
+============================================================
+
+✅ Total: 10/100
+📝 Lote 2/10: generando 10 ejercicios...
+
+============================================================
+📊 🎯 Generando pool de ejercicios: Función Lineal (2° Medio)
+============================================================
+Progreso: 10/100 (10.0%)
+Barra: [█████                                             ]
+Actual: Generando lote 2/10 de ejercicios
+Tiempo transcurrido: 12m 50s
+Tiempo estimado restante: 1h 55m 35s
+============================================================
+
+🔑 Intentando con API key 4/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 4/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 50.751772252s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 4
+🔑 Intentando con API key 5/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 5/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 42.588511323s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 5
+🔑 Intentando con API key 6/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 6/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 32.99187896s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 6
+🔑 Intentando con API key 7/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 31.73990586s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 7
+🔑 Intentando con API key 8/50
+⚠️ Intento 1/2 de parsing falló, reintentando...
+⚠️ Intento 2/2 de parsing falló, reintentando...
+❌ JSON parsing falló después de limpieza
+🤖 Pidiendo a la IA que corrija el JSON...
+🔑 Intentando con API key 8/50
+✅ IA corrigió el JSON exitosamente
+✅ 1/1 ejercicios válidos agregados
+
+============================================================
+📊 🎯 Generando pool de ejercicios: Función Lineal (2° Medio)
+============================================================
+Progreso: 20/100 (20.0%)
+Barra: [██████████                                        ]
+Actual: Lote 2/10 completado
+Tiempo transcurrido: 13m 24s
+Tiempo estimado restante: 53m 37s
+============================================================
+
+✅ Total: 20/100
+📝 Lote 3/10: generando 10 ejercicios...
+
+============================================================
+📊 🎯 Generando pool de ejercicios: Función Lineal (2° Medio)
+============================================================
+Progreso: 20/100 (20.0%)
+Barra: [██████████                                        ]
+Actual: Generando lote 3/10 de ejercicios
+Tiempo transcurrido: 13m 27s
+Tiempo estimado restante: 53m 49s
+============================================================
+
+🔑 Intentando con API key 8/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 21.415347881s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 8
+🔑 Intentando con API key 9/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 9/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 12.925888192s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 9
+🔑 Intentando con API key 10/50
+✅ JSON parseado exitosamente
+✅ 3/3 ejercicios válidos agregados
+🔑 Intentando con API key 10/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 5.88735194s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 10
+🔑 Intentando con API key 11/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 4.591963433s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 11
+🔑 Intentando con API key 12/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 3.343394975s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 12
+🔑 Intentando con API key 13/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 2.00418707s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 13
+🔑 Intentando con API key 14/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 787.451983ms.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 14
+🔑 Intentando con API key 15/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 59.602277216s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 15
+🔑 Intentando con API key 16/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 58.354380708s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 16
+🔑 Intentando con API key 17/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 57.150177699s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 17
+🔑 Intentando con API key 18/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 55.873558471s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 18
+🔑 Intentando con API key 19/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 54.54953255s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 19
+🔑 Intentando con API key 20/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 53.339689799s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 20
+🔑 Intentando con API key 21/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 52.115336007s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 21
+🔑 Intentando con API key 22/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 50.882465723s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 22
+🔑 Intentando con API key 23/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 49.65770872s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 23
+🔑 Intentando con API key 24/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 48.42729511s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 24
+🔑 Intentando con API key 25/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 47.196600643s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 25
+🔑 Intentando con API key 26/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 45.969154696s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 26
+🔑 Intentando con API key 27/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 44.737873037s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 27
+🔑 Intentando con API key 28/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 43.515986363s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 28
+🔑 Intentando con API key 29/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 42.278399412s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 29
+🔑 Intentando con API key 30/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 41.048976896s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 30
+🔑 Intentando con API key 31/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 39.820982174s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 31
+🔑 Intentando con API key 32/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 38.594555578s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 32
+🔑 Intentando con API key 33/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 37.372943058s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 33
+🔑 Intentando con API key 34/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 36.171576174s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 34
+🔑 Intentando con API key 35/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 34.945577966s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 35
+🔑 Intentando con API key 36/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 33.677406583s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 36
+🔑 Intentando con API key 37/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 31.781767082s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 37
+🔑 Intentando con API key 38/50
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash
+Please retry in 30.545527321s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 38
+Shutting down all Genkit servers...

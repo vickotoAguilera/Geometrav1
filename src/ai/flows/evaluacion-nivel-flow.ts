@@ -124,7 +124,7 @@ ${gradeContext}
 IMPORTANTE: Genera EXACTAMENTE 24 preguntas, 4 por cada una de las 6 áreas.`;
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-001',
+            model: 'googleai/gemini-2.0-flash',
             system: systemPrompt,
             prompt: 'Genera el test de evaluación completo con 24 preguntas.',
             output: {
@@ -179,7 +179,7 @@ ${JSON.stringify(questionsContext, null, 2)}
 Calcula el nivel del estudiante en cada área y proporciona un análisis completo.`;
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-001',
+            model: 'googleai/gemini-2.0-flash',
             system: systemPrompt,
             prompt,
             output: {

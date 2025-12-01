@@ -1,0 +1,45 @@
+Crea una presentación profesional y moderna de 8 diapositivas sobre el proyecto "Geometra".
+Estilo visual: "Dark Mode", tecnológico, neón, educativo, futurista.
+
+Estructura de la presentación:
+
+1. Título: "Geometra: Asistente Inteligente para el Aprendizaje de Funciones y Geometría".
+   Subtítulo: "Proyecto de Integración Tecnológica - ABPro Etapa 3".
+   Integrantes: Oscar Hernández, Félix Espinoza, Víctor Aguilera.
+
+2. La Problemática: "El Aprendizaje Solitario".
+   - Puntos clave:
+     * Los estudiantes sienten frustración al estudiar matemáticas solos en casa.
+     * Herramientas actuales (como GeoGebra) grafican pero no explican los errores.
+     * Falta de guía pedagógica en tiempo real.
+
+3. La Solución: "Un Tutor IA 24/7".
+   - Descripción: Una aplicación web que integra Inteligencia Artificial para detectar errores y dar pistas, no solo respuestas.
+   - Objetivo: Reducir la ansiedad matemática y acompañar el proceso de aprendizaje.
+
+4. Metodología de Trabajo (Línea de Tiempo):
+   - Fase 1: Investigación del Currículum Nacional (1° Medio).
+   - Fase 2: Diseño UX/UI para reducir la carga cognitiva.
+   - Fase 3: Desarrollo en Next.js y Firebase.
+   - Fase 4: Integración de IA (Gemini).
+   - Fase 5: Despliegue público en Vercel.
+
+5. Justificación Pedagógica (Respaldo Mineduc):
+   - Reactivación Educativa: Uso de tecnología para cerrar brechas de aprendizaje.
+   - Retroalimentación Oportuna: Corrección inmediata del error (Evaluación Formativa).
+   - Acceso Universal: Herramienta web gratuita y accesible desde cualquier dispositivo.
+
+6. Matemáticas en el Código: "Vectores".
+   - Explicación: Los vectores son la base de la interfaz gráfica.
+   - Aplicación: Posicionamiento de elementos (coordenadas X, Y) y animaciones de movimiento (traslaciones vectoriales).
+
+7. Matemáticas en el Código: "Homotecia y Funciones".
+   - Homotecia: Aplicada en el "Diseño Responsivo". Adaptamos la interfaz a celulares multiplicando dimensiones por un factor de escala (k < 1).
+   - Funciones: El código sigue la lógica matemática de Entrada -> Proceso -> Salida.
+
+8. Conclusiones y Futuro:
+   - Logro: Transformación de una necesidad educativa en software real.
+   - Aprendizaje: Fusión exitosa de Pedagogía, Matemáticas y Programación.
+   - Futuro: Implementación de reconocimiento de voz y más unidades temáticas.
+
+Nota: NO incluir diapositiva de demostración, ya que se hará en vivo.

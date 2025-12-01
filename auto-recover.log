@@ -1,0 +1,760 @@
+nohup: no se tendrá en cuenta la entrada
+🔄 Iniciando sistema de auto-recuperación...
+📝 Log: generation-output.log
+🔁 Reintentos máximos: 10
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #1 - 2025-11-30 12:58:35
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 107628)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #2 - 2025-11-30 13:22:48
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 122403)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #3 - 2025-11-30 13:30:00
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 125809)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #4 - 2025-11-30 13:37:13
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 129221)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #5 - 2025-11-30 13:44:25
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 132621)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #6 - 2025-11-30 13:51:37
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 136026)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #7 - 2025-11-30 13:58:49
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 139424)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #8 - 2025-11-30 14:06:02
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 142936)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #9 - 2025-11-30 14:53:45
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 166262)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #10 - 2025-11-30 15:49:31
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 181951)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ Se alcanzó el máximo de reintentos (10)
+📋 Revisa el log: generation-output.log
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

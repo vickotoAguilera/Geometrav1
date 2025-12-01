@@ -1,0 +1,266 @@
+[dotenv@17.2.3] injecting env (15) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+======================================================================
+🚀 GENERACIÓN DE POOLS COMPLETOS - 1° MEDIO
+======================================================================
+📊 100 ejercicios por materia
+💡 3 niveles de hints por ejercicio
+======================================================================
+
+📚 Total de materias: 12
+
+
+======================================================================
+📚 Ecuaciones Lineales
+======================================================================
+
+📝 Lote 1/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Expected ',' or '}' after property value in JSON at position 33
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+✅ Total generados: 9/100
+📝 Lote 2/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 19/100
+📝 Lote 3/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 29/100
+📝 Lote 4/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Expected ',' or '}' after property value in JSON at position 33
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 38/100
+📝 Lote 5/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Expected ',' or '}' after property value in JSON at position 32
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Bad control character in string literal in JSON at position 502
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Bad control character in string literal in JSON at position 423
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+✅ Total generados: 41/100
+📝 Lote 6/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 51/100
+📝 Lote 7/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 61/100
+📝 Lote 8/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Expected ',' or '}' after property value in JSON at position 33
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Bad control character in string literal in JSON at position 551
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+✅ Total generados: 67/100
+📝 Lote 9/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 77/100
+📝 Lote 10/10: generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+Error generating exercises: SyntaxError: Expected ',' or '}' after property value in JSON at position 33
+    at JSON.parse (<anonymous>)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:97:42)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generatePoolForSubject (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:37:31)
+    at async generateAllPools (/home/vickoto/Documentos/geometra/scripts/generate-all-pools.ts:142:25)
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+✅ Total generados: 86/100
+
+💡 Generando hints para 86 ejercicios...
+
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+  Progreso: 10/86
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+  Progreso: 20/86
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+  Progreso: 30/86
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+🔑 Intentando con API key 1/2
+Error: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-2.0-flash
+Please retry in 36.155096821s.
+    at makeRequest (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:355:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateContent (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/client.ts:92:20)
+    at async callGemini (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:623:22)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/google-genai/src/googleai/gemini.ts:686:11)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:475:12)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:369:26)
+    at async <anonymous> (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:121:24)
+    at async runInNewSpan (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/tracing/instrumentation.ts:105:10)
+    at async AsyncFunction.actionFn.run (/home/vickoto/Documentos/geometra/node_modules/@genkit-ai/core/src/action.ts:321:18)
+⚠️ Rate limit en API key 1
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 40/86
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 50/86
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 60/86
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 70/86
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 80/86
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+  Progreso: 86/86
+🔑 Intentando con API key 2/2
+
+☁️ Subiendo a R2...
+✅ Pool subido exitosamente!
+   📦 86 ejercicios con hints
+   ☁️ exercises/primero-medio/ecuaciones-lineales.json
+
+⏳ Esperando 5s antes de la siguiente materia...
+
+
+======================================================================
+📚 Factorización
+======================================================================
+
+📝 Lote 1/10: generando 10 ejercicios...
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+✅ Total generados: 10/100
+📝 Lote 2/10: generando 10 ejercicios...
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+✅ Total generados: 20/100
+📝 Lote 3/10: generando 10 ejercicios...
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2
+🔑 Intentando con API key 2/2

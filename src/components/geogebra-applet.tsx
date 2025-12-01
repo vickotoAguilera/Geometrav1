@@ -49,7 +49,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
-  
+
   useEffect(() => {
     if (typeof window === 'undefined' || !isClient) return;
 
@@ -88,9 +88,9 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
 
         const width = container.clientWidth || 800;
         const height = container.clientHeight || 600;
-        
+
         const isMobile = isMobileDeviceClient();
-        
+
         const parameters = {
           id: 'ggbAppletFree', // Unique ID for the free applet
           appName: 'classic',
@@ -109,6 +109,12 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
           useBrowserForJS: false,
           language: 'es',
           enableMobileView: isMobile,
+          appletOnLoad: function (api: any) {
+            // Exponer el API globalmente para que LearningBoard pueda acceder
+            // @ts-ignore
+            window.ggbAppletFree = api;
+            console.log('GeoGebra API loaded and exposed globally');
+          }
         };
 
         const applet = new window.GGBApplet(parameters, true);
@@ -126,7 +132,7 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
       const applet = appletRef.current;
       const container = containerRef.current;
       if (!applet || !container) return;
-      if (typeof applet.setSize !== 'function') return; 
+      if (typeof applet.setSize !== 'function') return;
 
       const newWidth = container.clientWidth;
       const newHeight = container.clientHeight;
@@ -138,11 +144,11 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
         }
       }
     });
-    
+
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
-    
+
     return () => {
       if (containerRef.current) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,31 +170,31 @@ export const GeoGebraApplet = memo(function GeoGebraApplet() {
       />
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[51] flex gap-2">
         <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button
-                    variant="destructive"
-                    size="icon"
-                    className="bg-red-500/80 hover:bg-red-600/90 text-white rounded-full shadow-lg"
-                    title="¡Atención! Cómo guardar tu progreso"
-                >
-                    <AlertTriangle className="w-5 h-5" />
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
-                     <AlertDialogDescription className="space-y-2">
-                        <span>Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.</span>
-                        <br /><br />
-                        <span><strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.</span>
-                        <br /><br />
-                        <span><strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.</span>
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogAction>Entendido</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="destructive"
+              size="icon"
+              className="bg-red-500/80 hover:bg-red-600/90 text-white rounded-full shadow-lg"
+              title="¡Atención! Cómo guardar tu progreso"
+            >
+              <AlertTriangle className="w-5 h-5" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¡Atención! Guarda tu progreso manualmente</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <span>Esta pizarra es un lienzo libre y <strong>no guarda tu trabajo automáticamente</strong> si sales o recargas la página.</span>
+                <br /><br />
+                <span><strong>Para Guardar:</strong> Usa el menú de GeoGebra (☰) {"->"} 'Descargar como' {"->"} 'Archivo GGB (.ggb)' para guardar tu construcción en tu computadora.</span>
+                <br /><br />
+                <span><strong>Para Abrir:</strong> Usa el menú (☰) {"->"} 'Abrir' para cargar un archivo `.ggb` que hayas guardado previamente.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction>Entendido</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
       </div>
     </div>

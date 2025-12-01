@@ -1,0 +1,1696 @@
+[dotenv@17.2.3] injecting env (15) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+============================================================
+🧪 GENERADOR DE POOL DE PRUEBA
+============================================================
+
+🧪 Generando pool de prueba
+📚 Curso: primero-medio
+📖 Materia: ecuaciones-lineales
+📊 Cantidad: 10 ejercicios
+
+📝 Generando 10 ejercicios...
+🔑 Intentando con API key 1/2
+Invalid exercise: {
+  id: '1678886400000-456789',
+  type: 'drag-drop',
+  description: 'Ejemplo: Para resolver 3x - 5 = x + 1, agrupamos las x: 3x - x = 1 + 5, simplificamos: 2x = 6, dividimos: x = 3.  Ahora, una empresa de arriendo de autos cobra un cargo fijo de $15.000 más $8.000 por cada día. Otra empresa cobra $23.000 fijos más $6.000 por día.  ¿Para cuántos días el costo total es el mismo?  Arrastra los términos correctos para formar la ecuación y luego la solución.',
+  question: '¿Para cuántos días el costo total es el mismo?',
+  equation_parts: [
+    '15000', '+',
+    '8000x', '=',
+    '23000', '+',
+    '6000x'
+  ],
+  solution_steps: [ '8000x - 6000x = 23000 - 15000', '2000x = 8000', 'x = 4' ],
+  draggable_items: [
+    '15000',
+    '+',
+    '8000x',
+    '=',
+    '23000',
+    '+',
+    '6000x',
+    '8000x - 6000x = 23000 - 15000',
+    '2000x = 8000',
+    'x = 4',
+    'x = 2',
+    '2000x = 38000'
+  ],
+  correct_sequence: [
+    { type: 'equation', items: [Array] },
+    { type: 'solution', items: [Array] }
+  ],
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400000-987654',
+  type: 'fill-in-blanks',
+  description: 'Ejemplo: Si 5(x + 2) = 25, primero dividimos entre 5: x + 2 = 5, luego restamos 2: x = 3. Ahora, un vendedor recibe un sueldo base de $300.000 más una comisión de $5.000 por cada venta.  ¿Cuántas ventas debe realizar para ganar $450.000? Completa los espacios en blanco para resolver la ecuación.',
+  question: '¿Cuántas ventas debe realizar para ganar $450.000?',
+  equation: '300000 + 5000x = 450000',
+  steps: [
+    {
+      step: 'Restamos 300000 de ambos lados: 5000x = ______',
+      answer: '150000'
+    },
+    {
+      step: 'Dividimos ambos lados por 5000: x = ______',
+      answer: '30'
+    }
+  ],
+  feedback: {
+    correct: '¡Correcto! El vendedor debe realizar 30 ventas.',
+    incorrect: 'Revisa tus cálculos.  Primero debes restar el sueldo base, luego dividir por la comisión.'
+  },
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "received": "fill-in-blanks",
+            "code": "invalid_literal",
+            "expected": "drag-drop",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"drag-drop\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400000-123456',
+  type: 'drag-drop',
+  description: 'Ejemplo:  Si (x/2) - 1 = 3, sumamos 1: x/2 = 4, multiplicamos por 2: x = 8. Ahora, la suma de dos números consecutivos es 35. ¿Cuáles son los números?  Define x como el primer número. Arrastra los elementos para formar la ecuación y luego la solución.',
+  question: 'La suma de dos números consecutivos es 35. ¿Cuáles son los números?',
+  equation_parts: [ 'x', '+', '(x+1)', '=', '35' ],
+  solution_steps: [ '2x + 1 = 35', '2x = 34', 'x = 17', 'x + 1 = 18' ],
+  draggable_items: [
+    'x',          '+',
+    '(x+1)',      '=',
+    '35',         '2x + 1 = 35',
+    '2x = 34',    'x = 17',
+    'x + 1 = 18', 'x = 36',
+    'x+2'
+  ],
+  correct_sequence: [
+    { type: 'equation', items: [Array] },
+    { type: 'solution', items: [Array] }
+  ],
+  points: 20
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+🔑 Intentando con API key 1/2
+Invalid exercise: {
+  id: '1678886400123-456',
+  type: 'drag-drop',
+  title: 'Resolviendo para el tiempo de viaje',
+  description: 'Ejemplo: Un tren viaja a 80 km/h. ¿Cuánto tiempo tarda en recorrer 240 km?  Distancia = Velocidad * Tiempo, por lo que 240 = 80 * t. Dividiendo ambos lados por 80, obtenemos t = 3 horas. Ahora, resuelve: Un ciclista recorre una distancia de 60 km a una velocidad constante. Si completa el recorrido en x horas y su velocidad es de (3x + 5) km/h, ¿cuánto tiempo tardó el ciclista en completar el recorrido?',
+  question: 'Arrastra los siguientes pasos para resolver la ecuación 60 = (3x + 5) * x.',
+  steps: [
+    '60 = 3x² + 5x',
+    '3x² + 5x - 60 = 0',
+    'Usa la fórmula cuadrática: x = (-b ± √(b² - 4ac)) / 2a, donde a = 3, b = 5, c = -60',
+    'x = (-5 ± √(5² - 4 * 3 * -60)) / (2 * 3)',
+    'x = (-5 ± √(25 + 720)) / 6',
+    'x = (-5 ± √745) / 6',
+    'x ≈ (-5 ± 27.3) / 6',
+    'x ≈ 3.72 o x ≈ -5.38 (descartamos el valor negativo)',
+    'x ≈ 3.72 horas'
+  ],
+  solution: [
+    '60 = 3x² + 5x',
+    '3x² + 5x - 60 = 0',
+    'Usa la fórmula cuadrática: x = (-b ± √(b² - 4ac)) / 2a, donde a = 3, b = 5, c = -60',
+    'x = (-5 ± √(5² - 4 * 3 * -60)) / (2 * 3)',
+    'x = (-5 ± √(25 + 720)) / 6',
+    'x = (-5 ± √745) / 6',
+    'x ≈ (-5 ± 27.3) / 6',
+    'x ≈ 3.72 o x ≈ -5.38 (descartamos el valor negativo)',
+    'x ≈ 3.72 horas'
+  ],
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400456-789',
+  type: 'fill-in-blanks',
+  title: 'Equilibrio en una Balanza',
+  description: "Ejemplo: Imagina una balanza. Un lado tiene 2x + 5 kg y el otro 15 kg. Para encontrar 'x', restamos 5 de ambos lados: 2x = 10, luego dividimos entre 2: x = 5 kg. Ahora resuelve: En una balanza, un lado tiene 3x + 8 gramos y el otro lado tiene 2x + 15 gramos. ¿Cuánto debe valer 'x' para que la balanza esté en equilibrio?",
+  question: 'Completa los espacios en blanco para encontrar el valor de x que equilibra la balanza:',
+  steps: [ '3x + 8 = 2x + 15', '3x - ___ = 15 - ___', 'x = ___' ],
+  blanks: [ '2x', '8', '7' ],
+  solution: { '3x + 8 = 2x + 15': true, '3x - 2x = 15 - 8': true, 'x = 7': true },
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "received": "fill-in-blanks",
+            "code": "invalid_literal",
+            "expected": "drag-drop",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"drag-drop\""
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              0
+            ],
+            "message": "Expected object, received string"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              1
+            ],
+            "message": "Expected object, received string"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              2
+            ],
+            "message": "Expected object, received string"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400789-012',
+  type: 'drag-drop',
+  title: 'Calculando las Edades',
+  description: 'Ejemplo: La edad de Ana es el doble de la edad de Juan más 3 años. Si Ana tiene 15 años, ¿cuántos años tiene Juan?  15 = 2x + 3. Restando 3: 12 = 2x. Dividiendo entre 2: x = 6. Juan tiene 6 años. Ahora, resuelve: La edad de María es tres veces la edad de Pedro menos 5 años. Si la suma de sus edades es 35 años, ¿cuántos años tiene Pedro?',
+  question: 'Arrastra los siguientes pasos para resolver este problema:',
+  steps: [
+    'María = 3x - 5, Pedro = x',
+    '3x - 5 + x = 35',
+    '4x - 5 = 35',
+    '4x = 40',
+    'x = 10',
+    'Pedro tiene 10 años'
+  ],
+  solution: [
+    'María = 3x - 5, Pedro = x',
+    '3x - 5 + x = 35',
+    '4x - 5 = 35',
+    '4x = 40',
+    'x = 10',
+    'Pedro tiene 10 años'
+  ],
+  points: 20
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+🔑 Intentando con API key 1/2
+Invalid exercise: {
+  id: '1708238400123-abc456',
+  type: 'drag-drop',
+  topic: 'Ecuaciones Lineales - Compras',
+  description: "Ejemplo: Para resolver el problema: 'Juan compra 3 manzanas y gasta $900. Si cada manzana cuesta lo mismo, ¿cuánto cuesta cada manzana?',  podemos escribir la ecuación: 3x = 900. Dividimos ambos lados entre 3: x = 300. Cada manzana cuesta $300.\n" +
+    '\n' +
+    'Ahora resuelve: María compra 2 entradas al cine y un combo de palomitas que cuesta $3500. Si gasta un total de $9500, ¿cuánto cuesta cada entrada al cine? Usa las siguientes expresiones para armar la ecuación y resolverla.',
+  question: 'Arrastra las siguientes expresiones en el orden correcto para resolver el problema:',
+  elements: [
+    '2x = 6000',
+    'x = 3000',
+    '2x + 3500 = 9500',
+    '2x = 9500 - 3500',
+    'Cada entrada cuesta $3000'
+  ],
+  solution: [
+    '2x + 3500 = 9500',
+    '2x = 9500 - 3500',
+    '2x = 6000',
+    'x = 3000',
+    'Cada entrada cuesta $3000'
+  ],
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1708238400456-def789',
+  type: 'fill-in-blanks',
+  topic: 'Ecuaciones Lineales - Edades',
+  description: 'Ejemplo: Si Pedro tiene el doble de la edad de Ana y la suma de sus edades es 30, podemos resolverlo así: Sea x la edad de Ana, entonces la edad de Pedro es 2x.  La ecuación es x + 2x = 30. Combinamos términos: 3x = 30. Dividimos: x = 10. Ana tiene 10 años y Pedro tiene 20 años.\n' +
+    '\n' +
+    'Ahora resuelve: La edad de Camila es 5 años menos que el triple de la edad de Sebastián. Si la suma de sus edades es 35, ¿cuántos años tiene Sebastián? Completa los espacios en blanco para resolver el problema.',
+  question: 'Sea x la edad de Sebastián. Entonces la edad de Camila es __1__. La ecuación es __2__. Simplificando, tenemos __3__. Resolviendo para x, obtenemos x = __4__. Sebastián tiene __4__ años.',
+  blanks: [ '3x - 5', 'x + (3x - 5) = 35', '4x - 5 = 35', '10' ],
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "received": "fill-in-blanks",
+            "code": "invalid_literal",
+            "expected": "drag-drop",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"drag-drop\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              0
+            ],
+            "message": "Expected object, received string"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              1
+            ],
+            "message": "Expected object, received string"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              2
+            ],
+            "message": "Expected object, received string"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "string",
+            "path": [
+              "blanks",
+              3
+            ],
+            "message": "Expected object, received string"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1708238400789-ghi123',
+  type: 'drag-drop',
+  topic: 'Ecuaciones Lineales - Perímetros',
+  description: 'Ejemplo: Un rectángulo tiene un largo que es el doble del ancho. Si el perímetro es 36 cm, ¿cuánto mide el ancho? Sea x el ancho, el largo es 2x. El perímetro es 2(x) + 2(2x) = 36. Simplificamos: 2x + 4x = 36.  6x = 36.  x = 6. El ancho mide 6 cm.\n' +
+    '\n' +
+    'Ahora resuelve: Un triángulo isósceles tiene dos lados iguales y un lado desigual. Si cada lado igual mide el doble que el lado desigual, y el perímetro del triángulo es 40 cm, ¿cuánto mide el lado desigual? Usa las siguientes expresiones para armar la ecuación y resolverla.',
+  question: 'Arrastra las siguientes expresiones en el orden correcto para resolver el problema:',
+  elements: [
+    'El lado desigual mide 8 cm',
+    '5x = 40',
+    'x = 8',
+    'x + 2x + 2x = 40',
+    'Sea x el lado desigual'
+  ],
+  solution: [
+    'Sea x el lado desigual',
+    'x + 2x + 2x = 40',
+    '5x = 40',
+    'x = 8',
+    'El lado desigual mide 8 cm'
+  ],
+  points: 20
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'facil' | 'medio' | 'dificil'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "difficulty"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+🔑 Intentando con API key 1/2
+Invalid exercise: {
+  id: '1678886400123_456',
+  type: 'drag-drop',
+  topic: 'Ecuaciones Lineales - Balanza',
+  description: 'Ejemplo: Imagina una balanza. En un lado tienes 3x + 5 y en el otro 14. Para equilibrar, debes quitar 5 de ambos lados (3x = 9) y luego dividir ambos lados entre 3 (x = 3). Ahora, considera una balanza donde un lado tiene 2x + 7 y el otro lado tiene 21.  ¿Qué operaciones debes realizar para encontrar el valor de x y mantener la balanza equilibrada?',
+  instructions: 'Arrastra las operaciones en el orden correcto para resolver la ecuación 2x + 7 = 21.',
+  elements: [
+    { id: 'subtract_7', text: 'Restar 7 a ambos lados', correct: true },
+    {
+      id: 'divide_by_2',
+      text: 'Dividir ambos lados entre 2',
+      correct: true
+    },
+    { id: 'add_7', text: 'Sumar 7 a ambos lados', correct: false },
+    {
+      id: 'multiply_by_2',
+      text: 'Multiplicar ambos lados por 2',
+      correct: false
+    }
+  ],
+  solution: [ 'subtract_7', 'divide_by_2' ],
+  difficulty: 'medium',
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "medium",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'medium'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "medium",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'medium'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400123_789',
+  type: 'fill-in-blanks',
+  topic: 'Ecuaciones Lineales - Compra',
+  description: 'Ejemplo: Si compras 4 manzanas y cada una cuesta $x, y pagas con un billete de $5000 y te dan $2000 de vuelto, la ecuación es 4x = 5000 - 2000. Entonces 4x = 3000, y x = 750. Ahora, imagina que compras 3 cuadernos y cada uno cuesta $x.  Pagaste con un billete de $10000 y te dieron $4000 de vuelto. Completa los espacios para encontrar el valor de cada cuaderno.',
+  instructions: 'Completa los espacios en blanco para resolver el problema:',
+  problem: "3x = <input type='number' id='total_cost' /> - <input type='number' id='refund' />",
+  solution: { total_cost: 10000, refund: 4000 },
+  follow_up: "Por lo tanto, x = <input type='number' id='x_value' />",
+  follow_up_solution: { x_value: 2000 },
+  difficulty: 'medium',
+  points: 15
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "received": "fill-in-blanks",
+            "code": "invalid_literal",
+            "expected": "drag-drop",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"drag-drop\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "medium",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'medium'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "medium",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'medium'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+Invalid exercise: {
+  id: '1678886400123_101',
+  type: 'drag-drop',
+  topic: 'Ecuaciones Lineales - Distribución',
+  description: 'Ejemplo: Para resolver 2(x + 3) = 10, primero distribuimos el 2: 2x + 6 = 10. Luego restamos 6 de ambos lados: 2x = 4, y finalmente dividimos entre 2: x = 2. Ahora, considera la ecuación 3(x - 2) = 9. ¿Qué operaciones debes realizar para encontrar el valor de x?',
+  instructions: 'Arrastra las operaciones en el orden correcto para resolver la ecuación 3(x - 2) = 9.',
+  elements: [
+    {
+      id: 'distribute_3',
+      text: 'Distribuir el 3: 3x - 6 = 9',
+      correct: true
+    },
+    { id: 'add_6', text: 'Sumar 6 a ambos lados', correct: true },
+    {
+      id: 'divide_by_3',
+      text: 'Dividir ambos lados entre 3',
+      correct: true
+    },
+    {
+      id: 'subtract_6',
+      text: 'Restar 6 a ambos lados',
+      correct: false
+    },
+    {
+      id: 'multiply_by_3',
+      text: 'Multiplicar ambos lados por 3',
+      correct: false
+    }
+  ],
+  solution: [ 'distribute_3', 'add_6', 'divide_by_3' ],
+  difficulty: 'difficult',
+  points: 20
+} ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "difficult",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'difficult'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "items"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "received": "drag-drop",
+            "code": "invalid_literal",
+            "expected": "fill-in-blanks",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \"fill-in-blanks\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "title"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "difficult",
+            "code": "invalid_enum_value",
+            "options": [
+              "facil",
+              "medio",
+              "dificil"
+            ],
+            "path": [
+              "difficulty"
+            ],
+            "message": "Invalid enum value. Expected 'facil' | 'medio' | 'dificil', received 'difficult'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "template"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "undefined",
+            "path": [
+              "blanks"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [],
+    "message": "Invalid input"
+  }
+]
+    at get error [as error] (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:55:31)
+    at ZodUnion.parse (/home/vickoto/Documentos/geometra/node_modules/zod/lib/types.js:131:22)
+    at generateExercises (/home/vickoto/Documentos/geometra/src/ai/flows/exercise-generator.ts:102:54)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateTestPool (/home/vickoto/Documentos/geometra/scripts/test-pool-generation.ts:30:27) {
+  issues: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_union',
+      unionErrors: [Array],
+      path: [],
+      message: 'Invalid input'
+    }
+  ]
+}
+✅ Ejercicios generados: 0
+
+💡 Generando hints para cada ejercicio...
+
+☁️ Subiendo pool de prueba a R2...
+Error uploading exercise pool to R2: Error: write EPROTO 803CEBE8087D0000:error:0A000410:SSL routines:ssl3_read_bytes:sslv3 alert handshake failure:../deps/openssl/openssl/ssl/record/rec_layer_s3.c:1605:SSL alert number 40
+
+    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:95:16)
+    at WriteWrap.callbackTrampoline (node:internal/async_hooks:130:17) {
+  errno: -71,
+  code: 'EPROTO',
+  syscall: 'write',
+  '$metadata': { attempts: 1, totalRetryDelay: 0 }
+}
+
+❌ Error subiendo pool a R2
+
+============================================================
+❌ Proceso falló
+============================================================
+
