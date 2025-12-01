@@ -337,6 +337,42 @@
       "isExhausted": true,
       "requestCount": 0,
       "lastExhaustedAt": "2025-12-01T19:07:47.809Z"
+    },
+    {
+      "keyNumber": 51,
+      "apiKey": "AIzaSyDzylX4g-XyAzDBaQEl8eIEveIVCJlHC7o",
+      "isExhausted": false,
+      "requestCount": 10
+    },
+    {
+      "keyNumber": 52,
+      "apiKey": "AIzaSyAT_JOZ8r98S45J-1v_EPgt1zbDODhR-8I",
+      "isExhausted": false,
+      "requestCount": 10
+    },
+    {
+      "keyNumber": 53,
+      "apiKey": "AIzaSyBib2CAJvq4CpFwzLD91MOTbocYvM3ewuw",
+      "isExhausted": false,
+      "requestCount": 10
+    },
+    {
+      "keyNumber": 54,
+      "apiKey": "AIzaSyCt_HTZJa8TaaxNDWL97EiisrEeoS4SuTk",
+      "isExhausted": false,
+      "requestCount": 10
+    },
+    {
+      "keyNumber": 55,
+      "apiKey": "AIzaSyA8YbCD5KQr8drC9pA9TPqRchADoienANU",
+      "isExhausted": false,
+      "requestCount": 10
+    },
+    {
+      "keyNumber": 56,
+      "apiKey": "AIzaSyAT1HGlGQfb0qgBDJsFHiA3emDFp0Im_nY",
+      "isExhausted": false,
+      "requestCount": 10
     }
   ],
   "lastResetDate": "2025-12-01"
