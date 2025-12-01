@@ -109,7 +109,7 @@ Proporciona:
 Recuerda: La retroalimentación debe ser constructiva, específica y motivadora.`;
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/gemini-2.0-flash-001',
             system: systemPrompt,
             prompt,
             output: {
