@@ -162,7 +162,7 @@ const parseResponse = (content: string) => {
   return finalParts;
 };
 
-export function ChatAssistant() {
+export function ChatAssistant({ onGeoGebraCommand }: { onGeoGebraCommand?: (command: string) => void }) {
   const [input, setInput] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [tutorMode, setTutorMode] = useState<TutorMode>('math');
@@ -475,10 +475,24 @@ export function ChatAssistant() {
 
           const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, concatenatedFiles);
 
+          // Detectar y ejecutar comandos de GeoGebra
+          let finalResponse = aiResponse;
+          const ggbCommandRegex = /\|\|\|GGB:(.*?)\|\|\|/g;
+          let match;
+          while ((match = ggbCommandRegex.exec(aiResponse)) !== null) {
+            const command = match[1];
+            if (onGeoGebraCommand) {
+              onGeoGebraCommand(command);
+            }
+            // Remover el comando de la respuesta visible
+            finalResponse = finalResponse.replace(match[0], '');
+          }
+
+
           await saveMessage({
             role: 'assistant',
             type: 'text',
-            content: aiResponse,
+            content: finalResponse,
             createdAt: serverTimestamp() as Timestamp,
           });
 

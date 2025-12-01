@@ -18,7 +18,7 @@ const DragDropExerciseSchema = z.object({
         content: z.string(),
         correctPosition: z.number(),
     })),
-});
+}).passthrough(); // Permitir campos adicionales como hints
 
 // Schema para ejercicio fill-in-blanks generado por IA
 const FillInBlanksExerciseSchema = z.object({
@@ -34,7 +34,7 @@ const FillInBlanksExerciseSchema = z.object({
         correctAnswer: z.union([z.string(), z.array(z.string())]),
         tolerance: z.number().optional(),
     })),
-});
+}).passthrough(); // Permitir campos adicionales como hints
 
 // Union schema
 const ExerciseSchema = z.union([DragDropExerciseSchema, FillInBlanksExerciseSchema]);
@@ -69,35 +69,172 @@ export async function generateExercises(input: GenerateExercisesInput) {
         const remaining = count - exercises.length;
         const currentBatchSize = Math.min(batchSize, remaining);
 
-        const prompt = createGenerationPrompt(subject.name, subject.topics, type, currentBatchSize, difficulty);
+        // Usar topics si existen, sino usar la descripción de la materia
+        const topics = (subject as any).topics || [subject.description || subject.name];
+        const prompt = createGenerationPrompt(subject.name, topics, type, currentBatchSize, difficulty);
 
         try {
-            const result = await ai.generate({
-                model: 'googleai/gemini-2.0-flash-exp',
+            // Usar sistema de fallback de API keys
+            const { generateWithFallback } = await import('@/ai/api-key-fallback');
+
+            let result = await generateWithFallback({
+                model: 'googleai/gemini-2.0-flash-001',
                 prompt,
                 config: {
                     temperature: 0.9, // Alta creatividad para ejercicios variados
                 },
             });
 
-            // Parsear respuesta JSON
-            const responseText = result.text;
-            const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+            // Parsear respuesta JSON con auto-corrección
+            let responseText = result.text;
+            let jsonMatch = responseText.match(/\[[\s\S]*\]/);
 
             if (!jsonMatch) {
-                console.error('No JSON found in response:', responseText);
+                console.error('No JSON found in response:', responseText.substring(0, 200));
                 continue;
             }
 
-            const parsedExercises = JSON.parse(jsonMatch[0]);
+            let parsedExercises = null;
+            let retryCount = 0;
+            const MAX_RETRIES = 2;
 
-            // Validar y agregar ejercicios
-            for (const ex of parsedExercises) {
+            while (parsedExercises === null && retryCount <= MAX_RETRIES) {
                 try {
-                    const validated = ExerciseSchema.parse(ex);
-                    exercises.push(validated as DragDropExercise | FillInBlanksExercise);
-                } catch (error) {
-                    console.error('Invalid exercise:', ex, error);
+                    // Intentar parsear
+                    if (retryCount === 0) {
+                        // Primer intento: parsear directamente
+                        parsedExercises = JSON.parse(jsonMatch[0]);
+                        console.log('✅ JSON parseado exitosamente');
+                    } else {
+                        // Intentos posteriores: limpiar primero
+                        let cleanedJson = jsonMatch[0]
+                            .replace(/\/\*[\s\S]*?\*\//g, '') // Remover comentarios /* */
+                            .replace(/\/\/.*/g, '') // Remover comentarios //
+                            .replace(/,(\s*[}\]])/g, '$1') // Remover trailing commas
+                            .replace(/\n/g, ' ') // Remover saltos de línea
+                            .replace(/\s+/g, ' '); // Normalizar espacios
+
+                        parsedExercises = JSON.parse(cleanedJson);
+                        console.log('✅ JSON limpiado y parseado exitosamente');
+                    }
+                } catch (parseError: any) {
+                    retryCount++;
+
+                    if (retryCount > MAX_RETRIES) {
+                        // ÚLTIMO RECURSO: Pedir a la IA que corrija el JSON
+                        console.error('❌ JSON parsing falló después de limpieza');
+                        console.error('🤖 Pidiendo a la IA que corrija el JSON...');
+
+                        const fixPrompt = `El siguiente JSON está malformado y necesita ser corregido. 
+Devuelve SOLO el JSON corregido, sin explicaciones ni texto adicional.
+
+JSON malformado:
+${jsonMatch[0]}
+
+Error: ${parseError.message}
+
+Instrucciones:
+1. Corrige el JSON para que sea válido
+2. Asegúrate de que todas las comillas estén correctamente cerradas
+3. Remueve trailing commas
+4. Asegúrate de que la estructura sea un array válido
+5. Devuelve SOLO el JSON corregido, nada más`;
+
+                        try {
+                            const fixResult = await generateWithFallback({
+                                model: 'googleai/gemini-2.0-flash-001',
+                                prompt: fixPrompt,
+                                config: {
+                                    temperature: 0.1, // Baja temperatura para corrección precisa
+                                },
+                            });
+
+                            const fixedJsonMatch = fixResult.text.match(/\[[\s\S]*\]/);
+                            if (fixedJsonMatch) {
+                                parsedExercises = JSON.parse(fixedJsonMatch[0]);
+                                console.log('✅ IA corrigió el JSON exitosamente');
+                            } else {
+                                throw new Error('IA no pudo generar JSON válido');
+                            }
+                        } catch (fixError) {
+                            // ERROR FATAL: No se pudo corregir el JSON
+                            console.error('');
+                            console.error('═'.repeat(70));
+                            console.error('❌ ERROR FATAL: No se pudo parsear ni corregir el JSON');
+                            console.error('═'.repeat(70));
+                            console.error('JSON problemático:', jsonMatch[0].substring(0, 500));
+                            console.error('Error original:', parseError.message);
+                            console.error('Error de corrección:', fixError);
+                            console.error('');
+                            console.error('🛑 DETENIENDO PROCESO - Requiere intervención manual');
+                            console.error('═'.repeat(70));
+
+                            throw new Error(`FATAL: JSON parsing failed after ${MAX_RETRIES + 1} attempts including AI correction`);
+                        }
+                    } else {
+                        console.warn(`⚠️ Intento ${retryCount}/${MAX_RETRIES} de parsing falló, reintentando...`);
+                    }
+                }
+            }
+
+            if (parsedExercises) {
+                // Validar y agregar ejercicios
+                let validCount = 0;
+                const batchStartCount = exercises.length;
+
+                for (const ex of parsedExercises) {
+                    try {
+                        const validated = ExerciseSchema.parse(ex);
+                        exercises.push(validated as DragDropExercise | FillInBlanksExercise);
+                        validCount++;
+                    } catch (error) {
+                        console.error('Invalid exercise schema:', error);
+                    }
+                }
+
+                console.log(`✅ ${validCount}/${parsedExercises.length} ejercicios válidos agregados`);
+
+                // Verificar si recibimos suficientes ejercicios
+                const expectedMin = Math.max(1, Math.floor(currentBatchSize * 0.66)); // Al menos 66% de lo pedido
+                if (validCount < expectedMin && validCount < currentBatchSize) {
+                    console.warn(`⚠️ Solo se generaron ${validCount}/${currentBatchSize} ejercicios esperados`);
+                    console.warn(`🔄 Regenerando para completar el lote...`);
+
+                    // Calcular cuántos faltan
+                    const missing = currentBatchSize - validCount;
+
+                    // Reintentar generar los faltantes (máximo 1 reintento)
+                    try {
+                        const retryResult = await generateWithFallback({
+                            model: 'googleai/gemini-2.0-flash-001',
+                            prompt: prompt.replace(`Genera exactamente ${currentBatchSize}`, `Genera exactamente ${missing}`),
+                            config: {
+                                temperature: 0.9,
+                            },
+                        });
+
+                        const retryJsonMatch = retryResult.text.match(/\[[\s\S]*\]/);
+                        if (retryJsonMatch) {
+                            try {
+                                const retryParsed = JSON.parse(retryJsonMatch[0]);
+                                let retryCount = 0;
+                                for (const ex of retryParsed) {
+                                    try {
+                                        const validated = ExerciseSchema.parse(ex);
+                                        exercises.push(validated as DragDropExercise | FillInBlanksExercise);
+                                        retryCount++;
+                                    } catch (error) {
+                                        console.error('Invalid retry exercise:', error);
+                                    }
+                                }
+                                console.log(`✅ Regenerados ${retryCount} ejercicios adicionales`);
+                            } catch (retryParseError) {
+                                console.warn('⚠️ No se pudieron parsear ejercicios de reintento, continuando...');
+                            }
+                        }
+                    } catch (retryError) {
+                        console.warn('⚠️ Reintento falló, continuando con los ejercicios actuales');
+                    }
                 }
             }
         } catch (error) {

@@ -113,7 +113,7 @@ IMPORTANTE: Sé constructivo y alentador. Enfócate en cómo el estudiante puede
         prompt += `Proporciona un análisis completo de la tarea.`;
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/gemini-2.0-flash-001',
             system: systemPrompt,
             prompt,
             output: {

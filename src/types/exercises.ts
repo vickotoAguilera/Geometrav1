@@ -1,5 +1,12 @@
 // Tipos para ejercicios interactivos con verificación automática
 
+// Hint/Pista para ayudar al estudiante
+export interface ExerciseHint {
+    level: 1 | 2 | 3;
+    text: string;
+    pointsPenalty: number;
+}
+
 // Tipo base para todos los ejercicios
 export interface BaseExercise {
     id: string;
@@ -7,6 +14,7 @@ export interface BaseExercise {
     description: string;
     points: number;
     difficulty: 'facil' | 'medio' | 'dificil';
+    hints?: ExerciseHint[]; // Pistas progresivas generadas por IA
 }
 
 // Ejercicio de arrastrar y soltar
