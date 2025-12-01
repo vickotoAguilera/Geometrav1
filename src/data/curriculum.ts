@@ -15,6 +15,19 @@ export interface Grade {
 
 // Currículum de 1° a 4° Medio (basado en contenido real)
 export const curriculum: Grade[] = [
+    // Módulo de Prueba
+    {
+        id: 'test',
+        name: '🧪 Prueba',
+        subjects: [
+            {
+                id: 'prueba',
+                name: 'Ejercicios de Prueba',
+                icon: '🧮',
+                description: '3 ejercicios simples para probar el sistema'
+            },
+        ],
+    },
     {
         id: 'primero-medio',
         name: '1° Medio',

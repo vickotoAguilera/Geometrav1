@@ -12,7 +12,9 @@ import { getSubjectById } from '@/data/curriculum';
 import { getExercises, saveResult } from '@/app/actions/exercises';
 import { useAuth } from '@/firebase';
 import ExerciseTimer, { useExerciseTimer } from '@/components/exercises/ExerciseTimer';
+import ExerciseResults from '@/components/exercises/ExerciseResults';
 import type { DragDropExercise as DragDropType, FillInBlanksExercise as FillInBlanksType } from '@/types/exercises';
+import type { UserAnswer } from '@/ai/flows/feedback-generator';
 
 // Importar componentes sin SSR
 const DragDropExercise = dynamic(
@@ -40,6 +42,8 @@ export default function MateriaExercisesPage() {
     const [loading, setLoading] = useState(true);
     const [completedCount, setCompletedCount] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
+    const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
+    const [showResults, setShowResults] = useState(false);
     const { timeSpent, handleTimeUpdate, handleComplete: handleTimerComplete, resetTime } = useExerciseTimer();
 
     const subject = getSubjectById(gradeId, subjectId);
@@ -71,6 +75,15 @@ export default function MateriaExercisesPage() {
         const pointsEarned = isCorrect ? exercise.points : 0;
         const finalTime = handleTimerComplete(timeSpent);
 
+        // Guardar respuesta del usuario
+        const userAnswer: UserAnswer = {
+            exerciseId: exercise.id,
+            answer: null, // Se puede expandir para guardar la respuesta específica
+            isCorrect,
+            timeSpent: finalTime,
+        };
+        setUserAnswers(prev => [...prev, userAnswer]);
+
         // Guardar resultado con tiempo
         await saveResult(user.uid, {
             exerciseId: exercise.id,
@@ -85,6 +98,11 @@ export default function MateriaExercisesPage() {
         if (isCorrect) {
             setCompletedCount(prev => prev + 1);
             setTotalPoints(prev => prev + pointsEarned);
+        }
+
+        // Si completó todos los ejercicios, mostrar resultados
+        if (currentIndex === exercises.length - 1) {
+            setShowResults(true);
         }
     }
 
@@ -106,6 +124,8 @@ export default function MateriaExercisesPage() {
         setCurrentIndex(0);
         setCompletedCount(0);
         setTotalPoints(0);
+        setUserAnswers([]);
+        setShowResults(false);
         resetTime();
     }
 
@@ -177,8 +197,16 @@ export default function MateriaExercisesPage() {
                     <Progress value={progress} className="h-2" />
                 </div>
 
-                {/* Exercise Content */}
-                {loading ? (
+                {/* Results or Exercise Content */}
+                {showResults ? (
+                    <ExerciseResults
+                        exercises={exercises}
+                        userAnswers={userAnswers}
+                        subjectName={subject.name}
+                        gradeName={gradeId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        onRestart={handleReset}
+                    />
+                ) : loading ? (
                     <Card>
                         <CardContent className="flex items-center justify-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
