@@ -1,0 +1,132 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Geometra application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "User's full name."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "Date and time the user registered.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name",
+        "registrationDate"
+      ]
+    },
+    "GeoGebraApplet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GeoGebraApplet",
+      "type": "object",
+      "description": "Represents a specific Geogebra applet used within the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the GeoGebra applet."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the GeoGebra applet."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the GeoGebra applet."
+        },
+        "geogebraUrl": {
+          "type": "string",
+          "description": "URL of the Geogebra applet.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "geogebraUrl"
+      ]
+    },
+    "AssistanceRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AssistanceRequest",
+      "type": "object",
+      "description": "Represents a user's request for assistance from the AI assistant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the assistance request."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N AssistanceRequest)"
+        },
+        "requestText": {
+          "type": "string",
+          "description": "The text of the user's request."
+        },
+        "responseText": {
+          "type": "string",
+          "description": "The AI assistant's response to the request."
+        },
+        "requestTimestamp": {
+          "type": "string",
+          "description": "Timestamp of when the request was made.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "requestText",
+        "responseText",
+        "requestTimestamp"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "collections": {
+      "/users/{userId}": {
+        "schema": {
+          "$ref": "#/backend/entities/User"
+        },
+        "description": "Stores user profiles. Path-based ownership is enforced by requiring `request.auth.uid == userId`."
+      },
+      "/users/{userId}/messages/{messageId}": {
+        "schema": {
+          "$ref": "#/backend/entities/AssistanceRequest"
+        },
+        "description": "Stores assistance requests (messages) associated with each user. Path-based ownership enforced by requiring `request.auth.uid == userId`."
+      },
+      "/geoGebraApplets/{appletId}": {
+        "schema": {
+          "$ref": "#/backend/entities/GeoGebraApplet"
+        },
+        "description": "Stores the GeoGebra applets used in the application. This collection is globally readable."
+      }
+    },
+    "reasoning": "The Firestore structure is designed to provide a secure and scalable solution for the Geometra application, focusing on user data and assistance requests. The structure prioritizes authorization independence by avoiding hierarchical dependencies in security rules. It also supports QAPs using path-based ownership, ensuring secure list operations.\n\n1.  **Users Collection:** The `/users/{userId}` collection stores user profiles. This adheres to the path-based ownership principle, ensuring that only the user can access their own data. This is the root level of private user data.\n2.  **Messages Subcollection:** The `/users/{userId}/messages/{messageId}` subcollection stores chat messages associated with each user. This continues the path-based ownership pattern, making security rules straightforward and efficient. The userId is implicitly associated and enforced by the path. The userId is not duplicated inside the document.\n\nThis design achieves Authorization Independence by using path-based ownership. Security rules can directly check `request.auth.uid` against the `{userId}` path parameter without needing to read any parent documents. This structure supports required QAPs since list operations on `/users/{userId}/messages` are secured via the path, allowing listing only by the authenticated user."
+  }
+}

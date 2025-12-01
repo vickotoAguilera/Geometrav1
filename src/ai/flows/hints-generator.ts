@@ -22,7 +22,7 @@ export async function generateHintsForExercise(exercise: Exercise): Promise<Exer
         const { generateWithFallback } = await import('@/ai/api-key-fallback');
 
         const result = await generateWithFallback({
-            model: 'googleai/gemini-2.0-flash-001',
+            model: 'googleai/gemini-2.0-flash',
             prompt,
             config: {
                 temperature: 0.7,

@@ -1,0 +1,110 @@
+nohup: no se tendrá en cuenta la entrada
+🔄 Iniciando sistema de auto-recuperación...
+📝 Log: generation-output.log
+🔁 Reintentos máximos: 10
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #1 - 2025-11-30 17:32:41
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 189412)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #2 - 2025-11-30 17:33:23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 189609)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #3 - 2025-11-30 17:34:06
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 189726)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #4 - 2025-11-30 17:34:48
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 189862)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #5 - 2025-11-30 17:35:30
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 189997)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #6 - 2025-11-30 17:36:12
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 190123)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #7 - 2025-11-30 17:36:54
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 190281)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #8 - 2025-11-30 17:37:36
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 190411)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #9 - 2025-11-30 17:38:19
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 190667)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Intento #10 - 2025-11-30 17:39:01
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Proceso iniciado (PID: 190892)
+📊 Monitoreando progreso...
+
+./scripts/auto-recover-generation.sh: línea 58: [: 0
+0: se esperaba una expresión entera
+⚠️  Proceso terminó inesperadamente
+⏳ Esperando 10 segundos antes de reintentar...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ Se alcanzó el máximo de reintentos (10)
+📋 Revisa el log: generation-output.log
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

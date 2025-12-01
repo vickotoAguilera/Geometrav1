@@ -78,7 +78,7 @@ export async function generateExercises(input: GenerateExercisesInput) {
             const { generateWithFallback } = await import('@/ai/api-key-fallback');
 
             let result = await generateWithFallback({
-                model: 'googleai/gemini-2.0-flash-001',
+                model: 'googleai/gemini-2.0-flash',
                 prompt,
                 config: {
                     temperature: 0.9, // Alta creatividad para ejercicios variados
@@ -142,7 +142,7 @@ Instrucciones:
 
                         try {
                             const fixResult = await generateWithFallback({
-                                model: 'googleai/gemini-2.0-flash-001',
+                                model: 'googleai/gemini-2.0-flash',
                                 prompt: fixPrompt,
                                 config: {
                                     temperature: 0.1, // Baja temperatura para corrección precisa
@@ -206,7 +206,7 @@ Instrucciones:
                     // Reintentar generar los faltantes (máximo 1 reintento)
                     try {
                         const retryResult = await generateWithFallback({
-                            model: 'googleai/gemini-2.0-flash-001',
+                            model: 'googleai/gemini-2.0-flash',
                             prompt: prompt.replace(`Genera exactamente ${currentBatchSize}`, `Genera exactamente ${missing}`),
                             config: {
                                 temperature: 0.9,

@@ -84,6 +84,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@marp-team/marp-cli": "^4.2.3",
     "@tailwindcss/typography": "^0.5.13",
     "@types/cors": "^2.8.17",
     "@types/html2canvas": "^1.0.0",
