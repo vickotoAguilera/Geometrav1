@@ -12,57 +12,25 @@ type Exercise = DragDropExercise | FillInBlanksExercise;
 
 export async function getExercises(gradeId: string, subjectId: string, count: number = 20) {
     try {
-        // Intentar obtener desde caché
-        const exercisesRef = firestore.collection('exercises').doc(gradeId).collection(subjectId);
-        const snapshot = await exercisesRef.get();
+        // Cargar ejercicios desde R2 con items de drag-drop desordenados
+        const { loadRandomExercises } = await import('@/lib/r2-exercises');
+        const exercises = await loadRandomExercises(gradeId, subjectId, count);
 
-        const cachedExercises: Exercise[] = [];
-        snapshot.forEach(doc => {
-            cachedExercises.push(doc.data() as Exercise);
-        });
-
-        if (cachedExercises.length >= count) {
-            // Retornar ejercicios cacheados (mezclados)
-            const shuffled = shuffleArray(cachedExercises);
-            return { success: true, exercises: shuffled.slice(0, count) };
+        if (exercises.length > 0) {
+            console.log(`✅ Loaded ${exercises.length} exercises from R2 for ${gradeId}/${subjectId}`);
+            return { success: true, exercises };
         }
 
-        // No hay suficientes, generar nuevos
-        console.log(`Generating ${count} exercises for ${gradeId}/${subjectId}`);
+        // Si no hay ejercicios en R2, usar fallback
+        console.warn(`No exercises found in R2 for ${gradeId}/${subjectId}, using fallback`);
+        const { getFallbackExercises } = await import('@/lib/fallback-exercises');
+        const fallbackExercises = getFallbackExercises(subjectId, count);
+        return { success: true, exercises: fallbackExercises };
 
-        try {
-            const newExercises = await generateExercises({
-                gradeId,
-                subjectId,
-                type: 'mixed',
-                count,
-                difficulty: 'medio',
-            });
-
-            // Cachear en Firestore
-            for (const exercise of newExercises) {
-                await firestore
-                    .collection('exercises')
-                    .doc(gradeId)
-                    .collection(subjectId)
-                    .doc(exercise.id)
-                    .set({
-                        ...exercise,
-                        cachedAt: new Date(),
-                    });
-            }
-
-            return { success: true, exercises: newExercises };
-        } catch (aiError) {
-            console.error('AI generation failed, using fallback exercises:', aiError);
-            // Usar ejercicios de fallback si la IA falla
-            const { getFallbackExercises } = await import('@/lib/fallback-exercises');
-            const fallbackExercises = getFallbackExercises(subjectId, count);
-            return { success: true, exercises: fallbackExercises };
-        }
     } catch (error) {
-        console.error('Error getting exercises:', error);
-        // En caso de error total, usar fallback
+        console.error('Error getting exercises from R2:', error);
+
+        // En caso de error, usar fallback
         try {
             const { getFallbackExercises } = await import('@/lib/fallback-exercises');
             const fallbackExercises = getFallbackExercises(subjectId, count);
