@@ -7,16 +7,17 @@
 
 ## 📊 Resumen Ejecutivo
 
-Se implementó exitosamente un sistema completo de generación automática de ejercicios matemáticos para Enseñanza Media, generando **25 pools de ejercicios** con un total de **2,500 ejercicios** (100 por pool) con hints inteligentes.
+Se implementó exitosamente un sistema completo de generación automática de ejercicios matemáticos para Enseñanza Media, generando **37 pools de ejercicios** con un total de **3,700 ejercicios** (100 por pool) con hints inteligentes.
 
 ### Resultados Finales
 
 | Nivel | Materias | Ejercicios | Estado |
 |-------|----------|------------|--------|
+| 1° Medio | 12 | 1,200 | ✅ 100% |
 | 2° Medio | 9 | 900 | ✅ 100% |
 | 3° Medio | 8 | 800 | ✅ 100% |
 | 4° Medio | 8 | 800 | ✅ 100% |
-| **TOTAL** | **25** | **2,500** | ✅ **100%** |
+| **TOTAL** | **37** | **3,700** | ✅ **100%** |
 
 ---
 
@@ -52,6 +53,7 @@ Se implementó exitosamente un sistema completo de generación automática de ej
 ### 2. Scripts de Generación por Nivel
 
 **Archivos creados:**
+- `scripts/generate-primero-medio.ts` (12 materias)
 - `scripts/generate-segundo-medio.ts` (9 materias)
 - `scripts/generate-tercero-medio.ts` (8 materias)
 - `scripts/generate-cuarto-medio.ts` (8 materias)
@@ -137,6 +139,20 @@ Tiempo estimado restante: 15m 20s
 ---
 
 ## 📚 Pools Generados
+
+### 1° Medio (12 pools - 1,200 ejercicios)
+1. ✅ Ecuaciones Lineales
+2. ✅ Factorización
+3. ✅ Homotecia
+4. ✅ Medidas de Tendencia Central
+5. ✅ Números Reales
+6. ✅ Potencias y Raíces
+7. ✅ Probabilidad Básica
+8. ✅ Productos Notables
+9. ✅ Semejanza de Triángulos
+10. ✅ Sistemas de Ecuaciones Lineales
+11. ✅ Transformaciones Isométricas
+12. ✅ Vectores en el Plano
 
 ### 2° Medio (9 pools - 900 ejercicios)
 1. ✅ Función Cuadrática
