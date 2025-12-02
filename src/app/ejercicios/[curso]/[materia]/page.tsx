@@ -86,29 +86,31 @@ export default function MateriaExercisesPage() {
                 isCorrect,
                 timeSpent: finalTime,
             };
-            setUserAnswers(prev => [...prev, userAnswer]);
+
+            const newUserAnswers = [...userAnswers, userAnswer];
+            setUserAnswers(newUserAnswers);
 
             // Incrementar contador solo si es correcto y es la primera vez
             if (isCorrect) {
                 setCompletedCount(prev => prev + 1);
                 setTotalPoints(prev => prev + pointsEarned);
             }
-        }
 
-        // Guardar resultado con tiempo
-        await saveResult(user.uid, {
-            exerciseId: exercise.id,
-            userId: user.uid,
-            isCorrect,
-            attempts,
-            timeSpent: finalTime,
-            pointsEarned,
-            completedAt: new Date(),
-        });
+            // Guardar resultado con tiempo
+            await saveResult(user.uid, {
+                exerciseId: exercise.id,
+                userId: user.uid,
+                isCorrect,
+                attempts,
+                timeSpent: finalTime,
+                pointsEarned,
+                completedAt: new Date(),
+            });
 
-        // Si completó todos los ejercicios, mostrar resultados
-        if (userAnswers.length + 1 >= exercises.length) {
-            setShowResults(true);
+            // Si completó todos los ejercicios, mostrar resultados
+            if (newUserAnswers.length >= exercises.length) {
+                setTimeout(() => setShowResults(true), 500);
+            }
         }
     }
 
