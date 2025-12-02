@@ -5,6 +5,7 @@ export interface Subject {
     name: string;
     icon: string;
     description: string;
+    exerciseCount?: number; // Número de ejercicios en el pool (por defecto 20)
 }
 
 export interface Grade {
@@ -24,7 +25,8 @@ export const curriculum: Grade[] = [
                 id: 'prueba',
                 name: 'Ejercicios de Prueba',
                 icon: '🧮',
-                description: '3 ejercicios simples para probar el sistema'
+                description: '3 ejercicios simples para probar el sistema',
+                exerciseCount: 3
             },
         ],
     },
