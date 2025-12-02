@@ -55,7 +55,8 @@ export default function MateriaExercisesPage() {
     async function loadExercises() {
         setLoading(true);
         try {
-            const result = await getExercises(gradeId, subjectId, 20);
+            const count = subject?.exerciseCount || 20;
+            const result = await getExercises(gradeId, subjectId, count);
             if (result.success && result.exercises) {
                 setExercises(result.exercises);
             } else {
