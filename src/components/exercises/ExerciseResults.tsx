@@ -40,9 +40,18 @@ export default function ExerciseResults({
     const successRate = Math.round((correctCount / totalCount) * 100);
 
     async function generateFeedback() {
+        console.log('🎯 [ExerciseResults] Starting feedback generation...');
+        console.log('📊 [ExerciseResults] Data:', {
+            exercisesCount: exercises.length,
+            userAnswersCount: userAnswers.length,
+            subjectName,
+            gradeName
+        });
+
         setGenerating(true);
         try {
             // Call API route instead of importing server-only code
+            console.log('📡 [ExerciseResults] Calling /api/generate-feedback...');
             const response = await fetch('/api/generate-feedback', {
                 method: 'POST',
                 headers: {
@@ -56,17 +65,23 @@ export default function ExerciseResults({
                 }),
             });
 
+            console.log('📥 [ExerciseResults] Response status:', response.status);
+
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ [ExerciseResults] API error:', errorText);
                 throw new Error('Failed to generate feedback');
             }
 
             const data = await response.json();
+            console.log('✅ [ExerciseResults] Feedback received:', data.feedback?.substring(0, 100) + '...');
             setFeedback(data.feedback);
         } catch (error) {
-            console.error('Error generating feedback:', error);
+            console.error('❌ [ExerciseResults] Error generating feedback:', error);
             setFeedback('No se pudo generar la retroalimentación. Por favor, intenta nuevamente.');
         } finally {
             setGenerating(false);
+            console.log('🏁 [ExerciseResults] Feedback generation completed');
         }
     }
 

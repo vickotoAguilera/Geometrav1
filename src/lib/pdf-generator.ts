@@ -69,7 +69,7 @@ export function generateFeedbackPDF(
         // ===== RESUMEN DE DESEMPEÑO =====
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('📊 Resumen de Desempeño', margin, yPosition);
+        doc.text('Resumen de Desempeño', margin, yPosition);
         yPosition += 10;
 
         doc.setFontSize(11);
@@ -105,24 +105,115 @@ export function generateFeedbackPDF(
         // ===== RETROALIMENTACIÓN DE IA =====
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('💡 Análisis del Desempeño', margin, yPosition);
+        doc.text('Análisis del Desempeño', margin, yPosition);
         yPosition += 10;
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
 
-        // Dividir feedback en líneas que quepan en la página
-        const feedbackLines = doc.splitTextToSize(feedback, maxWidth);
+        // Función para dividir texto manualmente respetando palabras
+        function wrapText(text: string, maxWidth: number): string[] {
+            const words = text.split(' ');
+            const lines: string[] = [];
+            let currentLine = '';
 
-        feedbackLines.forEach((line: string) => {
-            // Verificar si necesitamos nueva página
-            if (yPosition > 270) {
-                doc.addPage();
-                yPosition = 20;
+            words.forEach((word) => {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                const textWidth = doc.getTextWidth(testLine);
+
+                if (textWidth > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            });
+
+            if (currentLine) {
+                lines.push(currentLine);
             }
 
-            doc.text(line, margin, yPosition);
-            yPosition += 6;
+            return lines;
+        }
+
+        // Procesar el feedback línea por línea
+        const paragraphs = feedback.split('\n');
+
+        paragraphs.forEach((paragraph) => {
+            // Saltar líneas vacías pero agregar espacio
+            if (paragraph.trim() === '') {
+                yPosition += 4;
+                return;
+            }
+
+            // Detectar si es un encabezado (empieza con ** o números)
+            const isHeading = paragraph.trim().match(/^\*\*\d+\.|^\d+\./);
+            if (isHeading) {
+                doc.setFont('helvetica', 'bold');
+            }
+
+            // Reemplazar emojis y caracteres especiales que causan problemas
+            let cleanParagraph = paragraph
+                .replace(/📚/g, '[RECURSOS]')
+                .replace(/→/g, '->') // Reemplazar flecha por caracteres ASCII
+                .replace(/•/g, '-')  // Reemplazar bullets por guiones
+                .replace(/[^\x20-\x7E\xA0-\xFF\u0100-\u017F]/g, ''); // Eliminar otros caracteres no estándar
+
+            // Detectar si hay un link en el párrafo
+            const linkMatch = cleanParagraph.match(/\[LINK: (.*?)\]/);
+            let linkUrl = '';
+
+            if (linkMatch) {
+                linkUrl = linkMatch[1];
+                // Remover el tag del link para el texto visible
+                cleanParagraph = cleanParagraph.replace(/\[LINK: .*?\]/, '').trim();
+            }
+
+            // Dividir el párrafo en líneas respetando palabras
+            const lines = wrapText(cleanParagraph.trim(), maxWidth - 40);
+
+            lines.forEach((line: string, index: number) => {
+                // Verificar si necesitamos nueva página
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+
+                // Limpiar asteriscos de markdown
+                const cleanLine = line.replace(/\*\*/g, '');
+                doc.text(cleanLine, margin, yPosition);
+                yPosition += 5.5;
+            });
+
+            // Si había un link, agregarlo al final del párrafo
+            if (linkUrl) {
+                doc.setTextColor(0, 0, 255); // Azul
+                doc.setFont('helvetica', 'normal'); // Asegurar fuente normal
+
+                // Texto visible del link
+                const linkText = `Ir a estudiar: ${linkUrl}`;
+
+                // Verificar si cabe en la página
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+
+                // Usar el origen actual (localhost o dominio de producción)
+                const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://geometra.app';
+                doc.textWithLink(linkText, margin, yPosition, { url: `${baseUrl}${linkUrl}` });
+
+                doc.setTextColor(0, 0, 0); // Volver a negro
+                yPosition += 5.5;
+            }
+
+            // Volver a fuente normal después de encabezados
+            if (isHeading) {
+                doc.setFont('helvetica', 'normal');
+            }
+
+            // Espacio extra después de cada párrafo
+            yPosition += 2;
         });
 
         yPosition += 10;
