@@ -42,15 +42,26 @@ export default function ExerciseResults({
     async function generateFeedback() {
         setGenerating(true);
         try {
-            // Dynamic import to avoid bundling server-only code in client
-            const feedbackModule = await import('@/ai/flows/feedback-generator');
-            const feedbackText = await feedbackModule.generateExerciseFeedback(
-                exercises,
-                userAnswers,
-                subjectName,
-                gradeName
-            );
-            setFeedback(feedbackText);
+            // Call API route instead of importing server-only code
+            const response = await fetch('/api/generate-feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    exercises,
+                    userAnswers,
+                    subjectName,
+                    gradeName,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate feedback');
+            }
+
+            const data = await response.json();
+            setFeedback(data.feedback);
         } catch (error) {
             console.error('Error generating feedback:', error);
             setFeedback('No se pudo generar la retroalimentación. Por favor, intenta nuevamente.');
