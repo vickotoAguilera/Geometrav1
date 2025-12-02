@@ -21,6 +21,8 @@ import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
 import { StorageManager } from '@/components/storage/StorageManager';
 import { TeacherRequestButton } from '@/components/profile/TeacherRequestButton';
+import { CompactAchievements } from '@/components/profile/CompactAchievements';
+import { BadgeIcons } from '@/components/profile/BadgeIcons';
 import DebugPanel from '@/components/debug/DebugPanel';
 import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
 
@@ -114,10 +116,34 @@ function PerfilPageContent() {
             {levelData && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Award className="w-5 h-5" />
-                            Nivel y Progreso
-                        </CardTitle>
+                        <div className="flex items-center justify-between gap-4">
+                            <CardTitle className="flex items-center gap-2">
+                                <Award className="w-5 h-5" />
+                                Nivel y Progreso
+                            </CardTitle>
+                            {/* Insignias - Solo iconos */}
+                            <BadgeIcons
+                                badges={[
+                                    {
+                                        id: 'geogebra-pioneer',
+                                        icon: '📐',
+                                        title: 'Pionero de GeoGebra',
+                                        description: 'Has comenzado tu aventura con GeoGebra',
+                                        earnedDate: new Date(),
+                                        color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+                                    },
+                                    {
+                                        id: 'beginner',
+                                        icon: '🌱',
+                                        title: 'Principiante',
+                                        description: 'Diste tus primeros pasos en el aprendizaje',
+                                        earnedDate: new Date(),
+                                        color: 'bg-gradient-to-br from-green-500 to-emerald-500',
+                                    },
+                                ]}
+                                maxPerRow={6}
+                            />
+                        </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -204,6 +230,11 @@ function PerfilPageContent() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Logros */}
+            {progress && (
+                <CompactAchievements achievements={progress.achievements || []} maxDisplay={12} />
+            )}
 
             {/* Accesos Rápidos */}
             <Card>

@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
-import type { UserProgress } from '@/types/user-profile';
+import type { OriginalUserProgress as UserProgress } from '@/types/user-profile';
 import { getLevelProgress, didLevelUp, getNewLevel } from '@/lib/points-system';
 
 export function useProgress() {
@@ -179,6 +179,27 @@ export function useProgress() {
         }
     };
 
+    const addAchievement = async (achievement: any) => {
+        if (!user || !firestore) {
+            throw new Error('Usuario no autenticado');
+        }
+
+        try {
+            const progressRef = doc(firestore, 'users', user.uid, 'progress', 'data');
+            await updateDoc(progressRef, {
+                achievements: [...(progress?.achievements || []), achievement],
+            });
+
+            setProgress(prev => prev ? {
+                ...prev,
+                achievements: [...(prev.achievements || []), achievement],
+            } : null);
+        } catch (err) {
+            console.error('Error adding achievement:', err);
+            throw err;
+        }
+    };
+
     return {
         progress,
         isLoading,
@@ -187,5 +208,6 @@ export function useProgress() {
         incrementExercises,
         incrementTests,
         updateStreak,
+        addAchievement,
     };
 }
