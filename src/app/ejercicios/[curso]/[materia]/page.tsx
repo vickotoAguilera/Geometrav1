@@ -75,14 +75,25 @@ export default function MateriaExercisesPage() {
         const pointsEarned = isCorrect ? exercise.points : 0;
         const finalTime = handleTimerComplete(timeSpent);
 
-        // Guardar respuesta del usuario
-        const userAnswer: UserAnswer = {
-            exerciseId: exercise.id,
-            answer: null, // Se puede expandir para guardar la respuesta específica
-            isCorrect,
-            timeSpent: finalTime,
-        };
-        setUserAnswers(prev => [...prev, userAnswer]);
+        // Verificar si ya guardamos respuesta para este ejercicio
+        const alreadyAnswered = userAnswers.some(a => a.exerciseId === exercise.id);
+
+        if (!alreadyAnswered) {
+            // Guardar respuesta del usuario (solo la primera vez)
+            const userAnswer: UserAnswer = {
+                exerciseId: exercise.id,
+                answer: null,
+                isCorrect,
+                timeSpent: finalTime,
+            };
+            setUserAnswers(prev => [...prev, userAnswer]);
+
+            // Incrementar contador solo si es correcto y es la primera vez
+            if (isCorrect) {
+                setCompletedCount(prev => prev + 1);
+                setTotalPoints(prev => prev + pointsEarned);
+            }
+        }
 
         // Guardar resultado con tiempo
         await saveResult(user.uid, {
@@ -95,13 +106,8 @@ export default function MateriaExercisesPage() {
             completedAt: new Date(),
         });
 
-        if (isCorrect) {
-            setCompletedCount(prev => prev + 1);
-            setTotalPoints(prev => prev + pointsEarned);
-        }
-
         // Si completó todos los ejercicios, mostrar resultados
-        if (currentIndex === exercises.length - 1) {
+        if (userAnswers.length + 1 >= exercises.length) {
             setShowResults(true);
         }
     }
