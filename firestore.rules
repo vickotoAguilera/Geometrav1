@@ -177,6 +177,63 @@ service cloud.firestore {
     }
 
     /**
+     * @description Classes - Teachers can create classes, members can read
+     * @path /classes/{classId}
+     */
+    match /classes/{classId} {
+      // Anyone can read class info if they have the code (for joining)
+      allow get: if isSignedIn();
+      // Only teachers can create classes
+      allow create: if isSignedIn() && isTeacher();
+      // Only class owners can update
+      allow update: if isSignedIn() && isClassOwner(classId);
+      // Only class owners can delete
+      allow delete: if isSignedIn() && isClassOwner(classId);
+      // Members can list their classes
+      allow list: if isSignedIn();
+
+      /**
+       * @description Teachers subcollection - Only owners can manage teachers
+       * @path /classes/{classId}/teachers/{teacherId}
+       */
+      match /teachers/{teacherId} {
+        allow read: if isSignedIn() && isClassMember(classId);
+        allow create: if isSignedIn() && isClassOwner(classId);
+        allow update: if isSignedIn() && isClassOwner(classId);
+        allow delete: if isSignedIn() && isClassOwner(classId);
+      }
+
+      /**
+       * @description Students subcollection - Members can read, students can join
+       * @path /classes/{classId}/students/{studentId}
+       */
+      match /students/{studentId} {
+        allow read: if isSignedIn() && isClassMember(classId);
+        allow create: if isSignedIn() && request.auth.uid == studentId;
+        allow update: if isSignedIn() && (isClassOwner(classId) || request.auth.uid == studentId);
+        allow delete: if isSignedIn() && (isClassOwner(classId) || request.auth.uid == studentId);
+      }
+    }
+
+    /**
+     * @description Teacher Classes - Users can only access their own teacher classes
+     * @path /users/{userId}/teacherClasses/{classId}
+     */
+    match /users/{userId}/teacherClasses/{classId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Student Classes - Users can only access their own student classes
+     * @path /users/{userId}/studentClasses/{classId}
+     */
+    match /users/{userId}/studentClasses/{classId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
      * @description Allows public read access to GeoGebra applets. Only authenticated users can create, update, and delete applets.
      * @path /geoGebraApplets/{appletId}
      * @allow (get) Any user (authenticated or not) reads a GeoGebra applet.
@@ -219,5 +276,26 @@ service cloud.firestore {
   function isAdminByRole(userId) {
     return isSignedIn() && 
            get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
+  }
+
+  // Check if user is a teacher (has role 'teacher' or 'admin')
+  function isTeacher() {
+    let profile = get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data);
+    return profile.data.role == 'teacher' || profile.data.role == 'admin';
+  }
+
+  // Check if user is owner of a class
+  function isClassOwner(classId) {
+    return isSignedIn() && 
+           exists(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)).data.role == 'owner';
+  }
+
+  // Check if user is a member of a class (teacher or student)
+  function isClassMember(classId) {
+    return isSignedIn() && (
+      exists(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)) ||
+      exists(/databases/$(database)/documents/classes/$(classId)/students/$(request.auth.uid))
+    );
   }
 }
