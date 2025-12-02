@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +56,15 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
         () => parseTemplate(exercise.template, exercise.blanks),
         [exercise.template, exercise.blanks]
     );
+
+    // Reset state when exercise changes
+    useEffect(() => {
+        setUserAnswers({});
+        setShowFeedback(false);
+        setValidationResults({});
+        setIsCorrect(false);
+        setAttempts(0);
+    }, [exercise.id]);
 
     function handleInputChange(blankId: string, value: string) {
         setUserAnswers(prev => ({
