@@ -69,7 +69,7 @@ export default function MateriaExercisesPage() {
     }
 
     async function handleComplete(isCorrect: boolean, attempts: number) {
-        if (!user || !exercises[currentIndex]) return;
+        if (!exercises[currentIndex]) return;
 
         const exercise = exercises[currentIndex];
         const pointsEarned = isCorrect ? exercise.points : 0;
@@ -96,16 +96,18 @@ export default function MateriaExercisesPage() {
                 setTotalPoints(prev => prev + pointsEarned);
             }
 
-            // Guardar resultado con tiempo
-            await saveResult(user.uid, {
-                exerciseId: exercise.id,
-                userId: user.uid,
-                isCorrect,
-                attempts,
-                timeSpent: finalTime,
-                pointsEarned,
-                completedAt: new Date(),
-            });
+            // Guardar resultado con tiempo (solo si hay usuario autenticado)
+            if (user) {
+                await saveResult(user.uid, {
+                    exerciseId: exercise.id,
+                    userId: user.uid,
+                    isCorrect,
+                    attempts,
+                    timeSpent: finalTime,
+                    pointsEarned,
+                    completedAt: new Date(),
+                });
+            }
 
             // Si completó todos los ejercicios, mostrar resultados
             if (newUserAnswers.length >= exercises.length) {
