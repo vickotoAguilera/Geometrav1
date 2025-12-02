@@ -16,8 +16,15 @@ const testExercises = [
         type: 'fill-in-blanks',
         title: 'Suma Simple',
         description: 'Resuelve la siguiente suma',
-        question: '¿Cuánto es 2 + 3?',
-        correctAnswer: '5',
+        template: '¿Cuánto es 2 + 3? La respuesta es [___]',
+        blanks: [
+            {
+                id: 'blank-1',
+                correctAnswer: '5',
+                acceptedAnswers: ['5', 'cinco'],
+                caseSensitive: false
+            }
+        ],
         points: 10,
         difficulty: 'facil',
         hints: [
@@ -31,8 +38,15 @@ const testExercises = [
         type: 'fill-in-blanks',
         title: 'Resta Simple',
         description: 'Resuelve la siguiente resta',
-        question: '¿Cuánto es 10 - 4?',
-        correctAnswer: '6',
+        template: '¿Cuánto es 10 - 4? La respuesta es [___]',
+        blanks: [
+            {
+                id: 'blank-1',
+                correctAnswer: '6',
+                acceptedAnswers: ['6', 'seis'],
+                caseSensitive: false
+            }
+        ],
         points: 10,
         difficulty: 'facil',
         hints: [
@@ -46,8 +60,15 @@ const testExercises = [
         type: 'fill-in-blanks',
         title: 'Multiplicación Simple',
         description: 'Resuelve la siguiente multiplicación',
-        question: '¿Cuánto es 3 × 4?',
-        correctAnswer: '12',
+        template: '¿Cuánto es 3 × 4? La respuesta es [___]',
+        blanks: [
+            {
+                id: 'blank-1',
+                correctAnswer: '12',
+                acceptedAnswers: ['12', 'doce'],
+                caseSensitive: false
+            }
+        ],
         points: 10,
         difficulty: 'facil',
         hints: [
