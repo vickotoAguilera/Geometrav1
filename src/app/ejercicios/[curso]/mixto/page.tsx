@@ -13,7 +13,9 @@ import { getMixedExercisesAction, saveResult } from '@/app/actions/exercises';
 import { useAuth } from '@/firebase';
 import MixedExerciseCard from '@/components/exercises/MixedExerciseCard';
 import ExerciseTimer, { useExerciseTimer } from '@/components/exercises/ExerciseTimer';
+import ExerciseResults from '@/components/exercises/ExerciseResults';
 import type { DragDropExercise as DragDropType, FillInBlanksExercise as FillInBlanksType } from '@/types/exercises';
+import type { UserAnswer } from '@/ai/flows/feedback-generator';
 
 // Importar componentes sin SSR
 const DragDropExercise = dynamic(
@@ -45,6 +47,8 @@ export default function MixtoExercisesPage() {
     const [loading, setLoading] = useState(true);
     const [completedCount, setCompletedCount] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
+    const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
+    const [showResults, setShowResults] = useState(false);
     const { timeSpent, handleTimeUpdate, handleComplete: handleTimerComplete, resetTime } = useExerciseTimer();
 
     useEffect(() => {
@@ -74,6 +78,16 @@ export default function MixtoExercisesPage() {
         const pointsEarned = isCorrect ? exercise.points : 0;
         const finalTime = handleTimerComplete(timeSpent);
 
+        // Guardar respuesta del usuario
+        const userAnswer: UserAnswer = {
+            exerciseId: exercise.id,
+            answer: null, // En ejercicios mixtos no guardamos la respuesta específica
+            isCorrect,
+            timeSpent: finalTime
+        };
+
+        setUserAnswers(prev => [...prev, userAnswer]);
+
         // Guardar resultado con tiempo
         await saveResult(user.uid, {
             exerciseId: exercise.id,
@@ -88,6 +102,11 @@ export default function MixtoExercisesPage() {
         if (isCorrect) {
             setCompletedCount(prev => prev + 1);
             setTotalPoints(prev => prev + pointsEarned);
+        }
+
+        // Si es el último ejercicio, mostrar resultados
+        if (currentIndex === exercises.length - 1) {
+            setShowResults(true);
         }
     }
 
@@ -109,6 +128,8 @@ export default function MixtoExercisesPage() {
         setCurrentIndex(0);
         setCompletedCount(0);
         setTotalPoints(0);
+        setUserAnswers([]);
+        setShowResults(false);
         resetTime();
     }
 
@@ -181,7 +202,15 @@ export default function MixtoExercisesPage() {
                 </div>
 
                 {/* Exercise Content */}
-                {loading ? (
+                {showResults ? (
+                    <ExerciseResults
+                        exercises={exercises}
+                        userAnswers={userAnswers}
+                        subjectName="Ejercicios Mixtos"
+                        gradeName={grade.name}
+                        onRestart={handleReset}
+                    />
+                ) : loading ? (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
