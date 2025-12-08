@@ -1,0 +1,95 @@
+{
+    "subject": "ecuaciones-lineales",
+    "grade": "primero-medio",
+    "exercises": [
+        {
+            "id": "test-ex-1",
+            "type": "fill-in-blanks",
+            "title": "Resolver ecuación lineal simple",
+            "description": "Ejemplo: Para resolver 2x + 3 = 7, primero restamos 3 de ambos lados: 2x = 4, luego dividimos entre 2: x = 2. Ahora resuelve la siguiente ecuación siguiendo los mismos pasos.",
+            "points": 15,
+            "difficulty": "medio",
+            "template": "Ejercicio de ecuaciones-lineales:\n\nPaso 1: [___]\nPaso 2: [___]\nResultado: [___]",
+            "blanks": [
+                {
+                    "id": "b1",
+                    "correctAnswer": "Restar 3"
+                },
+                {
+                    "id": "b2",
+                    "correctAnswer": "Dividir entre 2"
+                },
+                {
+                    "id": "b3",
+                    "correctAnswer": "x = 2"
+                }
+            ],
+            "hints": [
+                {
+                    "level": 1,
+                    "text": "Piensa en despejar la variable. ¿Qué operación inversa necesitas usar?",
+                    "pointsPenalty": 2
+                },
+                {
+                    "level": 2,
+                    "text": "Primero elimina el término independiente. ¿Qué número debes restar de ambos lados?",
+                    "pointsPenalty": 5
+                },
+                {
+                    "level": 3,
+                    "text": "Resta 3 de ambos lados para obtener 2x = 4, luego divide ambos lados entre el coeficiente de x",
+                    "pointsPenalty": 8
+                }
+            ]
+        },
+        {
+            "id": "test-ex-2",
+            "type": "drag-drop",
+            "title": "Ordenar pasos para resolver ecuación",
+            "description": "Ejemplo: Para resolver 3x - 6 = 9, los pasos son: 1) Sumar 6 a ambos lados, 2) Dividir entre 3, 3) Obtener x = 5. Ordena los pasos correctamente.",
+            "points": 10,
+            "difficulty": "facil",
+            "items": [
+                {
+                    "id": "1",
+                    "content": "Sumar 6 a ambos lados",
+                    "correctPosition": 0
+                },
+                {
+                    "id": "2",
+                    "content": "Obtener 3x = 15",
+                    "correctPosition": 1
+                },
+                {
+                    "id": "3",
+                    "content": "Dividir entre 3",
+                    "correctPosition": 2
+                },
+                {
+                    "id": "4",
+                    "content": "Resultado: x = 5",
+                    "correctPosition": 3
+                }
+            ],
+            "hints": [
+                {
+                    "level": 1,
+                    "text": "¿Cuál es el primer paso para despejar x? Piensa en eliminar el término que está restando.",
+                    "pointsPenalty": 2
+                },
+                {
+                    "level": 2,
+                    "text": "Después de sumar 6, ¿qué operación necesitas para aislar x?",
+                    "pointsPenalty": 5
+                },
+                {
+                    "level": 3,
+                    "text": "El orden correcto es: sumar 6, simplificar a 3x = 15, dividir entre 3, obtener x = 5",
+                    "pointsPenalty": 8
+                }
+            ]
+        }
+    ],
+    "version": 1,
+    "lastUpdated": "2025-11-29T22:45:00.000Z"
+}

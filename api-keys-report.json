@@ -1,0 +1,508 @@
+{
+  "timestamp": "2025-12-02T00:31:49.045Z",
+  "total": 50,
+  "disponibles": [],
+  "agotadas": [
+    1
+  ],
+  "errores": [
+    {
+      "index": 2,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 3,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 4,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 5,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 6,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 7,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 8,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 9,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 10,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 11,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 12,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 13,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 14,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 15,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 16,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 17,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 18,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 19,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 20,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 21,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 22,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 23,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 24,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 25,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 26,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 27,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 28,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 29,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 30,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 31,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 32,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 33,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 34,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 35,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 36,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 37,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 38,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 39,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 40,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 41,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 42,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 43,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 44,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 45,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 46,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 47,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 48,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 49,
+      "error": "HTTP 403"
+    },
+    {
+      "index": 50,
+      "error": "HTTP 403"
+    }
+  ],
+  "results": [
+    {
+      "index": 1,
+      "status": "CUOTA AGOTADA",
+      "key": "AIzaSyC4yE...",
+      "error": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 200, model: gemini-2.0-flash\nPlease retry in 30.922371304s."
+    },
+    {
+      "index": 2,
+      "status": "ERROR",
+      "key": "AIzaSyBwtE...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 3,
+      "status": "ERROR",
+      "key": "AIzaSyChZN...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 4,
+      "status": "ERROR",
+      "key": "AIzaSyAFvN...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 5,
+      "status": "ERROR",
+      "key": "AIzaSyASbC...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 6,
+      "status": "ERROR",
+      "key": "AIzaSyDGuB...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 7,
+      "status": "ERROR",
+      "key": "AIzaSyCqzy...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 8,
+      "status": "ERROR",
+      "key": "AIzaSyDwoE...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 9,
+      "status": "ERROR",
+      "key": "AIzaSyDSFr...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 10,
+      "status": "ERROR",
+      "key": "AIzaSyBONB...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 11,
+      "status": "ERROR",
+      "key": "AIzaSyC3SM...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 12,
+      "status": "ERROR",
+      "key": "AIzaSyC54A...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 13,
+      "status": "ERROR",
+      "key": "AIzaSyAxG5...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 14,
+      "status": "ERROR",
+      "key": "AIzaSyByKL...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 15,
+      "status": "ERROR",
+      "key": "AIzaSyDsxa...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 16,
+      "status": "ERROR",
+      "key": "AIzaSyC9No...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 17,
+      "status": "ERROR",
+      "key": "AIzaSyA3Fp...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 18,
+      "status": "ERROR",
+      "key": "AIzaSyDbs2...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 19,
+      "status": "ERROR",
+      "key": "AIzaSyAzZc...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 20,
+      "status": "ERROR",
+      "key": "AIzaSyAKKB...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 21,
+      "status": "ERROR",
+      "key": "AIzaSyD-Sc...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 22,
+      "status": "ERROR",
+      "key": "AIzaSyBBDI...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 23,
+      "status": "ERROR",
+      "key": "AIzaSyCrq1...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 24,
+      "status": "ERROR",
+      "key": "AIzaSyByTY...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 25,
+      "status": "ERROR",
+      "key": "AIzaSyA-OK...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 26,
+      "status": "ERROR",
+      "key": "AIzaSyAnKU...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 27,
+      "status": "ERROR",
+      "key": "AIzaSyCyPM...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 28,
+      "status": "ERROR",
+      "key": "AIzaSyBSzY...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 29,
+      "status": "ERROR",
+      "key": "AIzaSyBO1p...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 30,
+      "status": "ERROR",
+      "key": "AIzaSyBwIH...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 31,
+      "status": "ERROR",
+      "key": "AIzaSyAh_n...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 32,
+      "status": "ERROR",
+      "key": "AIzaSyD4z_...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 33,
+      "status": "ERROR",
+      "key": "AIzaSyCF15...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 34,
+      "status": "ERROR",
+      "key": "AIzaSyCRTR...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 35,
+      "status": "ERROR",
+      "key": "AIzaSyDW0a...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 36,
+      "status": "ERROR",
+      "key": "AIzaSyDAmz...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 37,
+      "status": "ERROR",
+      "key": "AIzaSyCsbl...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 38,
+      "status": "ERROR",
+      "key": "AIzaSyAwUr...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 39,
+      "status": "ERROR",
+      "key": "AIzaSyAkK6...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 40,
+      "status": "ERROR",
+      "key": "AIzaSyCyw8...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 41,
+      "status": "ERROR",
+      "key": "AIzaSyBxqr...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 42,
+      "status": "ERROR",
+      "key": "AIzaSyC06j...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 43,
+      "status": "ERROR",
+      "key": "AIzaSyCCuY...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 44,
+      "status": "ERROR",
+      "key": "AIzaSyBsNL...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 45,
+      "status": "ERROR",
+      "key": "AIzaSyBm0M...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 46,
+      "status": "ERROR",
+      "key": "AIzaSyAYyN...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 47,
+      "status": "ERROR",
+      "key": "AIzaSyB1H4...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 48,
+      "status": "ERROR",
+      "key": "AIzaSyBSsk...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 49,
+      "status": "ERROR",
+      "key": "AIzaSyDLxj...",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 50,
+      "status": "ERROR",
+      "key": "AIzaSyDJ2e...",
+      "error": "HTTP 403"
+    }
+  ]
+}
