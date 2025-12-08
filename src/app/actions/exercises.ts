@@ -12,6 +12,7 @@ type Exercise = DragDropExercise | FillInBlanksExercise;
 
 export async function getExercises(gradeId: string, subjectId: string, count: number = 20) {
     try {
+<<<<<<< HEAD
         // Intentar obtener desde caché
         const exercisesRef = firestore.collection('exercises').doc(gradeId).collection(subjectId);
         const snapshot = await exercisesRef.get();
@@ -63,6 +64,27 @@ export async function getExercises(gradeId: string, subjectId: string, count: nu
     } catch (error) {
         console.error('Error getting exercises:', error);
         // En caso de error total, usar fallback
+=======
+        // Cargar ejercicios desde R2 con items de drag-drop desordenados
+        const { loadRandomExercises } = await import('@/lib/r2-exercises');
+        const exercises = await loadRandomExercises(gradeId, subjectId, count);
+
+        if (exercises.length > 0) {
+            console.log(`✅ Loaded ${exercises.length} exercises from R2 for ${gradeId}/${subjectId}`);
+            return { success: true, exercises };
+        }
+
+        // Si no hay ejercicios en R2, usar fallback
+        console.warn(`No exercises found in R2 for ${gradeId}/${subjectId}, using fallback`);
+        const { getFallbackExercises } = await import('@/lib/fallback-exercises');
+        const fallbackExercises = getFallbackExercises(subjectId, count);
+        return { success: true, exercises: fallbackExercises };
+
+    } catch (error) {
+        console.error('Error getting exercises from R2:', error);
+
+        // En caso de error, usar fallback
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         try {
             const { getFallbackExercises } = await import('@/lib/fallback-exercises');
             const fallbackExercises = getFallbackExercises(subjectId, count);

@@ -23,9 +23,12 @@ import { Button } from '@/components/ui/button';
 import { Check, X, GripVertical } from 'lucide-react';
 import type { DragDropExercise as DragDropExerciseType } from '@/types/exercises';
 import { validateDragDropOrder, calculateScore } from '@/lib/exercise-validator';
+<<<<<<< HEAD
 import HelpButton from './HelpButton';
 import HintModal from './HintModal';
 import { generateHintsForExercise, type ExerciseHint, type UserContext } from '@/ai/flows/hints-generator';
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 interface SortableItemProps {
     id: string;
@@ -93,6 +96,7 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
     const [attempts, setAttempts] = useState(0);
     const [itemFeedback, setItemFeedback] = useState<Record<string, boolean>>({});
 
+<<<<<<< HEAD
     // Help system state
     const [hints, setHints] = useState<ExerciseHint[]>([]);
     const [currentHintLevel, setCurrentHintLevel] = useState(0);
@@ -100,6 +104,8 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
     const [isLoadingHint, setIsLoadingHint] = useState(false);
     const [totalPenalty, setTotalPenalty] = useState(0);
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     // Mezclar items solo en el cliente después del primer render
     useEffect(() => {
         const shuffled = [...exercise.items];
@@ -161,6 +167,7 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
         setItems(shuffled);
         setShowFeedback(false);
         setItemFeedback({});
+<<<<<<< HEAD
         setCurrentHintLevel(0);
         setHints([]);
         setTotalPenalty(0);
@@ -207,6 +214,8 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
         setShowHintModal(false);
         setIsCorrect(false);
         setShowFeedback(true);
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     }
 
     const score = showFeedback
@@ -279,6 +288,7 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
                     </div>
                 )}
 
+<<<<<<< HEAD
                 <div className="flex gap-2 flex-wrap">
                     <Button onClick={handleVerify} disabled={showFeedback && isCorrect}>
                         Verificar Orden
@@ -308,6 +318,17 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
                 onShowSolution={handleShowSolution}
                 canRequestMore={currentHintLevel < 3}
             />
+=======
+                <div className="flex gap-2">
+                    <Button onClick={handleVerify} disabled={showFeedback && isCorrect}>
+                        Verificar Orden
+                    </Button>
+                    <Button variant="outline" onClick={handleReset}>
+                        Reiniciar
+                    </Button>
+                </div>
+            </CardContent>
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         </Card>
     );
 }

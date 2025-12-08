@@ -5,6 +5,10 @@ export interface Subject {
     name: string;
     icon: string;
     description: string;
+<<<<<<< HEAD
+=======
+    exerciseCount?: number; // Número de ejercicios en el pool (por defecto 20)
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }
 
 export interface Grade {
@@ -15,6 +19,23 @@ export interface Grade {
 
 // Currículum de 1° a 4° Medio (basado en contenido real)
 export const curriculum: Grade[] = [
+<<<<<<< HEAD
+=======
+    // Módulo de Prueba
+    {
+        id: 'test',
+        name: '🧪 Prueba',
+        subjects: [
+            {
+                id: 'prueba',
+                name: 'Ejercicios de Prueba',
+                icon: '🧮',
+                description: '3 ejercicios simples para probar el sistema',
+                exerciseCount: 3
+            },
+        ],
+    },
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     {
         id: 'primero-medio',
         name: '1° Medio',

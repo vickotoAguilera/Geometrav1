@@ -1,18 +1,30 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition, useMemo } from 'react';
+<<<<<<< HEAD
 import { getAiResponse, getInitialPrompts, processGoogleDriveFile } from '@/app/actions';
+=======
+import { getAiResponse, getInitialPrompts } from '@/app/actions';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+<<<<<<< HEAD
 import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic, Files, FolderOpen } from 'lucide-react';
+=======
+import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic, Files } from 'lucide-react';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+<<<<<<< HEAD
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc, where, getDoc } from 'firebase/firestore';
+=======
+import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -21,8 +33,11 @@ import { Switch } from '@/components/ui/switch';
 import Image from 'next/image';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import AIFeedback from '@/components/feedback/AIFeedback';
+<<<<<<< HEAD
 import { DriveFilePicker } from '@/components/drive/DriveFilePicker';
 import { DriveFile } from '@/types/drive';
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 
 interface BaseMessage {
@@ -178,10 +193,13 @@ export function ChatAssistant({ onGeoGebraCommand }: { onGeoGebraCommand?: (comm
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+<<<<<<< HEAD
   // Estados para Google Drive
   const [isDrivePickerOpen, setIsDrivePickerOpen] = useState(false);
   const [driveAccessToken, setDriveAccessToken] = useState<string | null>(null);
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 

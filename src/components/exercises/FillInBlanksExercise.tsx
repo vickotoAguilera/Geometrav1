@@ -1,13 +1,20 @@
 'use client';
 
+<<<<<<< HEAD
 import { useState, useMemo } from 'react';
+=======
+import { useState, useMemo, useEffect } from 'react';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Check, X } from 'lucide-react';
 import type { FillInBlanksExercise as FillInBlanksExerciseType } from '@/types/exercises';
 import { validateFillInBlanks, calculateScore } from '@/lib/exercise-validator';
+<<<<<<< HEAD
 import { FeedbackPopup } from './FeedbackPopup';
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 interface ParsedSegment {
     type: 'text' | 'blank';
@@ -58,6 +65,18 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
         [exercise.template, exercise.blanks]
     );
 
+<<<<<<< HEAD
+=======
+    // Reset state when exercise changes
+    useEffect(() => {
+        setUserAnswers({});
+        setShowFeedback(false);
+        setValidationResults({});
+        setIsCorrect(false);
+        setAttempts(0);
+    }, [exercise.id]);
+
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     function handleInputChange(blankId: string, value: string) {
         setUserAnswers(prev => ({
             ...prev,
@@ -88,8 +107,11 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
         setValidationResults({});
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     const score = showFeedback
         ? calculateScore(
             Object.values(validationResults).filter(Boolean).length,
@@ -155,6 +177,7 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
                                         isCorrectAnswer ? (
                                             <Check className="w-4 h-4 text-green-600 inline-block" />
                                         ) : (
+<<<<<<< HEAD
                                             <div className="inline-flex items-center gap-1">
                                                 <X className="w-4 h-4 text-red-600 inline-block" />
                                                 <FeedbackPopup
@@ -164,6 +187,9 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
                                                     isCorrect={isCorrectAnswer}
                                                 />
                                             </div>
+=======
+                                            <X className="w-4 h-4 text-red-600 inline-block" />
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                                         )
                                     )}
                                 </span>
@@ -188,7 +214,11 @@ export default function FillInBlanksExercise({ exercise, onComplete }: FillInBla
                     </div>
                 )}
 
+<<<<<<< HEAD
                 <div className="flex gap-2 flex-wrap">
+=======
+                <div className="flex gap-2">
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                     <Button onClick={handleVerify} disabled={showFeedback && isCorrect}>
                         Verificar Respuestas
                     </Button>

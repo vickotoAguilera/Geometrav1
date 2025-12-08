@@ -56,7 +56,11 @@ const mathAssistantFlow = ai.defineFlow(
       prompt.push({ media: { url: input.imageQueryDataUri } });
     }
 
+<<<<<<< HEAD
     // 2. Handle active context files
+=======
+    // 2. Handle active context files (DOCX only)
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     if (input.activeContextFiles && input.activeContextFiles.length > 0) {
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
@@ -68,6 +72,7 @@ const mathAssistantFlow = ai.defineFlow(
           if (file.fileName.endsWith('.docx')) {
             const result = await mammoth.extractRawText({ buffer });
             textContent = result.value;
+<<<<<<< HEAD
 
             const imagePlaceholderRegex = /\[IMAGEN:.+?\]/gi;
             if (imagePlaceholderRegex.test(textContent)) {
@@ -90,6 +95,20 @@ const mathAssistantFlow = ai.defineFlow(
             fileContents.push(`[Imagen '${file.fileName}' adjunta para análisis]`);
           }
 
+=======
+          } else if (file.fileName.endsWith('.pdf')) {
+            // PDF processing is removed due to bundling issues.
+            textContent = `[El procesamiento del archivo PDF '${file.fileName}' no está disponible en este momento.]`;
+          }
+
+          const imagePlaceholderRegex = /\[IMAGEN:.+?\]/gi;
+          if (imagePlaceholderRegex.test(textContent)) {
+            textContent += "\n\n--- INSTRUCCIÓN ADICIONAL: El documento anterior contiene marcadores de imagen como [IMAGEN: ...]. Si la pregunta del usuario se relaciona con uno de estos marcadores, DEBES pedirle al usuario que suba la imagen correspondiente para poder analizarla. Por ejemplo: 'Veo que este ejercicio se apoya en una imagen. Por favor, súbela al chat para poder ayudarte mejor'. NO intentes responder sin la imagen si esta es necesaria. ---";
+          }
+
+          fileContents.push(`Contenido del archivo '${file.fileName}':\n${textContent}`);
+
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         } catch (e) {
           console.error(`Error processing file ${file.fileName} in flow: `, e);
         }

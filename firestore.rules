@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -7,4 +8,306 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
   }
+=======
+/**
+ * @file Firestore Security Rules for Geometra Application
+ *
+ * @core_philosophy This ruleset enforces a strict user-ownership model for user profiles and their associated assistance requests. GeoGebra applets are publicly readable.
+ * @data_structure User profiles are stored under `/users/{userId}`, and their assistance requests are stored in a subcollection `/users/{userId}/messages/{messageId}`. GeoGebra applets are stored under `/geoGebraApplets/{appletId}`.
+ * @key_security_decisions
+ *   - Users can only access their own profiles and messages.
+ *   - GeoGebra applets are publicly readable.
+ *   - User listing is not allowed.
+ * @denormalization Not applicable. The current structure relies on path-based authorization.
+ * @structural_segregation User data and public applet data are stored in separate top-level collections to enforce different access controls.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 🚨 EMERGENCY RULE: Allow everything for the admin user
+    match /{document=**} {
+      allow read, write: if request.auth.uid == 'kRJ3QUGPsCRxImr3zKH9vrHnbk03';
+    }
+
+    /**
+     * @description Enforces access control for user profiles. Users can only read and write their own profile data.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' creates their profile. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' reads their profile. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' updates their profile. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' deletes their profile. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' attempts to create a profile for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' attempts to read the profile of 'user123'. request.auth.uid != 'user123'
+     * @deny (update) User with ID 'user456' attempts to update the profile of 'user123'. request.auth.uid != 'user123'
+     * @deny (delete) User with ID 'user456' attempts to delete the profile of 'user123'. request.auth.uid != 'user123'
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin(); // Admins can list all users
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Enforces access control for assistance requests (messages) within a user's subcollection. Users can only manage their own messages.
+     * @path /users/{userId}/messages/{messageId}
+     * @allow (create) User with ID 'user123' creates a message. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' reads their own message. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' updates their own message. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' deletes their own message. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' attempts to create a message for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' attempts to read a message from 'user123'. request.auth.uid != 'user123'
+     * @deny (update) User with ID 'user456' attempts to update a message from 'user123'. request.auth.uid != 'user123'
+     * @deny (delete) User with ID 'user456' attempts to delete a message from 'user123'. request.auth.uid != 'user123'
+     * @principle Restricts access to a user's own messages.
+     */
+    match /users/{userId}/messages/{messageId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Feedback General - Users can create and read their own feedback, admins can read all
+     * @path /feedback_general/{feedbackId}
+     */
+    match /feedback_general/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false; // Mantener historial
+    }
+
+    /**
+     * @description Feedback de Temas - Users can create and read their own feedback, admins can read all
+     * @path /feedback_temas/{feedbackId}
+     */
+    match /feedback_temas/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Feedback de IA - Users can create and read their own feedback, admins can read all
+     * @path /feedback_ia/{feedbackId}
+     */
+    match /feedback_ia/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Admins collection - Read-only for verification
+     * @path /admins/{userId}
+     */
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      // Allow write if user is already marked as admin in their profile (bootstrapping)
+      allow write: if isSignedIn() && 
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
+    }
+
+    /**
+     * @description User Notes - Users can only access their own notes
+     * @path /user_notes/{noteId}
+     */
+    match /user_notes/{noteId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description User Highlights - Users can only access their own highlights
+     * @path /user_highlights/{highlightId}
+     */
+    match /user_highlights/{highlightId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description User Profile - Users can only access their own profile data, admins can read all
+     * @path /users/{userId}/profile/{document}
+     */
+    match /users/{userId}/profile/{document=**} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    /**
+     * @description Math Level - Users can only access their own math level data
+     * @path /users/{userId}/mathLevel/{document}
+     */
+    match /users/{userId}/mathLevel/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description User Progress - Users can only access their own progress data
+     * @path /users/{userId}/progress/{document}
+     */
+    match /users/{userId}/progress/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Learning Profile - Users can only access their own learning profile
+     * @path /users/{userId}/learningProfile/{document}
+     */
+    match /users/{userId}/learningProfile/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Personal Tutor Config - Users can only access their own tutor configuration
+     * @path /users/{userId}/personalTutor/{document}
+     */
+    match /users/{userId}/personalTutor/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Classes - Teachers can create classes, members can read
+     * @path /classes/{classId}
+     */
+    match /classes/{classId} {
+      // Anyone can read class info if they have the code (for joining)
+      allow get: if isSignedIn();
+      // Only teachers can create classes
+      allow create: if isSignedIn() && isTeacher();
+      // Only class owners can update
+      allow update: if isSignedIn() && isClassOwner(classId);
+      // Only class owners can delete
+      allow delete: if isSignedIn() && isClassOwner(classId);
+      // Members can list their classes
+      allow list: if isSignedIn();
+
+      /**
+       * @description Teachers subcollection - Only owners can manage teachers
+       * @path /classes/{classId}/teachers/{teacherId}
+       */
+      match /teachers/{teacherId} {
+        allow read: if isSignedIn() && isClassMember(classId);
+        allow create: if isSignedIn() && isClassOwner(classId);
+        allow update: if isSignedIn() && isClassOwner(classId);
+        allow delete: if isSignedIn() && isClassOwner(classId);
+      }
+
+      /**
+       * @description Students subcollection - Members can read, students can join
+       * @path /classes/{classId}/students/{studentId}
+       */
+      match /students/{studentId} {
+        allow read: if isSignedIn() && isClassMember(classId);
+        allow create: if isSignedIn() && request.auth.uid == studentId;
+        allow update: if isSignedIn() && (isClassOwner(classId) || request.auth.uid == studentId);
+        allow delete: if isSignedIn() && (isClassOwner(classId) || request.auth.uid == studentId);
+      }
+    }
+
+    /**
+     * @description Teacher Classes - Users can only access their own teacher classes
+     * @path /users/{userId}/teacherClasses/{classId}
+     */
+    match /users/{userId}/teacherClasses/{classId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Student Classes - Users can only access their own student classes
+     * @path /users/{userId}/studentClasses/{classId}
+     */
+    match /users/{userId}/studentClasses/{classId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+
+    /**
+     * @description Allows public read access to GeoGebra applets. Only authenticated users can create, update, and delete applets.
+     * @path /geoGebraApplets/{appletId}
+     * @allow (get) Any user (authenticated or not) reads a GeoGebra applet.
+     * @allow (list) Any user (authenticated or not) lists GeoGebra applets.
+     * @deny (create) An unauthenticated user attempts to create a GeoGebra applet. request.auth == null
+     * @deny (update) An unauthenticated user attempts to update a GeoGebra applet. request.auth == null
+     * @deny (delete) An unauthenticated user attempts to delete a GeoGebra applet. request.auth == null
+     * @principle Grants public read access while restricting write access to authenticated users.
+     */
+    match /geoGebraApplets/{appletId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
+    }
+  }
+
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+
+  function isExistingOwner(userId) {
+    return isOwner(userId) && resource != null;
+  }
+
+  function isAdmin() {
+    return isSignedIn() && (
+      request.auth.uid == 'kRJ3QUGPsCRxImr3zKH9vrHnbk03' || 
+      exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+    );
+  }
+
+  // Check if user is admin by checking their role in profile
+  function isAdminByRole(userId) {
+    return isSignedIn() && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data).data.role == 'admin';
+  }
+
+  // Check if user is a teacher (has role 'teacher' or 'admin')
+  function isTeacher() {
+    let profile = get(/databases/$(database)/documents/users/$(request.auth.uid)/profile/data);
+    return profile.data.role == 'teacher' || profile.data.role == 'admin';
+  }
+
+  // Check if user is owner of a class
+  function isClassOwner(classId) {
+    return isSignedIn() && 
+           exists(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)).data.role == 'owner';
+  }
+
+  // Check if user is a member of a class (teacher or student)
+  function isClassMember(classId) {
+    return isSignedIn() && (
+      exists(/databases/$(database)/documents/classes/$(classId)/teachers/$(request.auth.uid)) ||
+      exists(/databases/$(database)/documents/classes/$(classId)/students/$(request.auth.uid))
+    );
+  }
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }

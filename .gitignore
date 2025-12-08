@@ -4,7 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
+<<<<<<< HEAD
 .yarn/install-state.gz
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 # testing
 /coverage
@@ -36,6 +39,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+<<<<<<< HEAD
 # ============================================
 # ARCHIVOS DE PRESENTACIÓN Y DOCUMENTACIÓN
 # ============================================
@@ -60,3 +64,31 @@ next-env.d.ts
 # Imágenes de documentación (excepto las del proyecto)
 /docs/images/
 /presentacion/
+
+# ============================================
+# ARCHIVOS SENSIBLES Y CREDENCIALES
+# ============================================
+
+# Firebase Admin SDK credentials
+geometra-firebase-adminsdk.json
+*-firebase-adminsdk*.json
+
+# Environment backups
+.env.local.backup*
+*.backup
+
+# API Keys
+NEW_API_KEYS.env
+FIREBASE_ADMIN_ENV.txt
+
+# Temporary files
+temp_*.txt
+abpro*.txt
+
+=======
+# studio
+.idx
+
+# script progress tracking
+.progress/
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636

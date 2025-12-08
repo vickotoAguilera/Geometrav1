@@ -16,7 +16,10 @@ import { LogOut, User as UserIcon, Bot, MessageSquareHeart, Menu, UserCircle } f
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, VisuallyHidden } from "./ui/sheet";
 import { ChatAssistant } from "./chat-assistant";
+<<<<<<< HEAD
 import { ChatBeta } from "./chat-beta/ChatBeta";
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { useAuth, useUser } from "@/firebase";
 import { useUserProfile } from "@/firebase/hooks/use-user-profile";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
@@ -44,9 +47,12 @@ const AuthButton = () => {
   const handleSignIn = async () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
+<<<<<<< HEAD
     // Agregar scopes de Google Drive para acceder a archivos del usuario
     provider.addScope('https://www.googleapis.com/auth/drive.readonly');
     provider.addScope('https://www.googleapis.com/auth/drive.file');
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
@@ -114,11 +120,14 @@ const AuthButton = () => {
 };
 
 const AIChatButton = () => {
+<<<<<<< HEAD
   // Ocultar el asistente IA principal
   return null;
 }
 
 const AIChatBetaButton = () => {
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -131,22 +140,34 @@ const AIChatBetaButton = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
+<<<<<<< HEAD
         <Button size="icon" title="Asistente Geometra">
           <Bot className="h-5 w-5" />
           <span className="sr-only">Asistente Geometra</span>
+=======
+        <Button size="icon" title="Asistente IA">
+          <Bot className="h-5 w-5" />
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-full lg:max-w-md p-0 flex flex-col h-full">
         <VisuallyHidden>
           <SheetTitle>Asistente Geometra</SheetTitle>
         </VisuallyHidden>
+<<<<<<< HEAD
         <ChatBeta />
+=======
+        <ChatAssistant />
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
       </SheetContent>
     </Sheet>
   );
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 const ScreenshotGuideButton = () => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -202,7 +223,10 @@ const MobileNav = () => {
         <div className="mt-auto space-y-2">
           <ScreenshotGuideButton />
           <AIChatButton />
+<<<<<<< HEAD
           <AIChatBetaButton />
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         </div>
       </SheetContent>
     </Sheet>
@@ -278,7 +302,10 @@ export default function Header() {
 
               <ScreenshotGuideButton />
               <AIChatButton />
+<<<<<<< HEAD
               <AIChatBetaButton />
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
               <Link href="/perfil?tab=feedback">
                 <Button variant="outline" size="icon" title="Enviar Feedback">
                   <MessageSquareHeart className="h-5 w-5" />

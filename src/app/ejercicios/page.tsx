@@ -76,11 +76,19 @@ export default function EjerciciosPage() {
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                     <BookOpen className="w-4 h-4" />
+<<<<<<< HEAD
                                                     <span>20 ejercicios</span>
                                                 </div>
                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                     <TrendingUp className="w-4 h-4" />
                                                     <span>0/20 completados</span>
+=======
+                                                    <span>{subject.exerciseCount || 20} ejercicios</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <TrendingUp className="w-4 h-4" />
+                                                    <span>0/{subject.exerciseCount || 20} completados</span>
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                                                 </div>
                                             </div>
                                         </CardContent>

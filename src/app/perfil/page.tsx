@@ -21,9 +21,16 @@ import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
 import { StorageManager } from '@/components/storage/StorageManager';
 import { TeacherRequestButton } from '@/components/profile/TeacherRequestButton';
+<<<<<<< HEAD
 import DebugPanel from '@/components/debug/DebugPanel';
 import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
 import { GoogleDriveConnect } from '@/components/GoogleDriveConnect';
+=======
+import { CompactAchievements } from '@/components/profile/CompactAchievements';
+import { BadgeIcons } from '@/components/profile/BadgeIcons';
+import DebugPanel from '@/components/debug/DebugPanel';
+import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 function PerfilPageContent() {
     const { user, isUserLoading } = useUser();
@@ -115,10 +122,41 @@ function PerfilPageContent() {
             {levelData && (
                 <Card>
                     <CardHeader>
+<<<<<<< HEAD
                         <CardTitle className="flex items-center gap-2">
                             <Award className="w-5 h-5" />
                             Nivel y Progreso
                         </CardTitle>
+=======
+                        <div className="flex items-center justify-between gap-4">
+                            <CardTitle className="flex items-center gap-2">
+                                <Award className="w-5 h-5" />
+                                Nivel y Progreso
+                            </CardTitle>
+                            {/* Insignias - Solo iconos */}
+                            <BadgeIcons
+                                badges={[
+                                    {
+                                        id: 'geogebra-pioneer',
+                                        icon: '📐',
+                                        title: 'Pionero de GeoGebra',
+                                        description: 'Has comenzado tu aventura con GeoGebra',
+                                        earnedDate: new Date(),
+                                        color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+                                    },
+                                    {
+                                        id: 'beginner',
+                                        icon: '🌱',
+                                        title: 'Principiante',
+                                        description: 'Diste tus primeros pasos en el aprendizaje',
+                                        earnedDate: new Date(),
+                                        color: 'bg-gradient-to-br from-green-500 to-emerald-500',
+                                    },
+                                ]}
+                                maxPerRow={6}
+                            />
+                        </div>
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -206,6 +244,14 @@ function PerfilPageContent() {
                 </Card>
             </div>
 
+<<<<<<< HEAD
+=======
+            {/* Logros */}
+            {progress && (
+                <CompactAchievements achievements={progress.achievements || []} maxDisplay={12} />
+            )}
+
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
             {/* Accesos Rápidos */}
             <Card>
                 <CardHeader>
@@ -222,6 +268,7 @@ function PerfilPageContent() {
                         </Link>
                     )}
 
+<<<<<<< HEAD
                     {/* Botón de Aulas - Visible para profesores, alumnos y admins */}
                     {(profile?.role === 'teacher' || profile?.role === 'student' || profile?.role === 'admin') && (
                         <Link href="/aulas" className="md:col-span-2">
@@ -243,6 +290,8 @@ function PerfilPageContent() {
                         </Link>
                     )}
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                     <Link href="/perfil/evaluacion">
                         <Button variant="outline" className="w-full justify-start" size="lg">
                             <Award className="w-5 h-5 mr-2" />
@@ -320,9 +369,12 @@ function PerfilPageContent() {
             {/* Gestión de Almacenamiento R2 */}
             <StorageManager />
 
+<<<<<<< HEAD
             {/* Integración con Google Drive */}
             <GoogleDriveConnect />
 
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
             {/* Debug Tools */}
             {/* Debug Tools - Solo visibles en desarrollo */}
             {process.env.NODE_ENV === 'development' && (

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import type { NextConfig } from 'next';
+=======
+import type {NextConfig} from 'next';
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -8,11 +12,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+<<<<<<< HEAD
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb', // Aumentar límite para archivos grandes
     },
   },
+=======
+>>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
   images: {
     remotePatterns: [
       {

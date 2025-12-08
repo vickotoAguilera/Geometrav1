@@ -1,0 +1,138 @@
+Guion de Presentación: Proyecto Geometra
+
+Tiempo estimado: 10-12 minutos
+Integrantes: Oscar (Intro), Victor (Técnico), Félix (UX/Demo)
+
+1. Portada (Diapositiva 1)
+
+Hablante: Oscar
+
+Oscar: "Buenas tardes profesora Pamela y compañeros.
+Somos el equipo detrás de Geometra, un Asistente de Inteligencia Artificial diseñado para el aprendizaje visual de Funciones y Matrices.
+Nuestro equipo está conformado por Victor Aguilera, Félix Espinoza y quien les habla, Oscar Hernández.
+Hoy les mostraremos cómo transformamos una necesidad educativa en una aplicación web real y funcional."
+
+2. Contexto y Problemática (Diapositiva 2)
+
+Hablante: Oscar
+
+Oscar: "Para entender Geometra, primero debemos entender el problema.
+Investigamos y notamos que el aprendizaje de matemáticas suele ser solitario. Herramientas como GeoGebra son potentes para graficar, pero no te explican cuando te equivocas.
+Si un estudiante está en su casa a las 11 de la noche y no entiende por qué una parábola se movió hacia abajo, no tiene a quién preguntar.
+Esa falta de guía en tiempo real genera frustración y hace que muchos abandonen el autoaprendizaje. Geometra nace para llenar ese vacío pedagógico."
+
+3. Descripción y Objetivos (Diapositiva 3)
+
+Hablante: Oscar
+
+Oscar: "Nuestro objetivo general fue desarrollar una plataforma web que no solo grafique, sino que integre un sistema Multi-Agente de IA que actúe como un tutor.
+Nos planteamos cuatro preguntas clave que ven en pantalla:
+
+¿Cómo hacemos que la IA tenga memoria y recuerde al alumno?
+
+¿Cómo diseñamos una interfaz que no intimide?
+
+¿Cómo resolvemos los problemas técnicos de conectar todo esto en la nube?
+
+¿Y cómo logramos que la IA entienda el lenguaje natural para mover gráficos?"
+
+(Oscar hace un gesto a Victor para el pase)
+Oscar: "Para explicar cómo construimos esto, dejo a Victor con la metodología."
+
+4. Metodología de Trabajo (Diapositiva 4)
+
+Hablante: Victor (Tú)
+
+Victor: "Gracias Oscar.
+Para lograr este desarrollo en 5 semanas, trabajamos con una metodología ágil y colaborativa usando Git y GitHub para el control de versiones.
+Como pueden ver en la tabla:
+
+Partimos investigando la falta de tutoría.
+
+Luego definimos la arquitectura técnica.
+
+En el desarrollo, yo me encargué de la integración con Firebase y la lógica backend, mientras Félix veía el Frontend en Next.js.
+
+Uno de nuestros hitos más importantes fue la Semana 4, donde solucionamos el problema de CORS, del cual hablaré más adelante.
+
+Finalmente, desplegamos todo en Vercel para que sea accesible públicamente."
+
+5. Justificación Pedagógica y Técnica (Diapositiva 5)
+
+Hablante: Victor (Tú)
+
+Victor: "La justificación de Geometra es técnica y pedagógica a la vez.
+No usamos un chat genérico. Implementamos una Arquitectura de Memoria Persistente en Firestore.
+¿Qué significa esto? Que creamos un 'Modelo del Estudiante'.
+El Tutor Principal guarda el contexto en la base de datos. Si el alumno sube un archivo o hace un ejercicio, la IA lo 'recuerda' gracias a que guardamos ese historial.
+Esto permite que el segundo agente, el Tutor de Retroalimentación, no solo diga 'está malo', sino que explique el error basándose en lo que el alumno intentó hacer previamente."
+
+6. Estrategias UX y Desafíos (Diapositiva 6)
+
+Hablante: Félix
+
+Félix: "Exacto, pero toda esa lógica compleja necesita ser amigable.
+Aquí entra el Diseño UX. Como ven en la pantalla, implementamos estrategias para reducir la ansiedad matemática:
+
+Verificación Visual: Usamos un sistema de semáforo. Verde es correcto, Rojo es error. Es feedback inmediato para que el cerebro aprenda rápido.
+
+Interfaz Modular: Usamos Next.js y Tailwind CSS para crear una experiencia rápida, dividiendo la materia en módulos pequeños para no abrumar al usuario."
+
+(Félix mira a Victor para el punto técnico)
+
+Victor (Interviene brevemente): "Y desde el lado técnico, tuvimos un desafío crítico: el bloqueo CORS de Google que nos impedía leer archivos PDF.
+En lugar de rendirnos, creamos el sistema 'fileContext'. En vez de pelear con el almacenamiento, extraemos el texto en el navegador y lo guardamos directamente en Firestore. Así aseguramos que la IA siempre tenga acceso al contenido del alumno."
+
+7. Producto Final (Demo) (Diapositiva 7)
+
+Hablante: Félix
+
+Félix: "Ahora, veamos el producto final.
+(Señala la imagen o hace la demo)
+Aquí simulamos un flujo real:
+
+El usuario selecciona 'Círculo'.
+
+Ingresa el radio.
+
+Al presionar calcular, el sistema no solo da el número, sino que grafica la función en tiempo real.
+
+Si el usuario escribe en el chat 'Explícame la fórmula', el Asistente responde con contexto.
+Todo esto funciona hoy en la web geometra.vercel.app."
+
+8. Nociones Matemáticas (Diapositiva 8)
+
+Hablante: Victor (Tú)
+
+Victor: "Detrás de esa interfaz, hay matemática pura aplicada al código.
+Utilizamos Funciones como objetos de primera clase en JavaScript.
+Por ejemplo, el cálculo del área no es un número fijo, es una función $f(r) = \pi \cdot r^2$ que reacciona a la variable independiente 'radio'.
+Además, para las transformaciones geométricas que mencionaba Oscar, aplicamos Matrices. Cuando un usuario dice 'agrandar al doble', el sistema aplica una Matriz de Escalar a las coordenadas del vector dibujo. Es álgebra lineal ejecutándose en el navegador."
+
+9. Conclusiones (Diapositiva 9)
+
+Hablante: Félix (o turnándose una frase cada uno)
+
+Félix: "Para concluir, Geometra valida que es posible crear herramientas educativas complejas con tecnologías web modernas."
+Victor: "Técnicamente, demostramos que podemos integrar IAs y Bases de Datos NoSQL (Firestore) para resolver problemas de infraestructura real."
+Oscar: "Y socialmente, reafirmamos que el software libre y el código abierto son caminos para democratizar el acceso a una educación de calidad."
+
+10. Mapa de Impacto (Diapositiva 10)
+
+Hablante: Oscar
+
+Oscar: "Finalmente, este proyecto impacta directamente nuestro futuro académico en INACAP.
+
+Lo que aprendimos de Next.js nos prepara para la asignatura de 'Programación Front End'.
+
+El manejo de Firestore nos adelanta materia de 'Bases de Datos No Estructuradas'.
+
+Y la gestión del proyecto es la base para nuestro futuro 'Proyecto de Título'.
+Geometra no fue solo una tarea, fue una simulación profesional completa."
+
+11. Bibliografía y Cierre (Diapositiva 11 y 12)
+
+Hablante: Oscar
+
+Oscar: "Nuestras referencias incluyen documentación oficial de Firebase, Next.js y teóricos de la educación como Freire.
+Muchas gracias por su atención. Estamos atentos a sus preguntas."
