@@ -62,7 +62,7 @@
     "katex": "^0.16.11",
     "lucide-react": "^0.475.0",
     "mammoth": "^1.7.2",
-    "next": "15.3.3",
+    "next": "15.3.6",
     "patch-package": "^8.0.0",
     "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^5.4.449",
