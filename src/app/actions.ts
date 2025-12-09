@@ -9,6 +9,15 @@ import { Part } from 'genkit';
 import { processGoogleDriveFile as processFile } from '@/lib/file-processor';
 import { getFirestore } from '@/firebase/server';
 import { cookies } from 'next/headers';
+
+interface GenkitMessage {
+  role: 'user' | 'model';
+  content: Part[];
+}
+
+interface ContextFile {
+  fileName: string;
+  fileDataUri: string;
 }
 
 export async function getAiResponse(
@@ -33,7 +42,6 @@ export async function getAiResponse(
 export async function getInitialPrompts(): Promise<GetStartedPromptOutput> {
   return await getStartedPrompt();
 }
-<<<<<<< HEAD
 
 /**
  * Server action para procesar archivos de Google Drive
@@ -82,5 +90,3 @@ export async function processGoogleDriveFile(
     };
   }
 }
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636

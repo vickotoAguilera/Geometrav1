@@ -179,29 +179,6 @@ export function useProgress() {
         }
     };
 
-=======
-    const addAchievement = async (achievement: any) => {
-        if (!user || !firestore) {
-            throw new Error('Usuario no autenticado');
-        }
-
-        try {
-            const progressRef = doc(firestore, 'users', user.uid, 'progress', 'data');
-            await updateDoc(progressRef, {
-                achievements: [...(progress?.achievements || []), achievement],
-            });
-
-            setProgress(prev => prev ? {
-                ...prev,
-                achievements: [...(prev.achievements || []), achievement],
-            } : null);
-        } catch (err) {
-            console.error('Error adding achievement:', err);
-            throw err;
-        }
-    };
-
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     return {
         progress,
         isLoading,
@@ -210,6 +187,5 @@ export function useProgress() {
         incrementExercises,
         incrementTests,
         updateStreak,
-<<<<<<< HEAD
     };
 }

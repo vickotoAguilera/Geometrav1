@@ -5,6 +5,16 @@
 import { getExercisePool, selectRandomExercises, poolExists } from '@/lib/r2-exercises';
 import { generateHintsForExercise } from '@/ai/flows/hints-generator';
 import { generateExamplesForExercises } from '@/ai/flows/example-generator';
+import { getFirestore } from '@/firebase/server';
+import type { DragDropExercise, FillInBlanksExercise, ExerciseResult } from '@/types/exercises';
+
+const firestore = getFirestore();
+
+type Exercise = DragDropExercise | FillInBlanksExercise;
+
+/**
+ * Obtiene ejercicios desde R2 (con fallback al sistema actual)
+ * AHORA CON EJEMPLOS GENERADOS POR IA
  */
 export async function getExercisesFromR2(
     gradeId: string,
@@ -38,7 +48,6 @@ export async function getExercisesFromR2(
 
         console.log(`✅ Seleccionados ${selected.length} ejercicios de pool de ${pool.length}`);
 
-<<<<<<< HEAD
         // 4. DESHABILITADO TEMPORALMENTE: Generar ejemplos con IA
         // console.log(`🤖 Generando ejemplos con IA para ${selected.length} ejercicios...`);
         // const examples = await generateExamplesForExercises(selected);
@@ -51,8 +60,6 @@ export async function getExercisesFromR2(
 
         // console.log(`✅ Ejercicios enriquecidos con ejemplos de IA`);
 
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         return {
             success: true,
             exercises: selected,
