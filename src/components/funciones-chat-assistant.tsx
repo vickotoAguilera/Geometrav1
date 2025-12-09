@@ -341,7 +341,7 @@ export function FuncionesChatAssistant({ ejercicioId, grupoId, messages, setMess
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>¡No pierdas tu progreso!</AlertTitle>
                         <AlertDescription className="text-xs">
-                           Para guardar tu trabajo en la pizarra, usa el menú de GeoGebra (☰) -> 'Descargar como' -> 'Archivo GGB (.ggb)'. Para recuperarlo más tarde, usa la opción 'Abrir' del mismo menú.
+                           Para guardar tu trabajo en la pizarra, usa el menú de GeoGebra (☰) {'>'} 'Descargar como' {'>'} 'Archivo GGB (.ggb)'. Para recuperarlo más tarde, usa la opción 'Abrir' del mismo menú.
                         </AlertDescription>
                     </Alert>
                 </AccordionContent>

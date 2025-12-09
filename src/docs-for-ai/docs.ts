@@ -203,4 +203,3 @@ Tras estos ajustes, logramos una implementación exitosa:
 
 Este proceso de depuración, aunque tuvo varios pasos, fue clave para entender las particularidades de Next.js y el renderizado de contenido dinámico, resultando en una solución robusta y correcta.
 `;
-```

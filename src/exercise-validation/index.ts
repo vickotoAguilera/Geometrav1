@@ -38,7 +38,7 @@ import distribucionBinomialValidation from './4-medio/distribucion-binomial';
 import distribucionNormalValidation from './4-medio/distribucion-normal';
 import funcionesPeriodicasValidation from './4-medio/funciones-periodicas';
 import funcionesTrigonometricasValidation from './4-medio/funciones-trigonometricas';
-import geometria-3dValidation from './4-medio/geometria-3d';
+import geometria3dValidation from './4-medio/geometria-3d';
 import geometriaConicaValidation from './4-medio/geometria-conica';
 import matematicaFinancieraValidation from './4-medio/matematica-financiera';
 import modelamientoMatematicoValidation from './4-medio/modelamiento-matematico';
@@ -85,7 +85,7 @@ export const validationsBySubject = {
         'distribucion-normal': distribucionNormalValidation,
         'funciones-periodicas': funcionesPeriodicasValidation,
         'funciones-trigonometricas': funcionesTrigonometricasValidation,
-        'geometria-3d': geometria-3dValidation,
+        'geometria-3d': geometria3dValidation,
         'geometria-conica': geometriaConicaValidation,
         'matematica-financiera': matematicaFinancieraValidation,
         'modelamiento-matematico': modelamientoMatematicoValidation,
