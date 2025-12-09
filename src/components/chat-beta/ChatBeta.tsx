@@ -342,7 +342,7 @@ export function ChatBeta() {
         <div className="flex flex-col h-full bg-background">
             <div className="p-4 border-b flex justify-between items-center bg-muted/20">
                 <div className="flex items-center gap-2">
-                    <h1 className="text-sm font-semibold">Chat Beta</h1>
+                    <h1 className="text-sm font-semibold">Asistente Geometra</h1>
                     <div className="text-xs text-muted-foreground">v0.5</div>
                 </div>
                 <div className="flex items-center gap-2">
