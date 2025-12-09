@@ -206,13 +206,6 @@ function PerfilPageContent() {
                 </Card>
             </div>
 
-=======
-            {/* Logros */}
-            {progress && (
-                <CompactAchievements achievements={progress.achievements || []} maxDisplay={12} />
-            )}
-
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
             {/* Accesos Rápidos */}
             <Card>
                 <CardHeader>
@@ -229,7 +222,6 @@ function PerfilPageContent() {
                         </Link>
                     )}
 
-<<<<<<< HEAD
                     {/* Botón de Aulas - Visible para profesores, alumnos y admins */}
                     {(profile?.role === 'teacher' || profile?.role === 'student' || profile?.role === 'admin') && (
                         <Link href="/aulas" className="md:col-span-2">
@@ -250,6 +242,86 @@ function PerfilPageContent() {
                             </Button>
                         </Link>
                     )}
+
+                    <Link href="/perfil/evaluacion">
+                        <Button variant="outline" className="w-full justify-start" size="lg">
+                            <Award className="w-5 h-5 mr-2" />
+                            Evaluación de Nivel
+                        </Button>
+                    </Link>
+                    <Link href="/perfil/mi-tutor">
+                        <Button variant="outline" className="w-full justify-start" size="lg">
+                            <Target className="w-5 h-5 mr-2" />
+                            Mi Tutor Personal
+                        </Button>
+                    </Link>
+                    <Link href="/perfil/estadisticas">
+                        <Button variant="outline" className="w-full justify-start" size="lg">
+                            <TrendingUp className="w-5 h-5 mr-2" />
+                            Estadísticas Detalladas
+                        </Button>
+                    </Link>
+                    <Link href="/estudia">
+                        <Button variant="outline" className="w-full justify-start" size="lg">
+                            <TrendingUp className="w-5 h-5 mr-2" />
+                            Continuar Estudiando
+                        </Button>
+                    </Link>
+                </CardContent>
+            </Card>
+
+            {/* Nivel Matemático */}
+            {mathLevel && mathLevel.overall > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Tu Nivel Matemático</CardTitle>
+                        <CardDescription>Basado en tu última evaluación</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground">Álgebra</p>
+                                <p className="text-2xl font-bold">{mathLevel.algebra}/100</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-muted-foreground">Geometría</p>
+                                <p className="text-2xl font-bold">{mathLevel.geometry}/100</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-muted-foreground">Cálculo</p>
+                                <p className="text-2xl font-bold">{mathLevel.calculus}/100</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-muted-foreground">Trigonometría</p>
+                                <p className="text-2xl font-bold">{mathLevel.trigonometry}/100</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-muted-foreground">Estadística</p>
+                                <p className="text-2xl font-bold">{mathLevel.statistics}/100</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-muted-foreground">Funciones</p>
+                                <p className="text-2xl font-bold">{mathLevel.functions}/100</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Solicitud de Docente */}
+            {profile && user && (
+                <TeacherRequestButton
+                    profile={profile}
+                    userId={user.uid}
+                    onRequestSent={() => window.location.reload()}
+                />
+            )}
+
+            {/* Gestión de Almacenamiento R2 */}
+            <StorageManager />
+
+            {/* Integración con Google Drive */}
+            <GoogleDriveConnect />
 
             {/* Debug Tools */}
             {/* Debug Tools - Solo visibles en desarrollo */}
