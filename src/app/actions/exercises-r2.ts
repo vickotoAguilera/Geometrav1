@@ -22,54 +22,35 @@ export async function getExercisesFromR2(
     count: number = 20
 ) {
     try {
-        console.log(`📚 Obteniendo ejercicios de R2: ${gradeId}/${subjectId}`);
+        console.log(`📚 Cargando ejercicios locales: ${gradeId}/${subjectId}`);
 
-        // 1. Verificar si existe pool en R2
-        const exists = await poolExists(gradeId, subjectId);
+        // Importar funciones de ejercicios locales
+        const { getExercisesFromValidation, selectRandomExercises } = await import('@/lib/local-exercises');
 
-        if (!exists) {
-            console.log(`⚠️ Pool no existe en R2, usando sistema actual`);
-            // Fallback al sistema actual (Firestore + IA)
-            const { getExercises } = await import('@/app/actions/exercises');
-            return await getExercises(gradeId, subjectId, count);
-        }
-
-        // 2. Obtener pool completo de R2
-        const pool = await getExercisePool(gradeId, subjectId);
+        // 1. Intentar cargar desde archivos de validación locales
+        const pool = await getExercisesFromValidation(gradeId, subjectId);
 
         if (pool.length === 0) {
-            console.log(`⚠️ Pool vacío, usando sistema actual`);
+            console.log(`⚠️ No hay ejercicios en validación local, usando sistema actual`);
             const { getExercises } = await import('@/app/actions/exercises');
             return await getExercises(gradeId, subjectId, count);
         }
 
-        // 3. Seleccionar ejercicios al azar
+        // 2. Seleccionar ejercicios al azar
         const selected = selectRandomExercises(pool, count);
 
-        console.log(`✅ Seleccionados ${selected.length} ejercicios de pool de ${pool.length}`);
-
-        // 4. DESHABILITADO TEMPORALMENTE: Generar ejemplos con IA
-        // console.log(`🤖 Generando ejemplos con IA para ${selected.length} ejercicios...`);
-        // const examples = await generateExamplesForExercises(selected);
-
-        // 5. Agregar ejemplos a los ejercicios
-        // const enrichedExercises = selected.map(exercise => ({
-        //     ...exercise,
-        //     example: examples.get(exercise.id),
-        // }));
-
-        // console.log(`✅ Ejercicios enriquecidos con ejemplos de IA`);
+        console.log(`✅ Seleccionados ${selected.length} ejercicios de pool local de ${pool.length}`);
 
         return {
             success: true,
             exercises: selected,
-            source: 'r2',
+            source: 'local-validation',
         };
     } catch (error) {
-        console.error('Error obteniendo ejercicios de R2:', error);
+        console.error('Error cargando ejercicios locales:', error);
 
         // Fallback al sistema actual
-        console.log(`⚠️ Error en R2, usando sistema actual`);
+        console.log(`⚠️ Error en validación local, usando sistema actual`);
         const { getExercises } = await import('@/app/actions/exercises');
         return await getExercises(gradeId, subjectId, count);
     }
