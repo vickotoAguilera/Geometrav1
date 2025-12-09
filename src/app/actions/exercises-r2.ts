@@ -22,35 +22,44 @@ export async function getExercisesFromR2(
     count: number = 20
 ) {
     try {
-        console.log(`📚 Cargando ejercicios locales: ${gradeId}/${subjectId}`);
+        console.log(`📚 Obteniendo ejercicios de R2: ${gradeId}/${subjectId}`);
 
-        // Importar funciones de ejercicios locales
-        const { getExercisesFromValidation, selectRandomExercises } = await import('@/lib/local-exercises');
+        // Importar funciones de R2
+        const { getExercisePool, selectRandomExercises, poolExists } = await import('@/lib/r2-exercises');
 
-        // 1. Intentar cargar desde archivos de validación locales
-        const pool = await getExercisesFromValidation(gradeId, subjectId);
+        // 1. Verificar si existe pool en R2
+        const exists = await poolExists(gradeId, subjectId);
 
-        if (pool.length === 0) {
-            console.log(`⚠️ No hay ejercicios en validación local, usando sistema actual`);
+        if (!exists) {
+            console.log(`⚠️ Pool no existe en R2, usando sistema actual`);
             const { getExercises } = await import('@/app/actions/exercises');
             return await getExercises(gradeId, subjectId, count);
         }
 
-        // 2. Seleccionar ejercicios al azar
+        // 2. Obtener pool completo de R2
+        const pool = await getExercisePool(gradeId, subjectId);
+
+        if (pool.length === 0) {
+            console.log(`⚠️ Pool vacío, usando sistema actual`);
+            const { getExercises } = await import('@/app/actions/exercises');
+            return await getExercises(gradeId, subjectId, count);
+        }
+
+        // 3. Seleccionar ejercicios al azar
         const selected = selectRandomExercises(pool, count);
 
-        console.log(`✅ Seleccionados ${selected.length} ejercicios de pool local de ${pool.length}`);
+        console.log(`✅ Seleccionados ${selected.length} ejercicios de pool de ${pool.length}`);
 
         return {
             success: true,
             exercises: selected,
-            source: 'local-validation',
+            source: 'r2',
         };
     } catch (error) {
-        console.error('Error cargando ejercicios locales:', error);
+        console.error('Error obteniendo ejercicios de R2:', error);
 
         // Fallback al sistema actual
-        console.log(`⚠️ Error en validación local, usando sistema actual`);
+        console.log(`⚠️ Error en R2, usando sistema actual`);
         const { getExercises } = await import('@/app/actions/exercises');
         return await getExercises(gradeId, subjectId, count);
     }
