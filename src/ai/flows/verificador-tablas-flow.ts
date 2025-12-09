@@ -73,7 +73,6 @@ const verificadorTablasFlow = ai.defineFlow(
 
     const resultados = respuestasUsuario.map((respuestaUser, index) => {
       const respuestaCorrecta = respuestasCorrectas[index];
-
       if (!respuestaUser || !respuestaUser.trim()) {
         return false;
       }

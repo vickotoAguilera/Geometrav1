@@ -5,7 +5,6 @@ export interface Subject {
     name: string;
     icon: string;
     description: string;
-    exerciseCount?: number; // Número de ejercicios en el pool (por defecto 20)
 }
 
 export interface Grade {

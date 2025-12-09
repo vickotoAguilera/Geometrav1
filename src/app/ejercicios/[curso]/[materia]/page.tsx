@@ -9,20 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
 import { getSubjectById } from '@/data/curriculum';
-<<<<<<< HEAD
 import { getExercisesFromR2 } from '@/app/actions/exercises-r2';
 import { saveResult } from '@/app/actions/exercises';
 import { useAuth } from '@/firebase';
 import ExerciseTimer, { useExerciseTimer } from '@/components/exercises/ExerciseTimer';
 import type { DragDropExercise as DragDropType, FillInBlanksExercise as FillInBlanksType } from '@/types/exercises';
-=======
-import { getExercises, saveResult } from '@/app/actions/exercises';
-import { useAuth } from '@/firebase';
-import ExerciseTimer, { useExerciseTimer } from '@/components/exercises/ExerciseTimer';
-import ExerciseResults from '@/components/exercises/ExerciseResults';
-import type { DragDropExercise as DragDropType, FillInBlanksExercise as FillInBlanksType } from '@/types/exercises';
-import type { UserAnswer } from '@/ai/flows/feedback-generator';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 // Importar componentes sin SSR
 const DragDropExercise = dynamic(
@@ -50,11 +41,6 @@ export default function MateriaExercisesPage() {
     const [loading, setLoading] = useState(true);
     const [completedCount, setCompletedCount] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
-<<<<<<< HEAD
-=======
-    const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
-    const [showResults, setShowResults] = useState(false);
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     const { timeSpent, handleTimeUpdate, handleComplete: handleTimerComplete, resetTime } = useExerciseTimer();
 
     const subject = getSubjectById(gradeId, subjectId);
@@ -66,16 +52,10 @@ export default function MateriaExercisesPage() {
     async function loadExercises() {
         setLoading(true);
         try {
-<<<<<<< HEAD
             console.log(`🔍 Cargando ejercicios de R2: ${gradeId}/${subjectId}`);
             const result = await getExercisesFromR2(gradeId, subjectId, 20);
             if (result.success && result.exercises) {
                 console.log(`✅ Cargados ${result.exercises.length} ejercicios desde ${result.source}`);
-=======
-            const count = subject?.exerciseCount || 20;
-            const result = await getExercises(gradeId, subjectId, count);
-            if (result.success && result.exercises) {
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                 setExercises(result.exercises);
             } else {
                 console.error('Error loading exercises:', result.error);
@@ -88,17 +68,12 @@ export default function MateriaExercisesPage() {
     }
 
     async function handleComplete(isCorrect: boolean, attempts: number) {
-<<<<<<< HEAD
         if (!user || !exercises[currentIndex]) return;
-=======
-        if (!exercises[currentIndex]) return;
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
         const exercise = exercises[currentIndex];
         const pointsEarned = isCorrect ? exercise.points : 0;
         const finalTime = handleTimerComplete(timeSpent);
 
-<<<<<<< HEAD
         // Guardar resultado con tiempo
         await saveResult(user.uid, {
             exerciseId: exercise.id,
@@ -113,46 +88,6 @@ export default function MateriaExercisesPage() {
         if (isCorrect) {
             setCompletedCount(prev => prev + 1);
             setTotalPoints(prev => prev + pointsEarned);
-=======
-        // Verificar si ya guardamos respuesta para este ejercicio
-        const alreadyAnswered = userAnswers.some(a => a.exerciseId === exercise.id);
-
-        if (!alreadyAnswered) {
-            // Guardar respuesta del usuario (solo la primera vez)
-            const userAnswer: UserAnswer = {
-                exerciseId: exercise.id,
-                answer: null,
-                isCorrect,
-                timeSpent: finalTime,
-            };
-
-            const newUserAnswers = [...userAnswers, userAnswer];
-            setUserAnswers(newUserAnswers);
-
-            // Incrementar contador solo si es correcto y es la primera vez
-            if (isCorrect) {
-                setCompletedCount(prev => prev + 1);
-                setTotalPoints(prev => prev + pointsEarned);
-            }
-
-            // Guardar resultado con tiempo (solo si hay usuario autenticado)
-            if (user) {
-                await saveResult(user.uid, {
-                    exerciseId: exercise.id,
-                    userId: user.uid,
-                    isCorrect,
-                    attempts,
-                    timeSpent: finalTime,
-                    pointsEarned,
-                    completedAt: new Date(),
-                });
-            }
-
-            // Si completó todos los ejercicios, mostrar resultados
-            if (newUserAnswers.length >= exercises.length) {
-                setTimeout(() => setShowResults(true), 500);
-            }
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         }
     }
 
@@ -174,11 +109,6 @@ export default function MateriaExercisesPage() {
         setCurrentIndex(0);
         setCompletedCount(0);
         setTotalPoints(0);
-<<<<<<< HEAD
-=======
-        setUserAnswers([]);
-        setShowResults(false);
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         resetTime();
     }
 
@@ -250,21 +180,8 @@ export default function MateriaExercisesPage() {
                     <Progress value={progress} className="h-2" />
                 </div>
 
-<<<<<<< HEAD
                 {/* Exercise Content */}
                 {loading ? (
-=======
-                {/* Results or Exercise Content */}
-                {showResults ? (
-                    <ExerciseResults
-                        exercises={exercises}
-                        userAnswers={userAnswers}
-                        subjectName={subject.name}
-                        gradeName={gradeId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        onRestart={handleReset}
-                    />
-                ) : loading ? (
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
                     <Card>
                         <CardContent className="flex items-center justify-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
