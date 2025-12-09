@@ -32,7 +32,7 @@ export interface ExerciseValidation {
     blanks: ValidationRule[];
 }
 
-export const geometria-3dValidation: ExerciseValidation[] = [
+export const geometria3dValidation: ExerciseValidation[] = [
 ];
 
-export default geometria-3dValidation;
+export default geometria3dValidation;
