@@ -1,12 +1,8 @@
 // Generador de hints/pistas con IA para ejercicios
 
-<<<<<<< HEAD
 'use server';
 
 import { getApiKey } from '@/lib/utils/api-key-fallback';
-=======
-import { ai } from '@/ai/genkit';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import type { DragDropExercise, FillInBlanksExercise } from '@/types/exercises';
 
 export interface ExerciseHint {
@@ -17,7 +13,6 @@ export interface ExerciseHint {
 
 type Exercise = DragDropExercise | FillInBlanksExercise;
 
-<<<<<<< HEAD
 // Contexto adicional del usuario para generar hints más específicos
 export interface UserContext {
     userAnswers?: Record<string, string> | string[]; // Respuestas actuales del usuario
@@ -69,36 +64,11 @@ export async function generateHintsForExercise(
         return hints;
     } catch (error) {
         console.error('❌ [hints-generator] Error:', error);
-=======
-/**
- * Genera hints para un ejercicio usando IA
- */
-export async function generateHintsForExercise(exercise: Exercise): Promise<ExerciseHint[]> {
-    const prompt = createHintsPrompt(exercise);
-
-    try {
-        // Usar sistema de fallback de API keys
-        const { generateWithFallback } = await import('@/ai/api-key-fallback');
-
-        const result = await generateWithFallback({
-            model: 'googleai/gemini-2.0-flash',
-            prompt,
-            config: {
-                temperature: 0.7,
-            },
-        });
-
-        const hints = parseHintsResponse(result.text);
-        return hints;
-    } catch (error) {
-        console.error('Error generating hints:', error);
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         return getDefaultHints();
     }
 }
 
 /**
-<<<<<<< HEAD
  * Crea el prompt para generar hints contextuales
  */
 function createHintsPrompt(exercise: Exercise, userContext?: UserContext): string {
@@ -177,91 +147,26 @@ ${userContextDescription ? '\n   - Si el estudiante tiene respuestas incorrectas
 - Usa un tono amigable y motivador
 
 **FORMATO DE RESPUESTA** (JSON únicamente):
-=======
- * Crea el prompt para generar hints
- */
-function createHintsPrompt(exercise: Exercise): string {
-    let exerciseDescription = '';
-
-    if (exercise.type === 'drag-drop') {
-        exerciseDescription = `
-Tipo: Ordenar pasos
-Título: ${exercise.title}
-Descripción: ${exercise.description}
-Pasos a ordenar: ${exercise.items.map(item => item.content).join(', ')}
-`;
-    } else {
-        exerciseDescription = `
-Tipo: Completar espacios
-Título: ${exercise.title}
-Descripción: ${exercise.description}
-Template: ${exercise.template}
-`;
-    }
-
-    return `Eres un tutor de matemáticas experto. Genera 3 pistas progresivas para ayudar al estudiante a resolver este ejercicio SIN dar la respuesta directa.
-
-${exerciseDescription}
-
-**IMPORTANTE**: Las pistas deben GUIAR al estudiante, NO resolver el ejercicio.
-
-Genera 3 pistas con este formato JSON:
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 [
   {
     "level": 1,
-<<<<<<< HEAD
     "text": "Pista conceptual específica del ejercicio",
-=======
-    "text": "Pista general sobre el concepto matemático a aplicar",
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     "pointsPenalty": 2
   },
   {
     "level": 2,
-<<<<<<< HEAD
     "text": "Pista estratégica con ejemplo o primer paso",
-=======
-    "text": "Pista sobre el primer paso o estrategia a seguir",
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     "pointsPenalty": 5
   },
   {
     "level": 3,
-<<<<<<< HEAD
     "text": "Pista detallada con pasos específicos",
-=======
-    "text": "Pista más específica con guía detallada pero sin resolver",
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     "pointsPenalty": 8
   }
 ]
 
-<<<<<<< HEAD
 Responde ÚNICAMENTE con el array JSON, sin texto adicional antes o después.`;
-=======
-**Ejemplo para "Resolver: 3x + 5 = 14":**
-[
-  {
-    "level": 1,
-    "text": "Piensa en despejar la variable. ¿Qué operación inversa necesitas usar?",
-    "pointsPenalty": 2
-  },
-  {
-    "level": 2,
-    "text": "Primero elimina el término independiente. ¿Qué número debes restar de ambos lados?",
-    "pointsPenalty": 5
-  },
-  {
-    "level": 3,
-    "text": "Resta 5 de ambos lados para obtener 3x = 9, luego divide ambos lados entre el coeficiente de x",
-    "pointsPenalty": 8
-  }
-]
-
-Responde SOLO con el array JSON, sin texto adicional.`;
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }
 
 /**

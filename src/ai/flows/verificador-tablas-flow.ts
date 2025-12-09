@@ -28,7 +28,6 @@ export async function verificarTabla(input: VerificadorTablasInput): Promise<Ver
   return verificadorTablasFlow(input);
 }
 
-<<<<<<< HEAD
 // Función de fallback (comparación simple)
 function sonNumerosEquivalentes(val1: string, val2: string): boolean {
   if (val1 === val2) return true;
@@ -57,20 +56,6 @@ function sonNumerosEquivalentes(val1: string, val2: string): boolean {
   }
 
   return false;
-=======
-// Función para comparar si dos valores numéricos son equivalentes (ej: "0.5" y "1/2").
-function sonNumerosEquivalentes(val1: string, val2: string): boolean {
-  if (val1 === val2) return true;
-  // Reemplazar coma por punto para la conversión
-  const num1 = Number(val1.replace(',', '.'));
-  const num2 = Number(val2.replace(',', '.'));
-  if (!isNaN(num1) && !isNaN(num2)) {
-    // Compara con una pequeña tolerancia para errores de punto flotante.
-    return Math.abs(num1 - num2) < 0.01;
-  }
-  // Podríamos añadir lógica para fracciones, pero por ahora comparamos como texto.
-  return val1.trim().toLowerCase() === val2.trim().toLowerCase();
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }
 
 const verificadorTablasFlow = ai.defineFlow(
@@ -88,10 +73,7 @@ const verificadorTablasFlow = ai.defineFlow(
 
     const resultados = respuestasUsuario.map((respuestaUser, index) => {
       const respuestaCorrecta = respuestasCorrectas[index];
-<<<<<<< HEAD
-=======
-      // Si el usuario no ha respondido, no es ni correcto ni incorrecto, pero lo marcamos como false.
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
+
       if (!respuestaUser || !respuestaUser.trim()) {
         return false;
       }

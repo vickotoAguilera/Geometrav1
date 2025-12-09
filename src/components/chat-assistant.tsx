@@ -1,30 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition, useMemo } from 'react';
-<<<<<<< HEAD
 import { getAiResponse, getInitialPrompts, processGoogleDriveFile } from '@/app/actions';
-=======
-import { getAiResponse, getInitialPrompts } from '@/app/actions';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { generateSpeech } from '@/app/tts-actions';
 import { SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-<<<<<<< HEAD
 import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic, Files, FolderOpen } from 'lucide-react';
-=======
-import { Bot, User, Send, Trash2, Paperclip, X, FileText, Loader2, Info, GraduationCap, Sigma, Image as ImageIcon, Volume2, Waves, Mic, Files } from 'lucide-react';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-<<<<<<< HEAD
 import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc, where, getDoc } from 'firebase/firestore';
-=======
-import { collection, query, orderBy, serverTimestamp, Timestamp, addDoc, getDocs, writeBatch, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { useToast } from '@/hooks/use-toast';
 import { Part } from 'genkit';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -33,173 +21,8 @@ import { Switch } from '@/components/ui/switch';
 import Image from 'next/image';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import AIFeedback from '@/components/feedback/AIFeedback';
-<<<<<<< HEAD
 import { DriveFilePicker } from '@/components/drive/DriveFilePicker';
 import { DriveFile } from '@/types/drive';
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
-
-
-interface BaseMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  createdAt?: Timestamp;
-}
-interface TextMessage extends BaseMessage {
-  type: 'text';
-  content: string;
-  imageUrl?: string;
-}
-interface FileContextMessage extends BaseMessage {
-  type: 'fileContext';
-  content: string;
-  fileName: string;
-  isActive: boolean;
-  groupId?: string;
-  partNumber?: number;
-  totalParts?: number;
-}
-
-type Message = TextMessage | FileContextMessage;
-
-interface GroupedFile {
-  id: string;
-  fileName: string;
-  isActive: boolean;
-  groupId: string;
-  totalParts: number;
-  messages: FileContextMessage[];
-}
-
-interface GenkitMessage {
-  role: 'user' | 'model';
-  content: Part[];
-}
-
-type TutorMode = 'math' | 'geogebra' | 'stepByStep' | 'socratic';
-
-// Firestore's document size limit is 1 MiB (1,048,576 bytes).
-// We set a chunk size just below this to account for other fields in the document.
-const CHUNK_SIZE = 1000000; // 1,000,000 bytes
-
-const WelcomeMessage = ({ onPromptClick }: { onPromptClick: (prompt: string) => void }) => {
-  const [prompts, setPrompts] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPrompts = async () => {
-      setIsLoading(true);
-      try {
-        const { examplePrompts } = await getInitialPrompts();
-        setPrompts(examplePrompts);
-      } catch (error) {
-        // En caso de error, no mostramos nada.
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPrompts();
-  }, []);
-
-  return (
-    <div className="text-sm p-3 rounded-lg bg-secondary text-secondary-foreground w-full space-y-2">
-      <p className="font-medium">
-        ¡Hola! Soy tu asistente Geometra. ¿En qué puedo ayudarte hoy?
-      </p>
-      {isLoading ? (
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-6 w-1/2" />
-        </div>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {prompts.slice(0, 4).map((prompt, i) => (
-            <Button
-              key={i}
-              size="sm"
-              variant="outline"
-              onClick={() => onPromptClick(prompt)}
-              className="text-xs h-auto py-1 px-2"
-            >
-              {prompt}
-            </Button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const parseResponse = (content: string) => {
-  const buttonRegex = /\[button:(.*?)\]/g;
-  const parts = [];
-  let lastIndex = 0;
-  let match;
-
-  while ((match = buttonRegex.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({ type: 'text', value: content.substring(lastIndex, match.index) });
-    }
-    parts.push({ type: 'button', value: match[1] });
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < content.length) {
-    parts.push({ type: 'text', value: content.substring(lastIndex) });
-  }
-
-  const finalParts = parts.map(part => {
-    if (part.type === 'text') {
-      const codeRegex = /<code>(.*?)<\/code>/gs;
-      const textSubParts: ({ type: 'text' | 'code' | 'bold', value: string })[] = [];
-      let lastTextIndex = 0;
-      let combinedRegex = new RegExp(/<code>(.*?)<\/code>|\*\*(.*?)\*\*/gs);
-      let textMatch;
-
-      while ((textMatch = combinedRegex.exec(part.value)) !== null) {
-        if (textMatch.index > lastTextIndex) {
-          textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex, textMatch.index) });
-        }
-        if (textMatch[1]) { // <code> match
-          textSubParts.push({ type: 'code', value: textMatch[1] });
-        } else if (textMatch[2]) { // **bold** match
-          textSubParts.push({ type: 'bold', value: textMatch[2] });
-        }
-        lastTextIndex = textMatch.index + textMatch[0].length;
-      }
-
-      if (lastTextIndex < part.value.length) {
-        textSubParts.push({ type: 'text', value: part.value.substring(lastTextIndex) });
-      }
-      return textSubParts;
-    }
-    return part;
-  }).flat();
-
-  return finalParts;
-};
-
-export function ChatAssistant({ onGeoGebraCommand }: { onGeoGebraCommand?: (command: string) => void }) {
-  const [input, setInput] = useState('');
-  const [attachedImage, setAttachedImage] = useState<string | null>(null);
-  const [tutorMode, setTutorMode] = useState<TutorMode>('math');
-  const [previousTutorMode, setPreviousTutorMode] = useState<TutorMode>('math');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isPending, startTransition] = useTransition();
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-
-  const [audioState, setAudioState] = useState<{ id: string; src: string; isPlaying: boolean } | null>(null);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-<<<<<<< HEAD
-  // Estados para Google Drive
-  const [isDrivePickerOpen, setIsDrivePickerOpen] = useState(false);
-  const [driveAccessToken, setDriveAccessToken] = useState<string | null>(null);
-
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 

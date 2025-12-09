@@ -23,89 +23,9 @@ import { Button } from '@/components/ui/button';
 import { Check, X, GripVertical } from 'lucide-react';
 import type { DragDropExercise as DragDropExerciseType } from '@/types/exercises';
 import { validateDragDropOrder, calculateScore } from '@/lib/exercise-validator';
-<<<<<<< HEAD
 import HelpButton from './HelpButton';
 import HintModal from './HintModal';
 import { generateHintsForExercise, type ExerciseHint, type UserContext } from '@/ai/flows/hints-generator';
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
-
-interface SortableItemProps {
-    id: string;
-    content: string;
-    isCorrect?: boolean;
-    showFeedback: boolean;
-}
-
-function SortableItem({ id, content, isCorrect, showFeedback }: SortableItemProps) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className={`
-        flex items-center gap-3 p-4 rounded-lg border-2 bg-card
-        ${isDragging ? 'shadow-lg cursor-grabbing' : 'cursor-grab'}
-        ${showFeedback && isCorrect !== undefined
-                    ? isCorrect
-                        ? 'border-green-500 bg-green-50 dark:bg-green-950'
-                        : 'border-red-500 bg-red-50 dark:bg-red-950'
-                    : 'border-border hover:border-primary'
-                }
-      `}
-            {...attributes}
-            {...listeners}
-        >
-            <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-            <span className="flex-1">{content}</span>
-            {showFeedback && isCorrect !== undefined && (
-                isCorrect ? (
-                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
-                ) : (
-                    <X className="w-5 h-5 text-red-600 flex-shrink-0" />
-                )
-            )}
-        </div>
-    );
-}
-
-interface DragDropExerciseProps {
-    exercise: DragDropExerciseType;
-    onComplete?: (isCorrect: boolean, attempts: number) => void;
-}
-
-export default function DragDropExercise({ exercise, onComplete }: DragDropExerciseProps) {
-    // Inicializar con items en orden original para evitar error de hidratación
-    const [items, setItems] = useState(exercise.items);
-    const [showFeedback, setShowFeedback] = useState(false);
-    const [isCorrect, setIsCorrect] = useState(false);
-    const [attempts, setAttempts] = useState(0);
-    const [itemFeedback, setItemFeedback] = useState<Record<string, boolean>>({});
-
-<<<<<<< HEAD
-    // Help system state
-    const [hints, setHints] = useState<ExerciseHint[]>([]);
-    const [currentHintLevel, setCurrentHintLevel] = useState(0);
-    const [showHintModal, setShowHintModal] = useState(false);
-    const [isLoadingHint, setIsLoadingHint] = useState(false);
-    const [totalPenalty, setTotalPenalty] = useState(0);
-
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     // Mezclar items solo en el cliente después del primer render
     useEffect(() => {
         const shuffled = [...exercise.items];
@@ -167,7 +87,6 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
         setItems(shuffled);
         setShowFeedback(false);
         setItemFeedback({});
-<<<<<<< HEAD
         setCurrentHintLevel(0);
         setHints([]);
         setTotalPenalty(0);
@@ -214,121 +133,6 @@ export default function DragDropExercise({ exercise, onComplete }: DragDropExerc
         setShowHintModal(false);
         setIsCorrect(false);
         setShowFeedback(true);
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
-    }
-
-    const score = showFeedback
-        ? calculateScore(
-            Object.values(itemFeedback).filter(Boolean).length,
-            items.length
-        )
-        : null;
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{exercise.title}</CardTitle>
-                <CardDescription>{exercise.description}</CardDescription>
-                <div className="flex items-center gap-4 text-sm">
-                    <span className="text-muted-foreground">
-                        Dificultad: <span className="font-medium capitalize">{exercise.difficulty}</span>
-                    </span>
-                    <span className="text-muted-foreground">
-                        Puntos: <span className="font-medium">{exercise.points}</span>
-                    </span>
-                    {attempts > 0 && (
-                        <span className="text-muted-foreground">
-                            Intentos: <span className="font-medium">{attempts}</span>
-                        </span>
-                    )}
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                    Arrastra los elementos para ordenarlos correctamente
-                </p>
-
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <SortableContext
-                        items={items.map(item => item.id)}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        <div className="space-y-2">
-                            {items.map((item) => (
-                                <SortableItem
-                                    key={item.id}
-                                    id={item.id}
-                                    content={item.content}
-                                    isCorrect={itemFeedback[item.id]}
-                                    showFeedback={showFeedback}
-                                />
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
-
-                {showFeedback && score !== null && (
-                    <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-100 dark:bg-green-950' : 'bg-yellow-100 dark:bg-yellow-950'}`}>
-                        <p className="font-medium">
-                            {isCorrect ? (
-                                <span className="text-green-700 dark:text-green-300">
-                                    ¡Excelente! Orden correcto 🎉
-                                </span>
-                            ) : (
-                                <span className="text-yellow-700 dark:text-yellow-300">
-                                    Puntuación: {score}% - Sigue intentando
-                                </span>
-                            )}
-                        </p>
-                    </div>
-                )}
-
-<<<<<<< HEAD
-                <div className="flex gap-2 flex-wrap">
-                    <Button onClick={handleVerify} disabled={showFeedback && isCorrect}>
-                        Verificar Orden
-                    </Button>
-                    <HelpButton
-                        onClick={handleRequestHelp}
-                        currentLevel={currentHintLevel}
-                        disabled={isLoadingHint || (showFeedback && isCorrect)}
-                    />
-                    <Button variant="outline" onClick={handleReset}>
-                        Reiniciar
-                    </Button>
-                    {totalPenalty > 0 && (
-                        <div className="ml-auto flex items-center gap-2 text-sm text-orange-600">
-                            <span className="font-medium">Penalización total: -{totalPenalty} pts</span>
-                        </div>
-                    )}
-                </div>
-            </CardContent>
-
-            <HintModal
-                open={showHintModal}
-                onClose={() => setShowHintModal(false)}
-                hint={hints[currentHintLevel - 1] || null}
-                exerciseTitle={exercise.title}
-                onRequestMoreHelp={handleRequestHelp}
-                onShowSolution={handleShowSolution}
-                canRequestMore={currentHintLevel < 3}
-            />
-=======
-                <div className="flex gap-2">
-                    <Button onClick={handleVerify} disabled={showFeedback && isCorrect}>
-                        Verificar Orden
-                    </Button>
-                    <Button variant="outline" onClick={handleReset}>
-                        Reiniciar
-                    </Button>
-                </div>
-            </CardContent>
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
         </Card>
     );
 }

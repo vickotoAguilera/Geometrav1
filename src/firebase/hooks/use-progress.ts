@@ -7,11 +7,7 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
-<<<<<<< HEAD
 import type { UserProgress } from '@/types/user-profile';
-=======
-import type { OriginalUserProgress as UserProgress } from '@/types/user-profile';
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 import { getLevelProgress, didLevelUp, getNewLevel } from '@/lib/points-system';
 
 export function useProgress() {
@@ -183,7 +179,6 @@ export function useProgress() {
         }
     };
 
-<<<<<<< HEAD
 =======
     const addAchievement = async (achievement: any) => {
         if (!user || !firestore) {
@@ -216,8 +211,5 @@ export function useProgress() {
         incrementTests,
         updateStreak,
 <<<<<<< HEAD
-=======
-        addAchievement,
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
     };
 }

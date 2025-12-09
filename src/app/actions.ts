@@ -6,36 +6,15 @@ import {
   GetStartedPromptOutput,
 } from '@/ai/flows/get-started-prompt';
 import { Part } from 'genkit';
-<<<<<<< HEAD
 import { processGoogleDriveFile as processFile } from '@/lib/file-processor';
 import { getFirestore } from '@/firebase/server';
 import { cookies } from 'next/headers';
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
-
-interface GenkitMessage {
-  role: 'user' | 'model';
-  content: Part[];
-}
-
-interface ContextFile {
-<<<<<<< HEAD
-  fileName: string;
-  fileDataUri: string;
-=======
-    fileName: string;
-    fileDataUri: string;
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }
 
 export async function getAiResponse(
   queryText: string,
   history: GenkitMessage[],
-<<<<<<< HEAD
   tutorMode: 'math' | 'geogebra' | 'stepByStep' | 'socratic',
-=======
-  tutorMode: 'math' | 'geogebra',
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
   imageQueryDataUri?: string,
   activeContextFiles?: ContextFile[],
 ): Promise<MathAssistantOutput> {
