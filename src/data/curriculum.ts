@@ -5,9 +5,7 @@ export interface Subject {
     name: string;
     icon: string;
     description: string;
-=======
     exerciseCount?: number; // Número de ejercicios en el pool (por defecto 20)
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 }
 
 export interface Grade {
@@ -18,7 +16,6 @@ export interface Grade {
 
 // Currículum de 1° a 4° Medio (basado en contenido real)
 export const curriculum: Grade[] = [
-<<<<<<< HEAD
     {
         id: 'primero-medio',
         name: '1° Medio',
