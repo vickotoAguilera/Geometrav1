@@ -61,35 +61,33 @@ const mathAssistantFlow = ai.defineFlow(
       let fileContents: string[] = [];
       for (const file of input.activeContextFiles) {
         try {
-          const base64Data = file.fileDataUri.substring(file.fileDataUri.indexOf(',') + 1);
-          const buffer = Buffer.from(base64Data, 'base64');
-          let textContent = '';
-
-          if (file.fileName.endsWith('.docx')) {
-            const result = await mammoth.extractRawText({ buffer });
-            textContent = result.value;
-
-            const imagePlaceholderRegex = /\[IMAGEN:.+?\]/gi;
-            if (imagePlaceholderRegex.test(textContent)) {
-              textContent += "\n\n--- INSTRUCCIÓN ADICIONAL: El documento anterior contiene marcadores de imagen como [IMAGEN: ...]. Si la pregunta del usuario se relaciona con uno de estos marcadores, DEBES pedirle al usuario que suba la imagen correspondiente para poder analizarla. Por ejemplo: 'Veo que este ejercicio se apoya en una imagen. Por favor, súbela al chat para poder ayudarte mejor'. NO intentes responder sin la imagen si esta es necesaria. ---";
+          if (file.fileDataUri.startsWith('data:')) {
+            // It's a Data URI, handle as before
+            const base64Data = file.fileDataUri.substring(file.fileDataUri.indexOf(',') + 1);
+            const buffer = Buffer.from(base64Data, 'base64');
+            let textContent = '';
+  
+            if (file.fileName.endsWith('.docx')) {
+              const result = await mammoth.extractRawText({ buffer });
+              textContent = result.value;
+  
+              const imagePlaceholderRegex = /\[IMAGEN:.+?\]/gi;
+              if (imagePlaceholderRegex.test(textContent)) {
+                textContent += "\n\n--- INSTRUCCIÓN ADICIONAL: El documento anterior contiene marcadores de imagen como [IMAGEN: ...]. Si la pregunta del usuario se relaciona con uno de estos marcadores, DEBES pedirle al usuario que suba la imagen correspondiente para poder analizarla. Por ejemplo: 'Veo que este ejercicio se apoya en una imagen. Por favor, súbela al chat para poder ayudarte mejor'. NO intentes responder sin la imagen si esta es necesaria. ---";
+              }
+  
+              fileContents.push(`Contenido del archivo '${file.fileName}':\n${textContent}`);
+            } else if (file.fileDataUri.startsWith('data:image/')) {
+               // Handle images
+               prompt.push({ media: { url: file.fileDataUri } });
+               fileContents.push(`[Imagen '${file.fileName}' adjunta para análisis]`);
             }
-
-            fileContents.push(`Contenido del archivo '${file.fileName}':\n${textContent}`);
-          } else if (file.fileName.endsWith('.pdf')) {
-            // PDFs are now processed with Google AI File Manager
-            // The extracted text is already in fileDataUri (not base64 encoded)
-            textContent = file.fileDataUri || '[PDF sin contenido extraído]';
-
-            console.log(`PDF procesado: ${file.fileName}, longitud del texto: ${textContent.length} caracteres`);
-            console.log(`Primeros 200 caracteres: ${textContent.substring(0, 200)}`);
-
-            fileContents.push(`Contenido del archivo '${file.fileName}':\n${textContent}`);
-          } else if (file.fileDataUri.startsWith('data:image/')) {
-            // Handle images
-            prompt.push({ media: { url: file.fileDataUri } });
-            fileContents.push(`[Imagen '${file.fileName}' adjunta para análisis]`);
+          } else {
+             // It's likely PLAIN TEXT (from Google Drive PDF/Doc extraction)
+             const textContent = file.fileDataUri || '[Archivo sin contenido extraído]';
+             console.log(`Archivo de texto procesado: ${file.fileName}, longitud: ${textContent.length}`);
+             fileContents.push(`Contenido del archivo '${file.fileName}':\n${textContent}`);
           }
-
         } catch (e) {
           console.error(`Error processing file ${file.fileName} in flow: `, e);
         }
