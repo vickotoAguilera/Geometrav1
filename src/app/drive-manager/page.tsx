@@ -170,58 +170,9 @@ export default function DriveManagerPage() {
                 const processedData = result.data;
                 const fileContent = processedData.extractedContent || processedData.visualDescription || '';
                 
-                // Guardar en Firestore (Chat Context)
-                const messagesRef = collection(firestore, 'users', user.uid, 'messages');
-                
-                // Límite de Firestore: 1MB. Usamos 900KB para estar seguros.
-                const CHUNK_SIZE = 900000; 
-
-                if (fileContent.length > CHUNK_SIZE) {
-                    // Lógica de Chunking
-                    const totalParts = Math.ceil(fileContent.length / CHUNK_SIZE);
-                    const groupId = `group-${Date.now()}`;
-                    const batch = writeBatch(firestore);
-
-                    for (let i = 0; i < totalParts; i++) {
-                        const chunkContent = fileContent.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-                        const docRef = doc(collection(firestore, 'users', user.uid, 'messages'));
-                        
-                        const fileMessageData = {
-                            role: 'user',
-                            type: 'fileContext',
-                            content: chunkContent,
-                            fileName: `${file.name} - Parte ${i + 1}/${totalParts}`,
-                            isActive: true,
-                            createdAt: serverTimestamp(),
-                            groupId,
-                            partNumber: i + 1,
-                            totalParts,
-                            // Metadata adicional
-                            driveFileId: file.id,
-                            mimeType: file.mimeType,
-                            fileSize: file.size
-                        };
-                        batch.set(docRef, fileMessageData);
-                    }
-                    await batch.commit();
-                    alert(`✅ Archivo "${file.name}" procesado y adjuntado en ${totalParts} partes!`);
-                } else {
-                    // Archivo único
-                    await addDoc(messagesRef, {
-                        role: 'user',
-                        type: 'fileContext',
-                        content: fileContent,
-                        fileName: file.name,
-                        isActive: true,
-                        createdAt: serverTimestamp(),
-                        // Metadata adicional
-                        driveFileId: file.id,
-                        mimeType: file.mimeType,
-                        fileSize: file.size,
-                        summary: processedData.contentSummary
-                    });
-                    alert(`✅ Archivo "${file.name}" adjuntado al chat exitosamente!`);
-                }
+                // Guardado realizado en el servidor para evitar bloqueos del cliente
+                // Solo notificamos éxito
+                alert(`✅ Archivo "${file.name}" procesado y guardado en el chat exitosamente!`);
 
             } else {
                 alert(`❌ Error: ${result.error || 'No se pudo obtener el contenido del archivo'}`);

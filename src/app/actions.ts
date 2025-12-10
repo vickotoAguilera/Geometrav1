@@ -71,16 +71,66 @@ export async function processGoogleDriveFile(
     const firestore = getFirestore();
 
     // Procesar archivo - ahora retorna contenido en lugar de guardar
-    const result = await processFile(
       driveFileId,
       userId,
       accessToken,
       firestore as any
     );
 
+    // Save to Firestore on the SERVER SIDE
+    const fileContent = result.extractedContent || result.visualDescription || '';
+    const messagesRef = firestore.collection('users').doc(userId).collection('messages');
+    
+    // Chunking logic (same as client)
+    const CHUNK_SIZE = 900000; 
+    
+    if (fileContent.length > CHUNK_SIZE) {
+        const totalParts = Math.ceil(fileContent.length / CHUNK_SIZE);
+        const groupId = `group-${Date.now()}`;
+        const batch = firestore.batch();
+
+        for (let i = 0; i < totalParts; i++) {
+            const chunkContent = fileContent.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+            const docRef = messagesRef.doc(); // Auto ID
+            
+            const fileMessageData = {
+                role: 'user',
+                type: 'fileContext',
+                content: chunkContent,
+                fileName: `${result.fileName} - Parte ${i + 1}/${totalParts}`,
+                isActive: true,
+                createdAt: new Date(), // Use server date
+                groupId,
+                partNumber: i + 1,
+                totalParts,
+                // Metadata
+                driveFileId: result.driveFileId,
+                mimeType: result.mimeType,
+                fileSize: result.fileSize
+            };
+            batch.set(docRef, fileMessageData);
+        }
+        await batch.commit();
+    } else {
+        // Single file
+        await messagesRef.add({
+            role: 'user',
+            type: 'fileContext',
+            content: fileContent,
+            fileName: result.fileName,
+            isActive: true,
+            createdAt: new Date(),
+            // Metadata
+            driveFileId: result.driveFileId,
+            mimeType: result.mimeType,
+            fileSize: result.fileSize,
+            summary: result.contentSummary
+        });
+    }
+
     return {
       success: true,
-      data: result, // Retornar todos los datos procesados
+      data: { ...result, savedToServer: true }, // Indicate it was saved
     };
   } catch (error) {
     console.error('Error in processGoogleDriveFile server action:', error);
