@@ -1,3 +1,5 @@
+'use server';
+
 import { mathAssistant as mathAssistantFlow, MathAssistantOutput } from '@/ai/flows/math-assistant';
 import { generateSpeech } from './tts-actions';
 import {
