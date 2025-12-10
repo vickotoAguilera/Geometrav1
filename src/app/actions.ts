@@ -29,67 +29,78 @@ export async function getAiResponse(
   activeFileParams?: { ids: { type: 'group' | 'single', id: string }[], userId: string },
 ): Promise<MathAssistantOutput> {
 
-  const activeContextFiles: ContextFile[] = [];
+  try {
+    const activeContextFiles: ContextFile[] = [];
 
-  // Fetch content from Firestore if IDs are provided
-  if (activeFileParams && activeFileParams.ids.length > 0 && activeFileParams.userId) {
-    try {
-        const firestore = getFirestore();
-        const messagesRef = firestore.collection('users').doc(activeFileParams.userId).collection('messages');
+    // Fetch content from Firestore if IDs are provided
+    if (activeFileParams && activeFileParams.ids.length > 0 && activeFileParams.userId) {
+      try {
+          const firestore = getFirestore();
+          const messagesRef = firestore.collection('users').doc(activeFileParams.userId).collection('messages');
 
-        for (const item of activeFileParams.ids) {
-            let contentParts: { part: number, content: string, fileName: string }[] = [];
-            let fileName = 'Archivo';
+          for (const item of activeFileParams.ids) {
+              let contentParts: { part: number, content: string, fileName: string }[] = [];
+              let fileName = 'Archivo';
 
-            if (item.type === 'group') {
-                // Fetch all parts of the group
-                const q = messagesRef.where('groupId', '==', item.id).orderBy('partNumber');
-                const snapshot = await q.get();
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    contentParts.push({ 
-                        part: data.partNumber || 1, 
-                        content: data.content,
-                        fileName: data.fileName.replace(/ - Parte \d+\/\d+$/, '')
-                    });
-                    fileName = data.fileName.replace(/ - Parte \d+\/\d+$/, '');
-                });
-            } else {
-                // Fetch single doc
-                const docSnap = await messagesRef.doc(item.id).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    contentParts.push({ part: 1, content: data?.content, fileName: data?.fileName });
-                    fileName = data?.fileName;
-                }
-            }
+              if (item.type === 'group') {
+                  // Fetch all parts of the group
+                  const q = messagesRef.where('groupId', '==', item.id).orderBy('partNumber');
+                  const snapshot = await q.get();
+                  snapshot.forEach(doc => {
+                      const data = doc.data();
+                      contentParts.push({ 
+                          part: data.partNumber || 1, 
+                          content: data.content,
+                          fileName: data.fileName.replace(/ - Parte \d+\/\d+$/, '')
+                      });
+                      fileName = data.fileName.replace(/ - Parte \d+\/\d+$/, '');
+                  });
+              } else {
+                  // Fetch single doc
+                  const docSnap = await messagesRef.doc(item.id).get();
+                  if (docSnap.exists) {
+                      const data = docSnap.data();
+                      contentParts.push({ part: 1, content: data?.content, fileName: data?.fileName });
+                      fileName = data?.fileName;
+                  }
+              }
 
-            // Reassemble
-            if (contentParts.length > 0) {
-                // Sort just in case (though query was sorted)
-                contentParts.sort((a, b) => a.part - b.part);
-                const fullContent = contentParts.map(p => p.content).join('');
-                activeContextFiles.push({
-                    fileName: fileName,
-                    fileDataUri: fullContent
-                });
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching context files from Firestore:", error);
-        // Continue without context if fetch fails, but log it
+              // Reassemble
+              if (contentParts.length > 0) {
+                  // Sort just in case (though query was sorted)
+                  contentParts.sort((a, b) => a.part - b.part);
+                  const fullContent = contentParts.map(p => p.content).join('');
+                  activeContextFiles.push({
+                      fileName: fileName,
+                      fileDataUri: fullContent
+                  });
+              }
+          }
+      } catch (error) {
+          console.error("[CONTEXT_FETCH_ERROR] Failed to fetch files from Firestore (continuing without context):", error);
+          // Continue without context to prevent valid text query failure
+      }
     }
+
+    const input = {
+      query: queryText,
+      history: history,
+      tutorMode: tutorMode,
+      imageQueryDataUri: imageQueryDataUri,
+      activeContextFiles: activeContextFiles,
+    };
+
+    return await mathAssistant(input);
+
+  } catch (criticalError: any) {
+      console.error("[AI_ACTION_CRITICAL_ERROR]", criticalError);
+      
+      // Return a safe fallback response so the UI doesn't crash with 500
+      return {
+          response: `⚠️ **Error del Sistema:** ${criticalError.message || 'Error desconocido'}.\n\n(Detalles técnicos: ${JSON.stringify(criticalError, null, 2)})`,
+          tutorMode: tutorMode
+      };
   }
-
-  const input = {
-    query: queryText,
-    history: history,
-    tutorMode: tutorMode,
-    imageQueryDataUri: imageQueryDataUri,
-    activeContextFiles: activeContextFiles,
-  };
-
-  return await mathAssistant(input);
 }
 
 export async function getInitialPrompts(): Promise<GetStartedPromptOutput> {
