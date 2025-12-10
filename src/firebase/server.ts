@@ -17,8 +17,8 @@ const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
         : null;
 
 if (serviceAccount) {
-    // Verificar si la app ya existe antes de inicializar
-    if (!getApps().length) {
+    // Verificar si la app ya existe antes de inicializar para evitar duplicados
+    if (getApps().length === 0) {
         initializeApp({
             credential: cert(serviceAccount),
         });
