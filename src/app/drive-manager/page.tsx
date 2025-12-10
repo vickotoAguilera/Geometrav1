@@ -473,6 +473,13 @@ export default function DriveManagerPage() {
                     </CardHeader>
                 </Card>
 
+                {/* Aviso sobre bloqueadores */}
+                <Alert className="bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-900">
+                    <AlertDescription className="text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
+                         <span>⚠️ <strong>Importante:</strong> Si tienes problemas subiendo archivos, por favor desactiva temporalmente tus bloqueadores de anuncios o extensiones de privacidad (AdBlock, uBlock, etc). Si no sabes cómo, pregúntale a Geometra en el chat.</span>
+                    </AlertDescription>
+                </Alert>
+
                 {/* Indicador de Almacenamiento */}
                 {accessToken && <StorageIndicator accessToken={accessToken} />}
 
