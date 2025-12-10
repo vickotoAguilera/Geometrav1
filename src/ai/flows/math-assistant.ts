@@ -106,7 +106,18 @@ const mathAssistantFlow = ai.defineFlow(
       prompt.push({ text: userQuery });
     }
 
-    const history = input.history || [];
+    // Sanitize history to ensure content is always an array (fix for potential 'length' error)
+    const rawHistory = input.history || [];
+    const history = rawHistory.map(msg => ({
+        role: msg.role,
+        content: Array.isArray(msg.content) ? msg.content : [{ text: String(msg.content || '') }]
+    }));
+
+    // Ensure prompt is not empty if user sends just whitespace
+    if (prompt.length === 0) {
+        prompt.push({ text: "..." });
+    }
+
     const newHistory = [...history, { role: 'user', content: prompt }];
 
     const mathTutorSystemPrompt = `Eres un erudito de las matemáticas, el mejor del mundo, y tu nombre es Geometra. Tu propósito es enseñar, no solo resolver. Eres paciente, alentador y extremadamente didáctico, funcionando como un tutor socrático.
