@@ -71,6 +71,7 @@ export async function processGoogleDriveFile(
     const firestore = getFirestore();
 
     // Procesar archivo - ahora retorna contenido en lugar de guardar
+    const result = await processFile(
       driveFileId,
       userId,
       accessToken,
