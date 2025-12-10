@@ -37,7 +37,7 @@ async function testChat() {
             [], 
             'math', 
             undefined, 
-            undefined // No files
+            { ids: [], userId: 'test-user' } // activeFileParams matching signature
         );
 
         console.log('\n✅ ¡ÉXITO! Respuesta recibida:');

@@ -1,6 +1,5 @@
-'use server';
-
-import { mathAssistant, MathAssistantOutput } from '@/ai/flows/math-assistant';
+import { mathAssistant as mathAssistantFlow, MathAssistantOutput } from '@/ai/flows/math-assistant';
+import { generateSpeech } from './tts-actions';
 import {
   getStartedPrompt,
   GetStartedPromptOutput,
@@ -23,9 +22,8 @@ interface ContextFile {
 export async function getAiResponse(
   queryText: string,
   history: GenkitMessage[],
-  tutorMode: 'math' | 'geogebra' | 'stepByStep' | 'socratic',
+  tutorMode: string = 'math',
   imageQueryDataUri?: string,
-  // Changed: receive IDs instead of content to avoid payload limits
   activeFileParams?: { ids: { type: 'group' | 'single', id: string }[], userId: string },
 ): Promise<MathAssistantOutput> {
 
@@ -82,15 +80,21 @@ export async function getAiResponse(
       }
     }
 
+    // Construct the input object
+    // Ensure prompt is always a string or Part[] as expected by schemas
+    const finalPrompt = activeContextFiles.length > 0
+        ? `[Contexto de Archivos Activos]:\n${activeContextFiles.map(f => `--- Archivo: ${f.fileName} ---\n${f.fileDataUri}\n--- Fin Archivo ---`).join('\n')}\n\n[Consulta del Usuario]: ${queryText}`
+        : queryText;
+
     const input = {
-      query: queryText,
+      query: finalPrompt,
       history: history,
-      tutorMode: tutorMode,
+      tutorMode: tutorMode as any,
       imageQueryDataUri: imageQueryDataUri,
       activeContextFiles: activeContextFiles,
     };
 
-    return await mathAssistant(input);
+    return await mathAssistantFlow(input);
 
   } catch (criticalError: any) {
       console.error("[AI_ACTION_CRITICAL_ERROR]", criticalError);
@@ -98,8 +102,10 @@ export async function getAiResponse(
       // Return a safe fallback response so the UI doesn't crash with 500
       return {
           response: `⚠️ **Error del Sistema:** ${criticalError.message || 'Error desconocido'}.\n\n(Detalles técnicos: ${JSON.stringify(criticalError, null, 2)})`,
-          tutorMode: tutorMode
-      };
+          questions: [],
+          latex: null,
+          geogebra: null
+      } as MathAssistantOutput;
   }
 }
 

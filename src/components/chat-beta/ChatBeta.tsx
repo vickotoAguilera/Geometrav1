@@ -170,13 +170,27 @@ export function ChatBeta() {
                 fileDataUri: f.extractedContent || f.fileDataUri || '',
             }));
 
+            // Prepare active file params (ids) to send to server
+            // We use the same 'activeFiles' list we prepared earlier, but mapping to the ID structure expected by actions.ts
+            const activeFileParamsIds: { type: 'group' | 'single', id: string }[] = [];
+            
+            // Map standalone files
+            standaloneFiles.forEach((f) => {
+                 activeFileParamsIds.push({ type: 'single', id: f.id });
+            });
+            
+            // Map file groups
+            for (const [groupId, _] of fileGroups) {
+                activeFileParamsIds.push({ type: 'group', id: groupId });
+            }
+
             // Get AI response
             const response = await getAiResponse(
                 content,
                 history as any,
                 tutorMode,
                 screenshot, // imageQueryDataUri (screenshot)
-                activeFiles
+                { ids: activeFileParamsIds, userId: user.uid } // activeFileParams
             );
 
             // Save AI response
