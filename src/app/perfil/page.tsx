@@ -17,22 +17,6 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import { Edit, TrendingUp, Award, Calendar, Target, GraduationCap, Shield } from 'lucide-react';
-// ... existing imports ...
-
-// ... inside function ...
-function PerfilPageContent() {
-    const { user, isUserLoading } = useUser();
-    // ...
-    const searchParams = useSearchParams();
-    const router = useRouter(); // Add this
-    const { toast } = useToast();
-
-    // ... useEffect ...
-
-    const isFeedbackOpen = searchParams.get('tab') === 'feedback';
-    const closeFeedback = () => {
-         router.replace('/perfil');
-    };
 import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
 import { StorageManager } from '@/components/storage/StorageManager';
@@ -50,6 +34,18 @@ function PerfilPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { toast } = useToast();
+
+    // Mostrar toast si viene de guardar cambios
+    useEffect(() => {
+        if (searchParams.get('saved') === 'true') {
+            toast({
+                title: '✅ Cambios guardados exitosamente',
+                description: 'Tu perfil ha sido actualizado correctamente.',
+            });
+            // Limpiar el query param de la URL
+            window.history.replaceState({}, '', '/perfil');
+        }
+    }, [searchParams, toast]);
 
     // Mostrar toast si viene de guardar cambios
     useEffect(() => {
