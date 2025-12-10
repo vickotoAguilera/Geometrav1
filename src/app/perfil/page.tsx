@@ -14,9 +14,25 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import { Edit, TrendingUp, Award, Calendar, Target, GraduationCap, Shield } from 'lucide-react';
+// ... existing imports ...
+
+// ... inside function ...
+function PerfilPageContent() {
+    const { user, isUserLoading } = useUser();
+    // ...
+    const searchParams = useSearchParams();
+    const router = useRouter(); // Add this
+    const { toast } = useToast();
+
+    // ... useEffect ...
+
+    const isFeedbackOpen = searchParams.get('tab') === 'feedback';
+    const closeFeedback = () => {
+         router.replace('/perfil');
+    };
 import { getLevelProgress } from '@/lib/points-system';
 import { useToast } from '@/hooks/use-toast';
 import { StorageManager } from '@/components/storage/StorageManager';
@@ -24,6 +40,7 @@ import { TeacherRequestButton } from '@/components/profile/TeacherRequestButton'
 import DebugPanel from '@/components/debug/DebugPanel';
 import ResetTeacherRequestButton from '@/components/debug/ResetTeacherRequestButton';
 import { GoogleDriveConnect } from '@/components/GoogleDriveConnect';
+import FeedbackModal from '@/components/feedback/FeedbackModal';
 
 function PerfilPageContent() {
     const { user, isUserLoading } = useUser();
@@ -31,6 +48,7 @@ function PerfilPageContent() {
     const { mathLevel, isLoading: isLoadingMathLevel } = useMathLevel();
     const { progress, isLoading: isLoadingProgress } = useProgress();
     const searchParams = useSearchParams();
+    const router = useRouter();
     const { toast } = useToast();
 
     // Mostrar toast si viene de guardar cambios
@@ -44,6 +62,11 @@ function PerfilPageContent() {
             window.history.replaceState({}, '', '/perfil');
         }
     }, [searchParams, toast]);
+
+    const isFeedbackOpen = searchParams.get('tab') === 'feedback';
+    const closeFeedback = () => {
+         router.replace('/perfil');
+    };
 
     if (isUserLoading || isLoadingProfile || isLoadingMathLevel || isLoadingProgress) {
         return <PerfilSkeleton />;
@@ -331,6 +354,11 @@ function PerfilPageContent() {
                     <ResetTeacherRequestButton />
                 </>
             )}
+            
+            <FeedbackModal 
+                isOpen={isFeedbackOpen}
+                onClose={closeFeedback}
+            />
         </div>
     );
 }
