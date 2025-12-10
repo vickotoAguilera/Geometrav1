@@ -14,7 +14,7 @@ import { deleteFile, permanentlyDeleteFile } from '@/lib/drive-storage';
 import { UploadProgress, UploadItem } from '@/components/drive/UploadProgress';
 import { Loader2, Search, FolderOpen, Grid3x3, List, RefreshCw, ChevronRight, Home, FolderPlus, Upload, Trash2, ArrowUpDown } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { processGoogleDriveFile } from '@/app/actions';
 
@@ -166,10 +166,65 @@ export default function DriveManagerPage() {
             setLoading(true);
             const result = await processGoogleDriveFile(file.id, user.uid, accessToken);
 
-            if (result.success) {
-                alert(`✅ Archivo "${file.name}\" procesado exitosamente!`);
+            if (result.success && result.data) {
+                const processedData = result.data;
+                const fileContent = processedData.extractedContent || processedData.visualDescription || '';
+                
+                // Guardar en Firestore (Chat Context)
+                const messagesRef = collection(firestore, 'users', user.uid, 'messages');
+                
+                // Límite de Firestore: 1MB. Usamos 900KB para estar seguros.
+                const CHUNK_SIZE = 900000; 
+
+                if (fileContent.length > CHUNK_SIZE) {
+                    // Lógica de Chunking
+                    const totalParts = Math.ceil(fileContent.length / CHUNK_SIZE);
+                    const groupId = `group-${Date.now()}`;
+                    const batch = writeBatch(firestore);
+
+                    for (let i = 0; i < totalParts; i++) {
+                        const chunkContent = fileContent.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                        const docRef = doc(collection(firestore, 'users', user.uid, 'messages'));
+                        
+                        const fileMessageData = {
+                            role: 'user',
+                            type: 'fileContext',
+                            content: chunkContent,
+                            fileName: `${file.name} - Parte ${i + 1}/${totalParts}`,
+                            isActive: true,
+                            createdAt: serverTimestamp(),
+                            groupId,
+                            partNumber: i + 1,
+                            totalParts,
+                            // Metadata adicional
+                            driveFileId: file.id,
+                            mimeType: file.mimeType,
+                            fileSize: file.size
+                        };
+                        batch.set(docRef, fileMessageData);
+                    }
+                    await batch.commit();
+                    alert(`✅ Archivo "${file.name}" procesado y adjuntado en ${totalParts} partes!`);
+                } else {
+                    // Archivo único
+                    await addDoc(messagesRef, {
+                        role: 'user',
+                        type: 'fileContext',
+                        content: fileContent,
+                        fileName: file.name,
+                        isActive: true,
+                        createdAt: serverTimestamp(),
+                        // Metadata adicional
+                        driveFileId: file.id,
+                        mimeType: file.mimeType,
+                        fileSize: file.size,
+                        summary: processedData.contentSummary
+                    });
+                    alert(`✅ Archivo "${file.name}" adjuntado al chat exitosamente!`);
+                }
+
             } else {
-                alert(`❌ Error: ${result.error}`);
+                alert(`❌ Error: ${result.error || 'No se pudo obtener el contenido del archivo'}`);
             }
         } catch (err) {
             console.error('Error processing file:', err);
