@@ -422,34 +422,25 @@ export function ChatAssistant({ onGeoGebraCommand }: { onGeoGebraCommand?: (comm
         try {
           await saveMessage(userMessage);
 
-          const activeFiles = fileContextMessages
-            .filter(f => f.isActive)
-            .sort((a, b) => (a.partNumber || 0) - (b.partNumber || 0))
-            .map(f => ({ fileName: f.fileName, fileDataUri: f.content }));
+          const activeFiles = fileContextMessages.filter(f => f.isActive);
+          const activeFileIds: { type: 'group' | 'single', id: string }[] = [];
+          const processedGroups = new Set<string>();
 
-          const concatenatedFiles: { fileName: string, fileDataUri: string }[] = [];
-          if (activeFiles.length > 0) {
-            const fileGroups: { [key: string]: { fileName: string, content: string[] } } = {};
-
-            activeFiles.forEach(f => {
-              const baseName = f.fileName.replace(/ - Parte \d+\/\d+$/, '');
-              if (!fileGroups[baseName]) {
-                fileGroups[baseName] = { fileName: baseName, content: [] };
-              }
-              // The content from Data URI is already a string, no need for Buffer
-              fileGroups[baseName].content.push(f.fileDataUri);
-            });
-
-            for (const groupName in fileGroups) {
-              concatenatedFiles.push({
-                fileName: fileGroups[groupName].fileName,
-                fileDataUri: fileGroups[groupName].content.join('')
-              });
+          activeFiles.forEach(f => {
+            if (f.groupId) {
+                if (!processedGroups.has(f.groupId)) {
+                    activeFileIds.push({ type: 'group', id: f.groupId });
+                    processedGroups.add(f.groupId);
+                }
+            } else {
+                activeFileIds.push({ type: 'single', id: f.id });
             }
+          });
 
+          if (activeFileIds.length > 0) {
             toast({
               title: "Usando contexto",
-              description: `La IA está usando ${concatenatedFiles.length} archivo(s) como contexto.`,
+              description: `La IA está analizando ${activeFileIds.length} archivo(s) desde la nube.`,
             });
           }
 
@@ -459,27 +450,31 @@ export function ChatAssistant({ onGeoGebraCommand }: { onGeoGebraCommand?: (comm
               role: m.role === 'assistant' ? 'model' : 'user',
               content: [{ text: (m as TextMessage).content }],
             }));
-
-          // Detectar cambio de modo y agregar mensaje del sistema
+          
+          // ... (Mode detection logic remains same)
           const modeNames = {
             math: 'Normal',
             geogebra: 'GeoGebra',
             stepByStep: 'Paso a Paso',
             socratic: 'Sócrates'
           };
-
           if (tutorMode !== previousTutorMode && history.length > 0) {
-            // Agregar mensaje del sistema informando del cambio de modo
-            history.push({
-              role: 'user',
-              content: [{
-                text: `[CAMBIO DE MODO: El usuario ha cambiado del modo "${modeNames[previousTutorMode]}" al modo "${modeNames[tutorMode]}". Por favor, adapta tu siguiente respuesta al nuevo modo de enseñanza. Si el usuario hizo una pregunta, respóndela usando el nuevo enfoque.]`
-              }]
-            });
-            setPreviousTutorMode(tutorMode);
+             history.push({
+               role: 'user',
+               content: [{
+                 text: `[CAMBIO DE MODO: El usuario ha cambiado del modo "${modeNames[previousTutorMode]}" al modo "${modeNames[tutorMode]}". Por favor, adapta tu siguiente respuesta al nuevo modo de enseñanza. Si el usuario hizo una pregunta, respóndela usando el nuevo enfoque.]`
+               }]
+             });
+             setPreviousTutorMode(tutorMode);
           }
 
-          const { response: aiResponse } = await getAiResponse(currentInput, history, tutorMode, currentAttachedImage ?? undefined, concatenatedFiles);
+          const { response: aiResponse } = await getAiResponse(
+              currentInput, 
+              history, 
+              tutorMode, 
+              currentAttachedImage ?? undefined, 
+              { ids: activeFileIds, userId: user!.uid }
+          );
 
           // Detectar y ejecutar comandos de GeoGebra
           let finalResponse = aiResponse;

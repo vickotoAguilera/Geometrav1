@@ -25,8 +25,61 @@ export async function getAiResponse(
   history: GenkitMessage[],
   tutorMode: 'math' | 'geogebra' | 'stepByStep' | 'socratic',
   imageQueryDataUri?: string,
-  activeContextFiles?: ContextFile[],
+  // Changed: receive IDs instead of content to avoid payload limits
+  activeFileParams?: { ids: { type: 'group' | 'single', id: string }[], userId: string },
 ): Promise<MathAssistantOutput> {
+
+  const activeContextFiles: ContextFile[] = [];
+
+  // Fetch content from Firestore if IDs are provided
+  if (activeFileParams && activeFileParams.ids.length > 0 && activeFileParams.userId) {
+    try {
+        const firestore = getFirestore();
+        const messagesRef = firestore.collection('users').doc(activeFileParams.userId).collection('messages');
+
+        for (const item of activeFileParams.ids) {
+            let contentParts: { part: number, content: string, fileName: string }[] = [];
+            let fileName = 'Archivo';
+
+            if (item.type === 'group') {
+                // Fetch all parts of the group
+                const q = messagesRef.where('groupId', '==', item.id).orderBy('partNumber');
+                const snapshot = await q.get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    contentParts.push({ 
+                        part: data.partNumber || 1, 
+                        content: data.content,
+                        fileName: data.fileName.replace(/ - Parte \d+\/\d+$/, '')
+                    });
+                    fileName = data.fileName.replace(/ - Parte \d+\/\d+$/, '');
+                });
+            } else {
+                // Fetch single doc
+                const docSnap = await messagesRef.doc(item.id).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    contentParts.push({ part: 1, content: data?.content, fileName: data?.fileName });
+                    fileName = data?.fileName;
+                }
+            }
+
+            // Reassemble
+            if (contentParts.length > 0) {
+                // Sort just in case (though query was sorted)
+                contentParts.sort((a, b) => a.part - b.part);
+                const fullContent = contentParts.map(p => p.content).join('');
+                activeContextFiles.push({
+                    fileName: fileName,
+                    fileDataUri: fullContent
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching context files from Firestore:", error);
+        // Continue without context if fetch fails, but log it
+    }
+  }
 
   const input = {
     query: queryText,
