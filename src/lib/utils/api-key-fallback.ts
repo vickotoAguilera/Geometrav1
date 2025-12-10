@@ -74,9 +74,10 @@ export async function processWithApiKeyFallback<T>(
             lastError = error as Error;
             const errorMessage = error instanceof Error ? error.message : String(error);
 
-            // Si es error de cuota (429), probar con la siguiente key
-            if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('exhausted')) {
-                console.log(`⚠️ API Key ${i + 1} agotada, probando con la siguiente...`);
+            // Si es error de cuota (429) o sobrecarga (503), probar con la siguiente key
+            if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('exhausted') || 
+                errorMessage.includes('503') || errorMessage.includes('overloaded')) {
+                console.log(`⚠️ API Key ${i + 1} falló (cuota o sobrecarga), probando con la siguiente...`);
                 continue;
             }
 
