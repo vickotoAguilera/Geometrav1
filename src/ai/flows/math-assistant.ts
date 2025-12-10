@@ -48,6 +48,7 @@ const mathAssistantFlow = ai.defineFlow(
     outputSchema: MathAssistantOutputSchema,
   },
   async input => {
+    try {
     let documentContext = '';
     const prompt: Part[] = [];
 
@@ -118,7 +119,7 @@ const mathAssistantFlow = ai.defineFlow(
         prompt.push({ text: "..." });
     }
 
-    const newHistory = [...history, { role: 'user', content: prompt }];
+    const newHistory = [...history, { role: 'user' as const, content: prompt }];
 
     const mathTutorSystemPrompt = `Eres un erudito de las matemáticas, el mejor del mundo, y tu nombre es Geometra. Tu propósito es enseñar, no solo resolver. Eres paciente, alentador y extremadamente didáctico, funcionando como un tutor socrático.
 
@@ -265,15 +266,20 @@ Reglas estrictas de comportamiento:
     }
 
     const { output } = await ai.generate({
+      // Use confirmed working model and message structure
       model: 'googleai/gemini-2.5-flash',
       system: systemPrompt,
-      history: newHistory.slice(0, -1),
-      prompt: newHistory.slice(-1)[0].content,
+      messages: newHistory,
       output: {
         schema: MathAssistantOutputSchema,
       },
     });
 
     return output!;
+    } catch (e: any) {
+        // Log critical error with input context
+        console.error("CRITICAL ERROR IN FLOW:", e);
+        throw new Error(`Flow Error: ${e.message} | Query: ${JSON.stringify(input?.query).substring(0, 50)}...`);
+    }
   }
 );
