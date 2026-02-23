@@ -113,7 +113,7 @@ IMPORTANTE: Sé constructivo y alentador. Enfócate en cómo el estudiante puede
         prompt += `Proporciona un análisis completo de la tarea.`;
 
         const result = await generateWithFallback({
-            model: 'googleai/gemini-2.5-flash',
+            model: 'groq/llama-3.3-70b-versatile',
             system: systemPrompt,
             prompt,
             output: {

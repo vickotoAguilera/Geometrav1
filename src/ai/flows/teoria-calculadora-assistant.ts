@@ -95,7 +95,7 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     const prompt: Part[] = [{ text: promptText }];
      
     const { output } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash',
+      model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       history: conversationHistory, // Pasamos el historial limpio.
       prompt: prompt, // Pasamos la pregunta actual y el contexto.

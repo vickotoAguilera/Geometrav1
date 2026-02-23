@@ -1,15 +1,18 @@
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
+import { groq } from 'genkitx-groq';
 
-// Usar la primera API key (verificada como funcionando)
-const API_KEY = process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_GENAI_API_KEY_2;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-if (!API_KEY) {
-  console.error("❌ CRITICAL: GOOGLE_GENAI_API_KEY is missing in server environment!");
-  // We don't throw here to avoid build crashes, but the app will likely fail at runtime
+if (!GEMINI_API_KEY || !GROQ_API_KEY) {
+  console.error("❌ CRITICAL: GEMINI_API_KEY or GROQ_API_KEY is missing in server environment!");
 }
 
 export const ai = genkit({
-  plugins: [googleAI({ apiKey: API_KEY })],
-  model: 'googleai/gemini-2.5-flash',
+  plugins: [
+    googleAI({ apiKey: GEMINI_API_KEY }),
+    groq({ apiKey: GROQ_API_KEY })
+  ],
+  model: 'groq/llama-3.3-70b-versatile',
 });

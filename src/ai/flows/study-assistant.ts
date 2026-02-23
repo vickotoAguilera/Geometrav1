@@ -82,7 +82,7 @@ Reglas de comportamiento OBLIGATORIAS:
     const newHistory = [...history, { role: 'user', content: [{text: fullQuery}] }];
 
     const {output} = await ai.generate({
-      model: 'googleai/gemini-2.5-flash',
+      model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       history: newHistory.slice(0, -1),
       prompt: newHistory.slice(-1)[0].content,

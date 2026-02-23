@@ -267,7 +267,7 @@ Reglas estrictas de comportamiento:
 
     const { output } = await ai.generate({
       // Use confirmed working model and message structure
-      model: 'googleai/gemini-2.5-flash',
+      model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       messages: newHistory,
       output: {

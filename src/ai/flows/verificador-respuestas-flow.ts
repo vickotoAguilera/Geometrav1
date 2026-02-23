@@ -47,7 +47,7 @@ const verificadorRespuestaFlow = ai.defineFlow(
   async ({ preguntaId, respuestaUsuario, respuestaCorrecta }) => {
 
     const { output } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash',
+        model: 'groq/llama-3.3-70b-versatile',
         system: systemPrompt,
         prompt: `Analiza la siguiente respuesta:
         - Pregunta ID: ${preguntaId}

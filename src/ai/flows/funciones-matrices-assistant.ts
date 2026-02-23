@@ -72,7 +72,7 @@ const funcionesMatricesAssistantFlow = ai.defineFlow(
     }
      
     const { output } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash',
+      model: 'groq/llama-3.3-70b-versatile',
       system: dynamicSystemPrompt,
       history: history || undefined,
       prompt: prompt,
