@@ -10,6 +10,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import wav from 'wav';
 import { TextToSpeechInputSchema, TextToSpeechOutputSchema, TextToSpeechInput, TextToSpeechOutput } from './schemas/tts-schemas';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 
 export async function textToSpeech(input: TextToSpeechInput): Promise<TextToSpeechOutput> {
@@ -50,7 +51,7 @@ const textToSpeechFlow = ai.defineFlow(
     outputSchema: TextToSpeechOutputSchema,
   },
   async (query) => {
-    const { media } = await ai.generate({
+    const { media } = await generateWithFallback({
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],

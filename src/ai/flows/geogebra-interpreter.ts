@@ -1,5 +1,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 // Schema para comandos de GeoGebra
 const GeoGebraCommandSchema = z.object({
@@ -127,7 +128,7 @@ export const geogebraInterpreter = ai.defineFlow(
             },
         ];
 
-        const result = await ai.generate({
+        const result = await generateWithFallback({
             model: 'groq/llama-3.3-70b-versatile',
             system: SYSTEM_PROMPT,
             messages,

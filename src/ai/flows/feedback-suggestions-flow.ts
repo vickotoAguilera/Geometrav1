@@ -10,6 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { prepareR2FileForAI, generateFileContext } from '@/lib/r2-ai-integration';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 // Schema de entrada
 const FeedbackSuggestionsInputSchema = z.object({
@@ -108,7 +109,7 @@ Proporciona:
 
 Recuerda: La retroalimentación debe ser constructiva, específica y motivadora.`;
 
-        const { output } = await ai.generate({
+        const { output } = await generateWithFallback({
             model: 'groq/llama-3.3-70b-versatile',
             system: systemPrompt,
             prompt,

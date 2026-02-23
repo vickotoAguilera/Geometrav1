@@ -11,6 +11,7 @@ import { ai } from '@/ai/genkit';
 import { Part } from 'genkit';
 import { z } from 'genkit';
 import mammoth from 'mammoth';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 
 const MessageSchema = z.object({
@@ -265,7 +266,7 @@ Reglas estrictas de comportamiento:
         systemPrompt = mathTutorSystemPrompt;
     }
 
-    const { output } = await ai.generate({
+    const { output } = await generateWithFallback({
       // Use confirmed working model and message structure
       model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,

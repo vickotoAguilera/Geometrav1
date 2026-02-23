@@ -5,6 +5,7 @@
 
 import { ai } from '@/ai/genkit';
 import {
+import { generateWithFallback } from '@/ai/api-key-fallback';
   VerificadorRespuestaInputSchema,
   VerificadorRespuestaOutputSchema,
   type VerificadorRespuestaInput,
@@ -46,7 +47,7 @@ const verificadorRespuestaFlow = ai.defineFlow(
   },
   async ({ preguntaId, respuestaUsuario, respuestaCorrecta }) => {
 
-    const { output } = await ai.generate({
+    const { output } = await generateWithFallback({
         model: 'groq/llama-3.3-70b-versatile',
         system: systemPrompt,
         prompt: `Analiza la siguiente respuesta:

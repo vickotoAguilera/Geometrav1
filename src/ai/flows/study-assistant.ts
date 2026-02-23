@@ -10,6 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {Part} from 'genkit';
 import {z} from 'genkit';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'model']),
@@ -81,7 +82,7 @@ Reglas de comportamiento OBLIGATORIAS:
 
     const newHistory = [...history, { role: 'user', content: [{text: fullQuery}] }];
 
-    const {output} = await ai.generate({
+    const {output} = await generateWithFallback({
       model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       history: newHistory.slice(0, -1),

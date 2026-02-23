@@ -7,6 +7,7 @@
 import { ai } from '@/ai/genkit';
 import { Part } from 'genkit';
 import { 
+import { generateWithFallback } from '@/ai/api-key-fallback';
     FuncionesMatricesAssistantInputSchema,
     FuncionesMatricesAssistantOutputSchema,
     type FuncionesMatricesAssistantInput,
@@ -71,7 +72,7 @@ const funcionesMatricesAssistantFlow = ai.defineFlow(
       prompt.push({ text: fullQuery });
     }
      
-    const { output } = await ai.generate({
+    const { output } = await generateWithFallback({
       model: 'groq/llama-3.3-70b-versatile',
       system: dynamicSystemPrompt,
       history: history || undefined,

@@ -8,6 +8,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 // Schema para una pregunta de evaluación
 const EvaluationQuestionSchema = z.object({
@@ -123,7 +124,7 @@ ${gradeContext}
 
 IMPORTANTE: Genera EXACTAMENTE 24 preguntas, 4 por cada una de las 6 áreas.`;
 
-        const { output } = await ai.generate({
+        const { output } = await generateWithFallback({
             model: 'groq/llama-3.3-70b-versatile',
             system: systemPrompt,
             prompt: 'Genera el test de evaluación completo con 24 preguntas.',
@@ -178,7 +179,7 @@ ${JSON.stringify(questionsContext, null, 2)}
 
 Calcula el nivel del estudiante en cada área y proporciona un análisis completo.`;
 
-        const { output } = await ai.generate({
+        const { output } = await generateWithFallback({
             model: 'groq/llama-3.3-70b-versatile',
             system: systemPrompt,
             prompt,

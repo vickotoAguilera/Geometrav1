@@ -10,6 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {Part} from 'genkit';
 import {z} from 'genkit';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'model']),
@@ -68,7 +69,7 @@ const screenshotAssistantFlow = ai.defineFlow(
     const history = input.history || [];
     const newHistory = [...history, { role: 'user', content: prompt }];
     
-    const {output} = await ai.generate({
+    const {output} = await generateWithFallback({
       model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       history: newHistory.slice(0, -1),

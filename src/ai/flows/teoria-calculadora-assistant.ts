@@ -8,6 +8,7 @@
 import { ai } from '@/ai/genkit';
 import { Part } from 'genkit';
 import { 
+import { generateWithFallback } from '@/ai/api-key-fallback';
     TeoriaCalculadoraAssistantInputSchema,
     TeoriaCalculadoraAssistantOutputSchema,
     type TeoriaCalculadoraAssistantInput,
@@ -94,7 +95,7 @@ const teoriaCalculadoraAssistantFlow = ai.defineFlow(
     const promptText = `CONTEXTO DEL EJERCICIO ACTUAL:\n${contextoEjercicio}\n\nPREGUNTA O RESPUESTA DEL USUARIO: ${lastUserMessage}`;
     const prompt: Part[] = [{ text: promptText }];
      
-    const { output } = await ai.generate({
+    const { output } = await generateWithFallback({
       model: 'groq/llama-3.3-70b-versatile',
       system: systemPrompt,
       history: conversationHistory, // Pasamos el historial limpio.
