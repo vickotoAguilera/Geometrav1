@@ -7,17 +7,21 @@ import { ai } from '@/ai/genkit';
  */
 export async function generateWithFallback(params: {
     model: string;
-    prompt: string;
+    prompt?: string;
+    system?: string;
+    messages?: any[];
+    output?: any;
     config?: any;
+    tools?: any[];
+    [key: string]: any; // Allow any other standard Genkit parameters
 }) {
-    const { model, prompt, config } = params;
+    const { model, ...restParams } = params;
     
     // Si el flow pide explícitamente Gemini TTS, no hacemos fallback a Groq porque Groq no tiene voces.
     if (model.includes('tts')) {
         return await ai.generate({
             model: 'googleai/gemini-2.5-flash-preview-tts',
-            prompt,
-            config,
+            ...restParams,
         });
     }
 
@@ -28,8 +32,7 @@ export async function generateWithFallback(params: {
         const groqModel = 'groq/llama-3.3-70b-versatile';
         const result = await ai.generate({
             model: groqModel,
-            prompt,
-            config,
+            ...restParams,
         });
 
         return result;
@@ -41,8 +44,7 @@ export async function generateWithFallback(params: {
         // Fallback a Gemini
         return await ai.generate({
             model: 'googleai/gemini-2.5-flash',
-            prompt,
-            config,
+            ...restParams,
         });
     }
 }
