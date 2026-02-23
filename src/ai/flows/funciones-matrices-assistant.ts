@@ -6,8 +6,8 @@
 
 import { ai } from '@/ai/genkit';
 import { Part } from 'genkit';
-import { 
 import { generateWithFallback } from '@/ai/api-key-fallback';
+import { 
     FuncionesMatricesAssistantInputSchema,
     FuncionesMatricesAssistantOutputSchema,
     type FuncionesMatricesAssistantInput,
@@ -68,7 +68,7 @@ const funcionesMatricesAssistantFlow = ai.defineFlow(
     
     let fullQuery = userQuery;
     
-    if (fullQuery.trim()) {
+    if (fullQuery && fullQuery.trim()) {
       prompt.push({ text: fullQuery });
     }
      

@@ -4,8 +4,8 @@
  */
 
 import { ai } from '@/ai/genkit';
-import {
 import { generateWithFallback } from '@/ai/api-key-fallback';
+import {
   VerificadorRespuestaInputSchema,
   VerificadorRespuestaOutputSchema,
   type VerificadorRespuestaInput,

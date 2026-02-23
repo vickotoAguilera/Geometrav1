@@ -7,8 +7,8 @@
 
 import { ai } from '@/ai/genkit';
 import { Part } from 'genkit';
-import { 
 import { generateWithFallback } from '@/ai/api-key-fallback';
+import { 
     TeoriaCalculadoraAssistantInputSchema,
     TeoriaCalculadoraAssistantOutputSchema,
     type TeoriaCalculadoraAssistantInput,
