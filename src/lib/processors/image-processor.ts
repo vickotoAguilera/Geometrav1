@@ -31,7 +31,7 @@ export async function analyzeImageWithGemini(
 
         // Usar primera API key disponible
         const genAI = new GoogleGenerativeAI(API_KEYS[0] || process.env.GOOGLE_GENAI_API_KEY || '');
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
         const prompt = `Analiza esta imagen en detalle. Proporciona:
 1. Una descripción visual completa de lo que ves

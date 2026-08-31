@@ -42,8 +42,8 @@ export async function processPdfWithGoogleAI(
                 throw new Error('El procesamiento del PDF falló');
             }
 
-            // Usar Gemini 2.5 Flash para extraer el texto del PDF (soporta File API)
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+            // Usar Gemini 3.6 Flash para extraer el texto del PDF (soporta File API)
+            const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
             const result = await model.generateContent([
                 {

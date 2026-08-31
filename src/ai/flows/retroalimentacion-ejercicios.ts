@@ -6,7 +6,7 @@
  * Adaptado para usar Gemini directamente
  */
 
-import { getApiKey } from '@/lib/utils/api-key-fallback';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 interface ExerciseAnswer {
     questionId: string;
@@ -44,39 +44,17 @@ export async function generateExerciseFeedback(input: FeedbackInput): Promise<Fe
     const score = Math.round((correctAnswers / totalQuestions) * 100);
 
     try {
-        const apiKey = await getApiKey();
-
         // Crear prompt para la IA
         const prompt = createFeedbackPrompt(input, score);
 
-        console.log('🤖 [exercise-feedback] Generating feedback...');
+        console.log('🤖 [exercise-feedback] Generating feedback with Groq/Gemini fallback...');
         console.log(`📊 Score: ${score}% (${correctAnswers}/${totalQuestions})`);
 
-        // Llamar a Gemini
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 2048,
-                    },
-                }),
-            }
-        );
+        const result = await generateWithFallback({
+            prompt: [{ text: prompt }],
+        });
 
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const feedbackText = data.candidates[0].content.parts[0].text;
-
+        const feedbackText = result.text || '';
         console.log('✅ [exercise-feedback] Feedback generated successfully');
 
         // Parsear respuesta de la IA
@@ -306,8 +284,6 @@ export async function generateQuickFeedback(
     }
 
     try {
-        const apiKey = await getApiKey();
-
         const prompt = `Eres un tutor de matemáticas. Un estudiante respondió incorrectamente esta pregunta:
 
 Pregunta: ${question}
@@ -321,23 +297,11 @@ Genera un feedback breve (2-3 oraciones) que:
 
 Responde SOLO el feedback, sin formato adicional.`;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 200,
-                    },
-                }),
-            }
-        );
+        const result = await generateWithFallback({
+            prompt: [{ text: prompt }],
+        });
 
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+        return result.text || 'Revisa tu respuesta e intenta nuevamente. ¡Tú puedes!';
     } catch (error) {
         console.error('❌ Error generating quick feedback:', error);
         return 'Revisa tu respuesta e intenta nuevamente. ¡Tú puedes!';

@@ -4,10 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
-<<<<<<< HEAD
 .yarn/install-state.gz
-=======
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636
 
 # testing
 /coverage
@@ -39,7 +36,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-<<<<<<< HEAD
+# studio
+.idx
+.progress/
+
 # ============================================
 # ARCHIVOS DE PRESENTACIÓN Y DOCUMENTACIÓN
 # ============================================
@@ -85,10 +85,3 @@ FIREBASE_ADMIN_ENV.txt
 temp_*.txt
 abpro*.txt
 
-=======
-# studio
-.idx
-
-# script progress tracking
-.progress/
->>>>>>> 7eac5583c1b9fa73578cdd07b34238f755b8e636

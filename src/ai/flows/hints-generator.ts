@@ -2,7 +2,7 @@
 
 'use server';
 
-import { getApiKey } from '@/lib/utils/api-key-fallback';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 import type { DragDropExercise, FillInBlanksExercise } from '@/types/exercises';
 
 export interface ExerciseHint {
@@ -30,34 +30,13 @@ export async function generateHintsForExercise(
     const prompt = createHintsPrompt(exercise, userContext);
 
     try {
-        const apiKey = await getApiKey();
+        console.log('🤖 [hints-generator] Generating contextual hints with Groq/Gemini fallback...');
 
-        console.log('🤖 [hints-generator] Generating contextual hints...');
+        const result = await generateWithFallback({
+            prompt: [{ text: prompt }],
+        });
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1500,
-                    },
-                }),
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const hintsText = data.candidates[0].content.parts[0].text;
-
+        const hintsText = result.text || '';
         console.log('✅ [hints-generator] Contextual hints generated successfully');
 
         const hints = parseHintsResponse(hintsText);

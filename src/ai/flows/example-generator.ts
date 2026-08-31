@@ -5,7 +5,7 @@
  * Analiza un ejercicio y genera un ejemplo resuelto paso a paso
  */
 
-import { getApiKey } from '@/lib/utils/api-key-fallback';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 
 interface Exercise {
     id: string;
@@ -28,42 +28,22 @@ interface ExampleOutput {
  */
 export async function generateExampleForExercise(exercise: Exercise): Promise<ExampleOutput> {
     try {
-        const apiKey = await getApiKey();
-
         const systemPrompt = createSystemPrompt();
         const userPrompt = createUserPrompt(exercise);
 
-        console.log(`🤖 [example-generator] Generando ejemplo para: ${exercise.title}`);
+        console.log(`🤖 [example-generator] Generando ejemplo para: ${exercise.title} con Groq/Gemini fallback...`);
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1000,
-                    },
-                }),
-            }
-        );
+        const result = await generateWithFallback({
+            system: systemPrompt,
+            prompt: userPrompt,
+        });
 
-        if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const aiResponse = data.candidates[0].content.parts[0].text;
-
-        const result = parseAIResponse(aiResponse);
+        const aiResponse = result.text || '';
+        const parsed = parseAIResponse(aiResponse);
 
         console.log(`✅ [example-generator] Ejemplo generado exitosamente`);
 
-        return result;
+        return parsed;
     } catch (error) {
         console.error('❌ [example-generator] Error:', error);
         return {

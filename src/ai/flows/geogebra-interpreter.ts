@@ -4,7 +4,7 @@ import { generateWithFallback } from '@/ai/api-key-fallback';
 
 // Schema para comandos de GeoGebra
 const GeoGebraCommandSchema = z.object({
-    type: z.enum(['create', 'modify', 'question']).describe('Tipo de acción'),
+    type: z.enum(['create', 'modify', 'question', 'info', 'greeting', 'general', 'error']).describe('Tipo de acción'),
     commands: z.array(z.string()).describe('Comandos de GeoGebra a ejecutar'),
     message: z.string().describe('Mensaje para el usuario'),
     needsConfirmation: z.boolean().optional().describe('Si necesita confirmación del usuario'),
@@ -37,13 +37,14 @@ COMANDOS DE GEOGEBRA DISPONIBLES:
 - Etiquetas: ShowLabel(objeto, true) o ShowLabel(objeto, false)
 
 REGLAS IMPORTANTES:
-1. Si el usuario NO especifica coordenadas, genera coordenadas aleatorias visualmente agradables (entre -5 y 5)
-2. Para triángulos rectángulos, asegura que un ángulo sea exactamente 90° usando coordenadas apropiadas
-3. Después de crear la figura, EXPLICA qué hiciste y pregunta si quiere modificar coordenadas
-4. Los nombres de puntos deben ser letras mayúsculas (A, B, C, etc.)
-5. Responde en español de forma amigable y educativa
-6. USA PARÉNTESIS () NO CORCHETES []
-7. IMPORTANTE: Usa comandos en INGLÉS (Polygon, Circle, Segment, ShowLabel)
+1. Si el usuario solo saluda (ej: "hola", "buenas", "ayuda"), responde amablemente explicando qué figuras o construcciones puedes hacer (triángulos, círculos, funciones, polígonos, rectas, etc.), usa "type": "info" y "commands": [].
+2. Si el usuario NO especifica coordenadas para una figura, genera coordenadas numéricas visualmente agradables (entre -5 y 5)
+3. Para triángulos rectángulos, asegura que un ángulo sea exactamente 90° usando coordenadas apropiadas
+4. Después de crear la figura, EXPLICA qué hiciste y pregunta si quiere modificar coordenadas
+5. Los nombres de puntos deben ser letras mayúsculas (A, B, C, etc.)
+6. Responde en español de forma amigable y educativa
+7. USA PARÉNTESIS () NO CORCHETES []
+8. IMPORTANTE: Usa comandos en INGLÉS (Polygon, Circle, Segment, ShowLabel)
 
 EJEMPLOS:
 

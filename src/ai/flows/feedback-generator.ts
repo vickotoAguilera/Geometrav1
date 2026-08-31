@@ -1,6 +1,6 @@
 // Generador de retroalimentación con IA para ejercicios completados
 
-import { ai } from '@/ai/genkit';
+import { generateWithFallback } from '@/ai/api-key-fallback';
 import type { DragDropExercise, FillInBlanksExercise } from '@/types/exercises';
 
 type Exercise = DragDropExercise | FillInBlanksExercise;
@@ -81,62 +81,17 @@ Al final de la retroalimentación, SIEMPRE incluye una sección llamada "📚 Re
 
 Genera la retroalimentación en formato de texto claro y bien estructurado.`;
 
-        // Generar retroalimentación con IA usando llamada directa
-        console.log('🤖 [feedback-generator] Starting AI generation...');
-        console.log('📝 [feedback-generator] Prompt length:', prompt.length);
+        console.log('🤖 [feedback-generator] Generating feedback with Groq/Gemini fallback...');
 
-        const apiKey = process.env.GOOGLE_GENAI_API_KEY;
-        if (!apiKey) {
-            throw new Error('GOOGLE_GENAI_API_KEY no está configurada');
-        }
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-        const requestBody = {
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
-            }],
-            generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2048,
-            }
-        };
-
-        console.log('📡 [feedback-generator] Calling Gemini API...');
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
+        const result = await generateWithFallback({
+            prompt: [{ text: prompt }],
         });
 
-        console.log('📥 [feedback-generator] Response status:', response.status);
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ [feedback-generator] API error:', errorData);
-            throw new Error(`Gemini API error: ${errorData.error?.message || 'Unknown error'}`);
-        }
-
-        const data = await response.json();
-
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const feedbackText = data.candidates[0].content.parts[0].text;
-            console.log('✅ [feedback-generator] Feedback generated successfully');
-            console.log('📄 [feedback-generator] Response length:', feedbackText.length);
-            return feedbackText;
-        }
-
-        console.error('❌ [feedback-generator] No valid response from API');
-        return 'No se pudo generar retroalimentación.';
+        const feedbackText = result.text || 'No se pudo generar retroalimentación.';
+        console.log('✅ [feedback-generator] Feedback generated successfully');
+        return feedbackText;
     } catch (error) {
         console.error('❌ [feedback-generator] Error generating feedback:', error);
-        console.error('❌ [feedback-generator] Error type:', error instanceof Error ? error.constructor.name : typeof error);
-        console.error('❌ [feedback-generator] Error message:', error instanceof Error ? error.message : String(error));
-        console.error('❌ [feedback-generator] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
         throw new Error('No se pudo generar la retroalimentación. Por favor, intenta nuevamente.');
     }
 }
