@@ -1,10 +1,10 @@
 'use server';
 
-import { 
-    verificarRespuesta,
-    type VerificadorRespuestaInput,
-    type VerificadorRespuestaOutput
-} from '@/ai/flows/verificador-respuestas-flow';
+import { verificarRespuesta } from '@/ai/flows/verificador-respuestas-flow';
+import type { 
+    VerificadorRespuestaInput,
+    VerificadorRespuestaOutput
+} from '@/ai/flows/schemas/verificador-respuestas-schemas';
 
 /**
  * Llama al flujo de Genkit para verificar una respuesta de desarrollo.

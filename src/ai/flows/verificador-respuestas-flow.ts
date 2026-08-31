@@ -5,13 +5,9 @@
 
 import { ai } from '@/ai/genkit';
 import { generateWithFallback } from '@/ai/api-key-fallback';
-export {
+import {
   VerificadorRespuestaInputSchema,
   VerificadorRespuestaOutputSchema,
-  type VerificadorRespuestaInput,
-  type VerificadorRespuestaOutput,
-} from './schemas/verificador-respuestas-schemas';
-import {
   type VerificadorRespuestaInput,
   type VerificadorRespuestaOutput,
 } from './schemas/verificador-respuestas-schemas';
